@@ -14,5 +14,5 @@
 */
 
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+    return $router->app->version() . PHP_EOL . \Illuminate\Support\Str::random(32);
 });
