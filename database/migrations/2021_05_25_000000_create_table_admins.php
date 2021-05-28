@@ -18,7 +18,7 @@ class CreateTableAdmins extends Migration
             $table->string('name');
             $table->string('username')->unique();
             $table->string('password');
-            $table->unsignedTinyInteger('status');
+            $table->unsignedTinyInteger('status')->default(0)->comment('0:Disabled,1:Enabled');
             $table->timestamps();
         });
     }

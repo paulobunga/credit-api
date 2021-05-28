@@ -16,11 +16,14 @@ class CreateTableMerchants extends Migration
     {
         Schema::create('merchants', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('username')->unique();
+            $table->string('password');
             $table->uuid('merchant_id')->unique();
             $table->string('api_key');
             $table->json('api_whitelist')->default(new Expression('(JSON_ARRAY())'));;
             $table->string('callback_url');
-            $table->unsignedTinyInteger('status');
+            $table->unsignedTinyInteger('status')->default(0)->comment('0:Disabled,1:Enabled');
             $table->timestamps();
         });
     }
