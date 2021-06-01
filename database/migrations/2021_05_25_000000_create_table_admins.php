@@ -21,6 +21,14 @@ class CreateTableAdmins extends Migration
             $table->unsignedTinyInteger('status')->default(0)->comment('0:Disabled,1:Enabled');
             $table->timestamps();
         });
+
+        // insert default administrator
+        DB::table('admins')->insert([
+            'name' => 'administrator',
+            'username' => 'admin@gmail.com',
+            'password' => app('hash')->make('P@ssw0rd'),
+            'status' => 1,
+        ]);
     }
 
     /**

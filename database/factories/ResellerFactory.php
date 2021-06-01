@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Admin;
+use App\Models\Reseller;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AdminFactory extends Factory
@@ -12,7 +12,7 @@ class AdminFactory extends Factory
      *
      * @var string
      */
-    protected $model = Admin::class;
+    protected $model = Reseller::class;
 
     /**
      * Define the model's default state.
@@ -24,7 +24,7 @@ class AdminFactory extends Factory
         return [
             'name' => $this->faker->name,
             'username' => $this->faker->unique()->userName,
-            'password' => '123456',
+            'password' => $this->faker->password,
         ];
     }
 }

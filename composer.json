@@ -9,10 +9,12 @@
         "dingo/api": "dev-master",
         "doctrine/dbal": "^3.1",
         "laravel/lumen-framework": "^8.0",
-        "spatie/laravel-permission": "^4.0"
+        "spatie/laravel-permission": "^4.0",
+        "tymon/jwt-auth": "^1.0."
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
+        "flipbox/lumen-generator": "^8.2",
         "mockery/mockery": "^1.3.1",
         "phpunit/phpunit": "^9.3"
     },
