@@ -22,8 +22,10 @@ class CreateTableReportResellerFunds extends Migration
             $table->datetime('start_at');
             $table->datetime('end_at');
             $table->unsignedTinyInteger('type')
-                ->comment('0:Top up Credit,1: Deduct Credit, 2: Top up Coin, 3:Deduct Coin');
-            $table->decimal('amount', 14, 4);
+                ->comment('0:Weekly,1:Monthly');
+            $table->decimal('turnover', 14, 4);
+            $table->decimal('credit', 14, 4);
+            $table->decimal('coin', 14, 4);
             $table->timestamps();
         });
     }

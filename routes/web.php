@@ -18,7 +18,6 @@ $router->get('/', function () use ($router) {
 });
 
 $router->group([
-    // 'middleware' => 'admins',
     'prefix' => 'auth',
 ], function ($router) {
     $router->post('login', 'AuthController@login');
