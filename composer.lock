@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a4622850d9bd4673d599d188a7abdadf",
+    "content-hash": "5e40841783b4ac369c9c2508d01dc9ba",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -193,7 +193,7 @@
         },
         {
             "name": "dingo/api",
-            "version": "dev-master",
+            "version": "v3.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dingo/api.git",
@@ -231,7 +231,6 @@
             "suggest": {
                 "tymon/jwt-auth": "Protect your API with JSON Web Tokens."
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -411,40 +410,39 @@
         },
         {
             "name": "doctrine/cache",
-            "version": "1.10.2",
+            "version": "1.11.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/cache.git",
-                "reference": "13e3381b25847283a91948d04640543941309727"
+                "reference": "3bb5588cec00a0268829cc4a518490df6741af9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/cache/zipball/13e3381b25847283a91948d04640543941309727",
-                "reference": "13e3381b25847283a91948d04640543941309727",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/3bb5588cec00a0268829cc4a518490df6741af9d",
+                "reference": "3bb5588cec00a0268829cc4a518490df6741af9d",
                 "shasum": ""
             },
             "require": {
                 "php": "~7.1 || ^8.0"
             },
             "conflict": {
-                "doctrine/common": ">2.2,<2.4"
+                "doctrine/common": ">2.2,<2.4",
+                "psr/cache": ">=3"
             },
             "require-dev": {
                 "alcaeus/mongo-php-adapter": "^1.1",
-                "doctrine/coding-standard": "^6.0",
+                "cache/integration-tests": "dev-master",
+                "doctrine/coding-standard": "^8.0",
                 "mongodb/mongodb": "^1.1",
-                "phpunit/phpunit": "^7.0",
-                "predis/predis": "~1.0"
+                "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
+                "predis/predis": "~1.0",
+                "psr/cache": "^1.0 || ^2.0",
+                "symfony/cache": "^4.4 || ^5.2"
             },
             "suggest": {
                 "alcaeus/mongo-php-adapter": "Required to use legacy MongoDB driver"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.9.x-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Doctrine\\Common\\Cache\\": "lib/Doctrine/Common/Cache"
@@ -491,7 +489,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/cache/issues",
-                "source": "https://github.com/doctrine/cache/tree/1.10.x"
+                "source": "https://github.com/doctrine/cache/tree/1.11.3"
             },
             "funding": [
                 {
@@ -507,7 +505,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-07-07T18:54:01+00:00"
+            "time": "2021-05-25T09:01:55+00:00"
         },
         {
             "name": "doctrine/dbal",
@@ -3522,16 +3520,16 @@
         },
         {
             "name": "psr/cache",
-            "version": "3.0.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/cache.git",
-                "reference": "aa5030cfa5405eccfdcb1083ce040c2cb8d253bf"
+                "reference": "213f9dbc5b9bfbc4f8db86d2838dc968752ce13b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/cache/zipball/aa5030cfa5405eccfdcb1083ce040c2cb8d253bf",
-                "reference": "aa5030cfa5405eccfdcb1083ce040c2cb8d253bf",
+                "url": "https://api.github.com/repos/php-fig/cache/zipball/213f9dbc5b9bfbc4f8db86d2838dc968752ce13b",
+                "reference": "213f9dbc5b9bfbc4f8db86d2838dc968752ce13b",
                 "shasum": ""
             },
             "require": {
@@ -3565,9 +3563,9 @@
                 "psr-6"
             ],
             "support": {
-                "source": "https://github.com/php-fig/cache/tree/3.0.0"
+                "source": "https://github.com/php-fig/cache/tree/2.0.0"
             },
-            "time": "2021-02-03T23:26:27+00:00"
+            "time": "2021-02-03T23:23:37+00:00"
         },
         {
             "name": "psr/container",
@@ -3939,16 +3937,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "4.1.0",
+            "version": "4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "4a89dd3f083ddb89153367e6d087de3872c724ff"
+                "reference": "a6e4122b65094baba7f98df153af0768ef910c85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/4a89dd3f083ddb89153367e6d087de3872c724ff",
-                "reference": "4a89dd3f083ddb89153367e6d087de3872c724ff",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/a6e4122b65094baba7f98df153af0768ef910c85",
+                "reference": "a6e4122b65094baba7f98df153af0768ef910c85",
                 "shasum": ""
             },
             "require": {
@@ -4005,7 +4003,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-permission/issues",
-                "source": "https://github.com/spatie/laravel-permission/tree/4.1.0"
+                "source": "https://github.com/spatie/laravel-permission/tree/4.2.0"
             },
             "funding": [
                 {
@@ -4013,7 +4011,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-06-02T00:39:38+00:00"
+            "time": "2021-06-04T23:47:08+00:00"
         },
         {
             "name": "symfony/console",
@@ -7396,16 +7394,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.5.4",
+            "version": "9.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c73c6737305e779771147af66c96ca6a7ed8a741"
+                "reference": "89ff45ea9d70e35522fb6654a2ebc221158de276"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c73c6737305e779771147af66c96ca6a7ed8a741",
-                "reference": "c73c6737305e779771147af66c96ca6a7ed8a741",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/89ff45ea9d70e35522fb6654a2ebc221158de276",
+                "reference": "89ff45ea9d70e35522fb6654a2ebc221158de276",
                 "shasum": ""
             },
             "require": {
@@ -7435,7 +7433,7 @@
                 "sebastian/global-state": "^5.0.1",
                 "sebastian/object-enumerator": "^4.0.3",
                 "sebastian/resource-operations": "^3.0.3",
-                "sebastian/type": "^2.3",
+                "sebastian/type": "^2.3.2",
                 "sebastian/version": "^3.0.2"
             },
             "require-dev": {
@@ -7483,7 +7481,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.4"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.5"
             },
             "funding": [
                 {
@@ -7495,7 +7493,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-03-23T07:16:29+00:00"
+            "time": "2021-06-05T04:49:07+00:00"
         },
         {
             "name": "psy/psysh",
@@ -8429,16 +8427,16 @@
         },
         {
             "name": "sebastian/type",
-            "version": "2.3.1",
+            "version": "2.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/type.git",
-                "reference": "81cd61ab7bbf2de744aba0ea61fae32f721df3d2"
+                "reference": "0d1c587401514d17e8f9258a27e23527cb1b06c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/81cd61ab7bbf2de744aba0ea61fae32f721df3d2",
-                "reference": "81cd61ab7bbf2de744aba0ea61fae32f721df3d2",
+                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/0d1c587401514d17e8f9258a27e23527cb1b06c1",
+                "reference": "0d1c587401514d17e8f9258a27e23527cb1b06c1",
                 "shasum": ""
             },
             "require": {
@@ -8473,7 +8471,7 @@
             "homepage": "https://github.com/sebastianbergmann/type",
             "support": {
                 "issues": "https://github.com/sebastianbergmann/type/issues",
-                "source": "https://github.com/sebastianbergmann/type/tree/2.3.1"
+                "source": "https://github.com/sebastianbergmann/type/tree/2.3.2"
             },
             "funding": [
                 {
@@ -8481,7 +8479,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-10-26T13:18:59+00:00"
+            "time": "2021-06-04T13:02:07+00:00"
         },
         {
             "name": "sebastian/version",
@@ -8590,7 +8588,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "dingo/api": 20,
         "tymon/jwt-auth": 20
     },
     "prefer-stable": true,

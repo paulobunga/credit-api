@@ -60,6 +60,7 @@ $app->singleton(
  */
 
 $app->configure('app');
+$app->configure('api');
 $app->configure('cors');
 $app->configure('auth');
 $app->configure('permission');
@@ -101,6 +102,7 @@ $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+$app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 
@@ -121,6 +123,7 @@ $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
     require __DIR__ . '/../routes/web.php';
+    require __DIR__ . '/../routes/api.php';
 });
 
 return $app;
