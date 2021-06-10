@@ -8,9 +8,13 @@ use App\Transformers\AdminTransformer;
 
 class AdminController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('api.auth');
+    }
+
     public function index()
     {
-        throw new \Exception('test', 1234);
         return $this->response->item(Admin::first(), new AdminTransformer);
     }
 }

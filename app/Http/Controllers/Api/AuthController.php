@@ -9,7 +9,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        // $this->middleware('auth', ['except' => ['login']]);
+        $this->middleware('api.auth', ['except' => ['login']]);
     }
 
     /**

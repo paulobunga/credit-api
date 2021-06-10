@@ -16,10 +16,9 @@ class Json extends Base
     protected function encode($content)
     {
         $content['code'] = $content['code'] ?? $this->response->getStatusCode();
-        $content['message'] = $content['message']?? $content['error']?? 'success';
-        $this->response->setStatusCode(200);
-        $jsonEncodeOptions = [];
+        $content['message'] = $content['message'] ?? $content['error'] ?? 'success';
 
+        $jsonEncodeOptions = [];
         // Here is a place, where any available JSON encoding options, that
         // deal with users' requirements to JSON response formatting and
         // structure, can be conveniently applied to tweak the output.
@@ -37,7 +36,6 @@ class Json extends Base
                 $this->options['indent_style']
             );
         }
-
         return $encodedString;
     }
 }

@@ -13,18 +13,25 @@
 |
  */
 
+ 
 $api = app('Dingo\Api\Routing\Router');
 
-$api->version('v1', function (\Dingo\Api\Routing\Router $api) {
+$api->version(
+    'v1',
+    ['middleware' => 'api.throttle', 'limit' => 100, 'expires' => 5],
+    function (\Dingo\Api\Routing\Router $api) {
 
-    $api->group([
-        'middleware' => [],
-        'namespace' => 'App\Http\Controllers\Api',
-    ], function ($api) {
-        $api->post('/auth/login', 'AuthController@login');
-        $api->get('/admins', 'AdminController@index');
-        $api->post('/auth/logout', 'AuthController@logout');
-        $api->post('/auth/refresh', 'AuthController@refresh');
-        $api->post('/auth/me', 'AuthController@me');
-    });
-});
+        $api->group([
+            'middleware' => [],
+            'namespace' => 'App\Http\Controllers\Api',
+        ], function ($api) {
+            $api->post('/auth/login', 'AuthController@login');
+            $api->get('/admins', 'AdminController@index');
+            $api->post('/auth/logout', 'AuthController@logout');
+            $api->post('/auth/refresh', 'AuthController@refresh');
+            $api->post('/auth/me', 'AuthController@me');
+
+            $api->get('/permissions', 'PermissionController@index');
+        });
+    }
+);
