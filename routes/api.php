@@ -13,7 +13,7 @@
 |
  */
 
- 
+
 $api = app('Dingo\Api\Routing\Router');
 
 $api->version(
@@ -31,7 +31,22 @@ $api->version(
             $api->post('/auth/refresh', 'AuthController@refresh');
             $api->post('/auth/me', 'AuthController@me');
 
-            $api->get('/permissions', 'PermissionController@index');
+            $api->get('/permissions', [
+                'uses' => 'PermissionController@index',
+                'as' => 'permissions.index'
+            ]);
+            $api->post('/permissions/create', [
+                'uses' => 'PermissionController@create',
+                'as' => 'permissions.create'
+            ]);
+            $api->put('/permissions/{name}/edit', [
+                'uses' => 'PermissionController@edit',
+                'as' => 'permissions.edit'
+            ]);
+            $api->delete('/permissions/{name}/destroy', [
+                'uses' => 'PermissionController@destroy',
+                'as' => 'permissions.destroy'
+            ]);
         });
     }
 );

@@ -64,7 +64,7 @@ $app->configure('api');
 $app->configure('cors');
 $app->configure('auth');
 $app->configure('permission');
-
+$app->configure('query-builder');
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -104,6 +104,7 @@ $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
+$app->register(Spatie\QueryBuilder\QueryBuilderServiceProvider::class);
 
 $app->alias('cache', \Illuminate\Cache\CacheManager::class); // if you don't have this already
 

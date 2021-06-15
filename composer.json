@@ -6,12 +6,13 @@
     "type": "project",
     "require": {
         "php": "^7.3|^8.0",
+        "dingo/api": "^3.0.0",
         "doctrine/dbal": "^3.1",
         "fruitcake/laravel-cors": "^2.0",
         "laravel/lumen-framework": "^8.0",
         "spatie/laravel-permission": "^4.0",
-        "tymon/jwt-auth": "dev-develop",
-        "dingo/api": "^3.0.0"
+        "spatie/laravel-query-builder": "^3.4",
+        "tymon/jwt-auth": "dev-develop"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
