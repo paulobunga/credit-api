@@ -14,6 +14,11 @@ class RoleSeeder extends Seeder
      */
     public function run()
     {
-        Role::factory()->count(1)->create();
+        $role = Role::create(['name' => 'Super Admin']);
+        $role->givePermissionTo('permissions', 'roles', 'admins');
+        $role = Role::create(['name' => 'Market']);
+        $role->givePermissionTo('admins');
+        $role = Role::create(['name' => 'IT']);
+        $role->givePermissionTo('admins');
     }
 }

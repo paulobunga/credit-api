@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Permission;
 use Illuminate\Support\Facades\DB;
+use App\Models\Permission;
 
 class PermissionSeeder extends Seeder
 {
@@ -20,10 +20,11 @@ class PermissionSeeder extends Seeder
                 continue;
             }
             if (!Permission::where('name', 'like', $table)->count()) {
-                Permission::create(['name' => "create_$table"]);
-                Permission::create(['name' => "edit_$table"]);
-                Permission::create(['name' => "view_$table"]);
-                Permission::create(['name' => "delete_$table"]);
+                Permission::firstOrCreate(['name' => "$table"]);
+                Permission::firstOrCreate(['name' => "$table.index"]);
+                Permission::firstOrCreate(['name' => "$table.create"]);
+                Permission::firstOrCreate(['name' => "$table.edit"]);
+                Permission::firstOrCreate(['name' => "$table.destroy"]);
             }
         }
     }

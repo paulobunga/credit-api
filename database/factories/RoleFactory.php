@@ -23,8 +23,6 @@ class RoleFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'username' => $this->faker->unique()->userName,
-            'password' => '123456',
         ];
     }
 }

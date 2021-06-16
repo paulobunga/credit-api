@@ -14,6 +14,9 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-        Admin::factory()->count(1)->create();
+        $admin = Admin::factory()->count(1)->create()->first();
+        $admin->assignRole('Market');
+        $admin = Admin::factory()->count(1)->create()->first();
+        $admin->assignRole('IT');
     }
 }

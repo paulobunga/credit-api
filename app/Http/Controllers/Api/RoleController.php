@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class PermissionController extends Controller
+class RoleController extends Controller
 {
-    protected $model = \App\Models\Permission::class;
-    protected $transformer = \App\Transformers\PermissionTransformer::class;
+    protected $model = \App\Models\Role::class;
+    protected $transformer = \App\Transformers\RoleTransformer::class;
 
     public function __construct()
     {
@@ -19,10 +19,10 @@ class PermissionController extends Controller
 
     public function index()
     {
-        $permissions = QueryBuilder::for($this->model)
+        $roles = QueryBuilder::for($this->model)
             ->allowedFilters(['name'])
             ->paginate($this->perPage);
-        return $this->response->withPaginator($permissions, $this->transformer);
+        return $this->response->withPaginator($roles, $this->transformer);
     }
 
     public function create(Request $request)
@@ -31,16 +31,16 @@ class PermissionController extends Controller
             'name' => 'required'
         ]);
 
-        $permission = $this->model::create([
+        $role = $this->model::create([
             'name' => $request->name
         ]);
-        return $this->response->item($permission, $this->transformer);
+        return $this->response->item($role, $this->transformer);
     }
 
     public function destroy(String $name)
     {
-        $permission = $this->model::where('name', $name)->firstOrFail();
-        $permission->delete();
+        $role = $this->model::where('name', $name)->firstOrFail();
+        $role->delete();
         return [
             'message' => 'success'
         ];
@@ -49,10 +49,10 @@ class PermissionController extends Controller
     public function edit(Request $request, String $name)
     {
         $this->validate($request, [
-            'name' => 'required|unique:permissions'
+            'name' => 'required|unique:roles'
         ]);
-        $permission = $this->model::where('name', $name)->firstOrFail();
-        $permission->update([
+        $role = $this->model::where('name', $name)->firstOrFail();
+        $role->update([
             'name' => $request->name
         ]);
         return [

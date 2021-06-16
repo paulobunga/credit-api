@@ -16,6 +16,26 @@
 
 $api = app('Dingo\Api\Routing\Router');
 
+function resource($api, $uri, $controller, $optional = '{name}')
+{
+    $api->get("/{$uri}", [
+        'uses' => "{$controller}@index",
+        'as' => "{$uri}.index"
+    ]);
+    $api->post("/$uri/create", [
+        'uses' => "{$controller}@create",
+        'as' => "{$uri}.create"
+    ]);
+    $api->put("/{$uri}/{$optional}/edit", [
+        'uses' => "{$controller}@edit",
+        'as' => "{$uri}.edit"
+    ]);
+    $api->delete("/{$uri}/{$optional}/destroy", [
+        'uses' => "{$controller}@destroy",
+        'as' => "{$uri}.destroy"
+    ]);
+};
+
 $api->version(
     'v1',
     ['middleware' => 'api.throttle', 'limit' => 100, 'expires' => 5],
@@ -26,27 +46,13 @@ $api->version(
             'namespace' => 'App\Http\Controllers\Api',
         ], function ($api) {
             $api->post('/auth/login', 'AuthController@login');
-            $api->get('/admins', 'AdminController@index');
             $api->post('/auth/logout', 'AuthController@logout');
             $api->post('/auth/refresh', 'AuthController@refresh');
             $api->post('/auth/me', 'AuthController@me');
 
-            $api->get('/permissions', [
-                'uses' => 'PermissionController@index',
-                'as' => 'permissions.index'
-            ]);
-            $api->post('/permissions/create', [
-                'uses' => 'PermissionController@create',
-                'as' => 'permissions.create'
-            ]);
-            $api->put('/permissions/{name}/edit', [
-                'uses' => 'PermissionController@edit',
-                'as' => 'permissions.edit'
-            ]);
-            $api->delete('/permissions/{name}/destroy', [
-                'uses' => 'PermissionController@destroy',
-                'as' => 'permissions.destroy'
-            ]);
+            resource($api, 'permissions', 'PermissionController');
+            resource($api, 'roles', 'RoleController');
+            resource($api, 'admins', 'AdminController');
         });
     }
 );
