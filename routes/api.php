@@ -16,7 +16,7 @@
 
 $api = app('Dingo\Api\Routing\Router');
 
-function resource($api, $uri, $controller, $optional = '{name}')
+function resource($api, $uri, $controller, $optional = '{id}')
 {
     $api->get("/{$uri}", [
         'uses' => "{$controller}@index",
@@ -50,9 +50,10 @@ $api->version(
             $api->post('/auth/refresh', 'AuthController@refresh');
             $api->post('/auth/me', 'AuthController@me');
 
-            resource($api, 'permissions', 'PermissionController');
-            resource($api, 'roles', 'RoleController');
-            resource($api, 'admins', 'AdminController');
+            resource($api, 'permissions', 'PermissionController', '{name}');
+            resource($api, 'roles', 'RoleController', '{name}');
+            resource($api, 'admins', 'AdminController', '{name}');
+            resource($api, 'admin_white_lists', 'AdminWhiteListController');
         });
     }
 );

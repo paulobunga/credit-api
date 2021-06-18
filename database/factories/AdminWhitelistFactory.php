@@ -4,14 +4,14 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class AdminFactory extends Factory
+class AdminWhiteListFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = \App\Models\Admin::class;
+    protected $model = \App\Models\AdminWhiteList::class;
 
     /**
      * Define the model's default state.
@@ -21,10 +21,8 @@ class AdminFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name,
-            'username' => $this->faker->unique()->userName,
-            'password' => '123456',
-            'status' => rand(0, 1),
+            'ip' => $this->faker->ipv4,
+            'status' => $this->faker->boolean,
         ];
     }
 }

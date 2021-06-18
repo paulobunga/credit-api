@@ -14,4 +14,11 @@ abstract class Controller extends BaseController
     {
         $this->perPage = min(request()->get('per_page', 10), 100);
     }
+
+    protected function success()
+    {
+        return [
+            'message' => 'success'
+        ];
+    }
 }

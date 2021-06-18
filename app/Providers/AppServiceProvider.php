@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Throwable;
-use Dingo\Api\Http\Response;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,6 +13,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
     }
 }

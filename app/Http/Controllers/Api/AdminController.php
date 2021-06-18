@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller as Controller;
+use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -22,7 +22,7 @@ class AdminController extends Controller
     {
         $admins = QueryBuilder::for($this->model)
             ->allowedFilters([
-                AllowedFilter::custom('name', new \App\Http\Filters\AdminFilter)
+                AllowedFilter::custom('name', new \App\Http\Filters\AdminFilter),
             ])
             ->paginate($this->perPage);
         return $this->response->withPaginator($admins, $this->transformer);
@@ -47,22 +47,20 @@ class AdminController extends Controller
     {
         $admin = $this->model::where('name', $name)->firstOrFail();
         $admin->delete();
-        return [
-            'message' => 'success'
-        ];
+        return $this->success();
     }
 
     public function edit(Request $request, String $name)
     {
-        $this->validate($request, [
-            'name' => 'required|unique:admins'
-        ]);
         $admin = $this->model::where('name', $name)->firstOrFail();
-        $admin->update([
-            'name' => $request->name
+        $this->validate($request, [
+            'name' => "required|unique:admins,name,{$admin->id}",
+            'username' => "required|unique:admins,username,{$admin->id}"
         ]);
-        return [
-            'message' => 'success'
-        ];
+        $admin->update([
+            'name' => $request->name,
+            'username' => $request->username,
+        ]);
+        return $this->success();
     }
 }
