@@ -10,32 +10,29 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Lumen\Auth\Authorizable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Trait\HasJWTSubject;
 
-class Merchant extends Model implements AuthenticatableContract, AuthorizableContract
+class Merchant extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
-    use Authenticatable, Authorizable, HasFactory;
+    use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
+        'name',
+        'username',
+        'password',
         'api_whitelist',
         'callback_url',
         'status',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
     protected $casts = [
         'api_whitelist' => 'array',
+        'status' => 'boolean',
     ];
 
-    function __construct(array $attributes = array()){
+    public function __construct(array $attributes = [])
+    {
         parent::__construct($attributes);
         $this->merchant_id = Str::uuid();
         $this->api_key = Str::random(255);

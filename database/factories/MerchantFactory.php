@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Merchant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MerchantFactory extends Factory
@@ -12,7 +11,7 @@ class MerchantFactory extends Factory
      *
      * @var string
      */
-    protected $model = Merchant::class;
+    protected $model = \App\Models\Merchant::class;
 
     /**
      * Define the model's default state.

@@ -23,7 +23,7 @@ class CreateTableMerchants extends Migration
             $table->string('api_key');
             $table->json('api_whitelist')->default(new Expression('(JSON_ARRAY())'));;
             $table->string('callback_url');
-            $table->unsignedTinyInteger('status')->default(0)->comment('0:Disabled,1:Enabled');
+            $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
             $table->timestamps();
         });
     }

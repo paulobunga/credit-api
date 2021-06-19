@@ -31,14 +31,16 @@ class AdminController extends Controller
     public function create(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required',
-            'username' => 'required',
-            'password' => 'required'
+            'name' => 'required|unique:admins,name',
+            'username' => 'required|unique:admins,username',
+            'password' => 'required|confirmed',
+            'status' => 'boolean'
         ]);
         $admin = $this->model::create([
             'name' => $request->name,
             'username' => $request->username,
-            'password' => $request->password
+            'password' => $request->password,
+            'status' => $request->status,
         ]);
         return $this->response->item($admin, $this->transformer);
     }
@@ -55,11 +57,13 @@ class AdminController extends Controller
         $admin = $this->model::where('name', $name)->firstOrFail();
         $this->validate($request, [
             'name' => "required|unique:admins,name,{$admin->id}",
-            'username' => "required|unique:admins,username,{$admin->id}"
+            'username' => "required|unique:admins,username,{$admin->id}",
+            'status' => 'boolean'
         ]);
         $admin->update([
             'name' => $request->name,
             'username' => $request->username,
+            'status' => $request->status,
         ]);
         return $this->success();
     }

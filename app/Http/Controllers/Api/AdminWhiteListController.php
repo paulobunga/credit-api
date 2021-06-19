@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
+use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 
@@ -33,7 +34,16 @@ class AdminWhiteListController extends Controller
     {
         $this->validate($request, [
             'admin_id' => 'required|exists:admins,id',
-            'ip' => 'required|ipv4',
+            'ip' => [
+                'required',
+                'ipv4',
+                Rule::unique('admin_white_lists')->where(function ($query) use ($request) {
+                    return $query->where([
+                        'admin_id' => $request->admin_id,
+                        'ip' => $request->ip
+                    ]);
+                }),
+            ],
             'status' => 'boolean',
         ]);
         $admin_white_list = $this->model::create([
@@ -55,7 +65,16 @@ class AdminWhiteListController extends Controller
     {
         $this->validate($request, [
             'admin_id' => 'required|exists:admins,id',
-            'ip' => 'required|ipv4',
+            'ip' => [
+                'required',
+                'ipv4',
+                Rule::unique('admin_white_lists')->where(function ($query) use ($request) {
+                    return $query->where([
+                        'admin_id' => $request->admin_id,
+                        'ip' => $request->ip
+                    ]);
+                }),
+            ],
             'status' => 'boolean'
         ]);
         $admin_white_list = $this->model::findOrFail($id);

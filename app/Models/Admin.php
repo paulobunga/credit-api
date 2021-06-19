@@ -17,11 +17,7 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
 {
     use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
     use HasRoles;
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+
     protected $fillable = [
         'name',
         'username',
@@ -29,15 +25,14 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
         'status',
     ];
 
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password',
     ];
 
+    protected $casts = [
+        'status' => 'boolean',
+    ];
+    
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;
