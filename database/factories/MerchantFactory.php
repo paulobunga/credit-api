@@ -28,7 +28,8 @@ class MerchantFactory extends Factory
                 $this->faker->ipv4,
                 $this->faker->ipv4,
             ],
-            'callback_url' => $this->faker->url
+            'callback_url' => $this->faker->url,
+            'status' => $this->faker->boolean,
         ];
     }
 }

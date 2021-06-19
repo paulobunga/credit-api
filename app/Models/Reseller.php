@@ -30,6 +30,10 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         'password',
     ];
 
+    protected $casts = [
+        'status' => 'boolean',
+    ];
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;

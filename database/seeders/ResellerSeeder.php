@@ -13,6 +13,6 @@ class ResellerSeeder extends Seeder
      */
     public function run()
     {
-        //
+        \App\Models\Reseller::factory()->count(1)->create();
     }
 }

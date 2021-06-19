@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Merchant;
 
 class MerchantSeeder extends Seeder
 {
@@ -14,6 +13,6 @@ class MerchantSeeder extends Seeder
      */
     public function run()
     {
-        Merchant::factory()->count(1)->create();
+        \App\Models\Merchant::factory()->count(3)->create();
     }
 }

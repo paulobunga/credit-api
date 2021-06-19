@@ -55,6 +55,7 @@ $api->version(
             resource($api, 'admins', 'AdminController', '{name}');
             resource($api, 'admin_white_lists', 'AdminWhiteListController');
             resource($api, 'merchants', 'MerchantController', '{name}');
+            resource($api, 'resellers', 'ResellerController', '{name}');
         });
     }
 );

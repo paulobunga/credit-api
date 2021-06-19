@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             AdminWhiteListSeeder::class,
             ResellerSeeder::class,
             MerchantSeeder::class,
+            ResellerSeeder::class
         ]);
     }
 }

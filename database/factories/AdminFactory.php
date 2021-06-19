@@ -24,7 +24,7 @@ class AdminFactory extends Factory
             'name' => $this->faker->name,
             'username' => $this->faker->unique()->userName,
             'password' => '123456',
-            'status' => rand(0, 1),
+            'status' => $this->faker->boolean,
         ];
     }
 }
