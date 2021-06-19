@@ -18,9 +18,11 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminSeeder::class,
             AdminWhiteListSeeder::class,
+            BankSeeder::class,
             ResellerSeeder::class,
+            ResellerBankCardSeeder::class,
             MerchantSeeder::class,
-            ResellerSeeder::class
+            MerchantDepositSeeder::class
         ]);
     }
 }

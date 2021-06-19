@@ -18,21 +18,22 @@ $api = app('Dingo\Api\Routing\Router');
 
 function resource($api, $uri, $controller, $optional = '{id}')
 {
+    $alias = str_replace('/', '.', $uri);
     $api->get("/{$uri}", [
         'uses' => "{$controller}@index",
-        'as' => "{$uri}.index"
+        'as' => "{$alias}.index"
     ]);
     $api->post("/$uri/create", [
         'uses' => "{$controller}@create",
-        'as' => "{$uri}.create"
+        'as' => "{$alias}.create"
     ]);
     $api->put("/{$uri}/{$optional}/edit", [
         'uses' => "{$controller}@edit",
-        'as' => "{$uri}.edit"
+        'as' => "{$alias}.edit"
     ]);
     $api->delete("/{$uri}/{$optional}/destroy", [
         'uses' => "{$controller}@destroy",
-        'as' => "{$uri}.destroy"
+        'as' => "{$alias}.destroy"
     ]);
 };
 
@@ -55,7 +56,9 @@ $api->version(
             resource($api, 'admins', 'AdminController', '{name}');
             resource($api, 'admin_white_lists', 'AdminWhiteListController');
             resource($api, 'merchants', 'MerchantController', '{name}');
+            resource($api, 'merchant/deposits', 'MerchantDepositController', '{name}');
             resource($api, 'resellers', 'ResellerController', '{name}');
+            resource($api, 'reseller/deposits', 'ResellerDepositController', '{name}');
         });
     }
 );

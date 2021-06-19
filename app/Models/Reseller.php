@@ -34,6 +34,11 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         'status' => 'boolean',
     ];
 
+    public function bankCards()
+    {
+        return $this->hasMany(ResellerBankCard::class);
+    }
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;

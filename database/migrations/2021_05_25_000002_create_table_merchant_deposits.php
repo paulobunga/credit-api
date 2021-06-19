@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTableDeposits extends Migration
+class CreateTableMerchantDeposits extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,9 @@ class CreateTableDeposits extends Migration
      */
     public function up()
     {
-        Schema::create('deposits', function (Blueprint $table) {
+        Schema::create('merchant_deposits', function (Blueprint $table) {
             $table->id();
-            $table->string('order_id');
             $table->foreignId('merchant_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->string('merchant_order_id');
-            $table->foreignId('reseller_id')
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
@@ -29,6 +23,8 @@ class CreateTableDeposits extends Migration
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->string('order_id');
+            $table->string('merchant_order_id');
             $table->decimal('amount', 14, 4);
             $table->unsignedTinyInteger('status')
                   ->comment('1:Created,2:Waiting to Approve,3:Approved,4:Rejected,5:Enforced,6:Canceled');
@@ -45,6 +41,6 @@ class CreateTableDeposits extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('deposits');
+        Schema::dropIfExists('merchant_deposits');
     }
 }

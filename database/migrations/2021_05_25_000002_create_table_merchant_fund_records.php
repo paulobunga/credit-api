@@ -15,11 +15,7 @@ class CreateTableMerchantFundRecords extends Migration
     {
         Schema::create('merchant_fund_records', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('merchant_id')
-                  ->constrained()
-                  ->onUpdate('cascade')
-                  ->onDelete('cascade');
-            $table->foreignId('deposit_id')
+            $table->foreignId('merchant_deposit_id')
                   ->constrained()
                   ->onUpdate('cascade')
                   ->onDelete('cascade');

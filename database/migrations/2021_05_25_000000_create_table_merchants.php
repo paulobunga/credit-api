@@ -21,7 +21,7 @@ class CreateTableMerchants extends Migration
             $table->string('password');
             $table->uuid('merchant_id')->unique();
             $table->string('api_key');
-            $table->json('api_whitelist')->default(new Expression('(JSON_ARRAY())'));;
+            $table->json('api_whitelist')->default(new Expression('(JSON_ARRAY())'));
             $table->string('callback_url');
             $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
             $table->timestamps();

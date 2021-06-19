@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Query\Expression;
 
 class CreateTableResellerBankCards extends Migration
 {
@@ -24,9 +25,9 @@ class CreateTableResellerBankCards extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->unsignedTinyInteger('type')->comment('0:Bank Account,1:UPI,2:Wallet');
-            $table->string('account_name', 16);
+            $table->string('account_name', 64);
             $table->string('account_no', 64);
-            $table->json('info');
+            $table->json('info')->default(new Expression('(JSON_ARRAY())'));
             $table->unsignedTinyInteger('status')->default(1)->comment('0:Disabled,1:Enabled');
             $table->timestamps();
         });
