@@ -20,9 +20,12 @@ class DatabaseSeeder extends Seeder
             AdminWhiteListSeeder::class,
             BankSeeder::class,
             ResellerSeeder::class,
+            ResellerDepositSeeder::class,
+            ResellerWithdrawalSeeder::class,
             ResellerBankCardSeeder::class,
             MerchantSeeder::class,
-            MerchantDepositSeeder::class
+            MerchantDepositSeeder::class,
+            MerchantWithdrawalSeeder::class
         ]);
     }
 }

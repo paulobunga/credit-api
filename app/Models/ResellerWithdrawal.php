@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class MerchantWithdrawal extends Model
+class ResellerWithdrawal extends Model
 {
     use HasFactory;
 
-    public function merchant()
+    public function reseller()
     {
-        return $this->belongsTo(Merchant::class);
+        return $this->belongsTo(Reseller::class);
     }
 }

@@ -4,14 +4,14 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class MerchantWithdrawalFactory extends Factory
+class ResellerWithdrawalFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = \App\Models\MerchantWithdrawal::class;
+    protected $model = \App\Models\ResellerWithdrawal::class;
 
     /**
      * Define the model's default state.

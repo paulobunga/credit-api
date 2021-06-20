@@ -10,6 +10,7 @@ class MerchantDepositTransformer extends TransformerAbstract
     {
         return [
             'id' => $merchant_deposit->id,
+            'name' => $merchant_deposit->merchant->name,
             'order_id' => $merchant_deposit->order_id,
             'merchant_order_id' => $merchant_deposit->merchant_order_id,
             'amount' => $merchant_deposit->amount,

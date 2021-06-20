@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTableMerchantWithdrawals extends Migration
+class CreateTableResellerWithdrawals extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateTableMerchantWithdrawals extends Migration
      */
     public function up()
     {
-        Schema::create('merchant_withdrawals', function (Blueprint $table) {
+        Schema::create('reseller_withdrawals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('merchant_id')
+            $table->foreignId('reseller_id')
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
@@ -34,6 +34,6 @@ class CreateTableMerchantWithdrawals extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('merchant_withdrawals');
+        Schema::dropIfExists('reseller_withdrawals');
     }
 }

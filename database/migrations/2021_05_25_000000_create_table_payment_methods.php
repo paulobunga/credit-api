@@ -16,10 +16,22 @@ class CreateTablePaymentMethods extends Migration
         // By Cash, By Bank Transfer, By Other
         Schema::create('payment_methods', function (Blueprint $table) {
             $table->id();
-            $table->string('ident', 16);
-            $table->string('name', 32);
+            $table->string('name', 64);
             $table->timestamps();
         });
+        // insert data
+        $methods = [
+            'BY_CASH',
+            'BY_BANK_TRANSFER',
+            'BY_CREDIT_CARD',
+            'BY_WALLET',
+            'BY_OTHER'
+        ];
+        foreach ($methods as $method) {
+            DB::table('payment_methods')->insert([
+                'name' => $method,
+            ]);
+        }
     }
 
     /**

@@ -57,8 +57,10 @@ $api->version(
             resource($api, 'admin_white_lists', 'AdminWhiteListController');
             resource($api, 'merchants', 'MerchantController', '{name}');
             resource($api, 'merchant/deposits', 'MerchantDepositController', '{name}');
+            resource($api, 'merchant/withdrawals', 'MerchantWithdrawalController', '{name}');
             resource($api, 'resellers', 'ResellerController', '{name}');
             resource($api, 'reseller/deposits', 'ResellerDepositController', '{name}');
+            resource($api, 'reseller/withdrawals', 'ResellerWithdrawalController', '{name}');
         });
     }
 );
