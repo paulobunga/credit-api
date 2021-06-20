@@ -8,10 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Bank extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'ident',
         'name',
         'status'
+    ];
+
+    protected $casts = [
+        'status' => 'boolean',
     ];
 }

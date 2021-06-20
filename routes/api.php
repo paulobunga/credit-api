@@ -53,6 +53,7 @@ $api->version(
 
             resource($api, 'permissions', 'PermissionController', '{name}');
             resource($api, 'roles', 'RoleController', '{name}');
+            resource($api, 'banks', 'BankController');
             resource($api, 'admins', 'AdminController', '{name}');
             resource($api, 'admin_white_lists', 'AdminWhiteListController');
             resource($api, 'merchants', 'MerchantController', '{name}');
