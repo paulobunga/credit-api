@@ -60,6 +60,7 @@ $api->version(
             resource($api, 'merchant/deposits', 'MerchantDepositController', '{name}');
             resource($api, 'merchant/withdrawals', 'MerchantWithdrawalController', '{name}');
             resource($api, 'resellers', 'ResellerController', '{name}');
+            resource($api, 'reseller/bank_cards', 'ResellerBankCardController');
             resource($api, 'reseller/deposits', 'ResellerDepositController', '{name}');
             resource($api, 'reseller/withdrawals', 'ResellerWithdrawalController', '{name}');
         });
