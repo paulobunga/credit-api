@@ -22,10 +22,12 @@ class DatabaseSeeder extends Seeder
             ResellerSeeder::class,
             ResellerDepositSeeder::class,
             ResellerWithdrawalSeeder::class,
+            ResellerFundRecordSeeder::class,
             ResellerBankCardSeeder::class,
             MerchantSeeder::class,
             MerchantDepositSeeder::class,
-            MerchantWithdrawalSeeder::class
+            MerchantWithdrawalSeeder::class,
+            MerchantFundRecordSeeder::class,
         ]);
     }
 }

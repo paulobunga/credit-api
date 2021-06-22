@@ -13,4 +13,9 @@ class MerchantWithdrawal extends Model
     {
         return $this->belongsTo(Merchant::class);
     }
+
+    public function fundRecords()
+    {
+        return $this->morphMany('App\Models\MerchantFundRecord', 'fundable');
+    }
 }

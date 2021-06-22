@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Query\Expression;
 
 class CreateTableMerchantFundRecords extends Migration
 {
@@ -15,14 +16,11 @@ class CreateTableMerchantFundRecords extends Migration
     {
         Schema::create('merchant_fund_records', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('merchant_deposit_id')
-                  ->constrained()
-                  ->onUpdate('cascade')
-                  ->onDelete('cascade');
+            $table->morphs('fundable');
             $table->unsignedTinyInteger('type')
-                ->comment('0:Top up Credit,1:Transaction Fee');
+                ->comment('0:Top up Credit,2:Withdraw Credit');
             $table->decimal('amount', 14, 4);
-            $table->json('info');
+            $table->json('info')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamp('created_at');
         });
     }

@@ -13,4 +13,9 @@ class ResellerWithdrawal extends Model
     {
         return $this->belongsTo(Reseller::class);
     }
+
+    public function fundRecords()
+    {
+        return $this->morphMany('App\Models\ResellerFundRecord', 'fundable');
+    }
 }

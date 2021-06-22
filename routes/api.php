@@ -56,13 +56,17 @@ $api->version(
             resource($api, 'banks', 'BankController');
             resource($api, 'admins', 'AdminController', '{name}');
             resource($api, 'admin_white_lists', 'AdminWhiteListController');
+            
             resource($api, 'merchants', 'MerchantController', '{name}');
             resource($api, 'merchant/deposits', 'MerchantDepositController', '{name}');
             resource($api, 'merchant/withdrawals', 'MerchantWithdrawalController', '{name}');
+            resource($api, 'merchant/fund_records', 'MerchantFundRecordController', '{name}');
+
             resource($api, 'resellers', 'ResellerController', '{name}');
             resource($api, 'reseller/bank_cards', 'ResellerBankCardController');
             resource($api, 'reseller/deposits', 'ResellerDepositController', '{name}');
             resource($api, 'reseller/withdrawals', 'ResellerWithdrawalController', '{name}');
+            resource($api, 'reseller/fund_records', 'ResellerFundRecordController', '{name}');
         });
     }
 );

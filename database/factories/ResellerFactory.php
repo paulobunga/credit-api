@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Reseller;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ResellerFactory extends Factory
@@ -12,7 +11,7 @@ class ResellerFactory extends Factory
      *
      * @var string
      */
-    protected $model = Reseller::class;
+    protected $model = \App\Models\Reseller::class;
 
     /**
      * Define the model's default state.
@@ -29,7 +28,7 @@ class ResellerFactory extends Factory
             'credit' => $this->faker->numberBetween(1, 1000),
             'coin' => $this->faker->numberBetween(1, 1000),
             'transaction_fee' => $this->faker->randomFloat(4, 0, 1),
-            'pending_limit' => rand(1, 5),
+            'pending_limit' => $this->faker->numberBetween(1, 5),
             'status' => $this->faker->boolean,
         ];
     }

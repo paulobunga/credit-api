@@ -15,14 +15,7 @@ class CreateTableResellerFundRecords extends Migration
     {
         Schema::create('reseller_fund_records', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('reseller_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->foreignId('reseller_deposit_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+            $table->morphs('fundable');
             $table->unsignedTinyInteger('type')
                 ->comment('0:Top up Credit,1: Deduct Credit, 2: Top up Coin, 3:Deduct Coin');
             $table->decimal('amount', 14, 4);
