@@ -58,6 +58,10 @@ $api->version(
             resource($api, 'admin_white_lists', 'AdminWhiteListController');
 
             resource($api, 'merchants', 'MerchantController', '{name}');
+            $api->put("/merchants/{id}/renewKey", [
+                'uses' => "MerchantController@renewKey",
+                'as' => "merchants.renew"
+            ]);
             resource($api, 'merchant/deposits', 'MerchantDepositController', '{name}');
             resource($api, 'merchant/withdrawals', 'MerchantWithdrawalController', '{name}');
             resource($api, 'merchant/fund_records', 'MerchantFundRecordController', '{name}');

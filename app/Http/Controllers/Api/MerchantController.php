@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Support\Str;
 
 class MerchantController extends Controller
 {
@@ -73,6 +74,14 @@ class MerchantController extends Controller
             'callback_url' => $request->callback_url,
             'status' => $request->status
         ]);
-        return $this->success();
+        return $this->response->item($merchant, $this->transformer);
+    }
+
+    public function renewKey(Request $request, String $id)
+    {
+        $merchant = $this->model::findOrFail($id);
+        $merchant->api_key = Str::random(255);
+        $merchant->save();
+        return $this->response->item($merchant, $this->transformer);
     }
 }
