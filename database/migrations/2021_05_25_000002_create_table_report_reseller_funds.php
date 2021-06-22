@@ -21,9 +21,7 @@ class CreateTableReportResellerFunds extends Migration
                   ->onDelete('cascade');
             $table->datetime('start_at');
             $table->datetime('end_at');
-            $table->unsignedTinyInteger('type')
-                ->comment('0:Weekly,1:Monthly');
-            $table->decimal('turnover', 14, 4);
+            $table->unsignedInteger('turnover');
             $table->decimal('credit', 14, 4);
             $table->decimal('coin', 14, 4);
             $table->timestamps();

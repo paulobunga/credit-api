@@ -16,17 +16,25 @@ class MerchantFundRecordSeeder extends Seeder
      */
     public function run()
     {
+        $type = [0, 2];
         foreach (MerchantDeposit::all() as $deposit) {
             foreach (range(1, rand(1, 3)) as $i) {
                 $deposit->fundRecords()->create(
-                    MerchantFundRecord::factory()->make()->toArray()
+                    array_merge(
+                        MerchantFundRecord::factory()->make()->toArray(),
+                        ['type' => $type[array_rand($type)]]
+                    )
                 );
             }
         }
+        $type = [1, 3];
         foreach (MerchantWithdrawal::all() as $withdrawal) {
             foreach (range(1, rand(1, 3)) as $i) {
                 $withdrawal->fundRecords()->create(
-                    MerchantFundRecord::factory()->make()->toArray()
+                    array_merge(
+                        MerchantFundRecord::factory()->make()->toArray(),
+                        ['type' => $type[array_rand($type)]]
+                    )
                 );
             }
         }

@@ -56,7 +56,7 @@ $api->version(
             resource($api, 'banks', 'BankController');
             resource($api, 'admins', 'AdminController', '{name}');
             resource($api, 'admin_white_lists', 'AdminWhiteListController');
-            
+
             resource($api, 'merchants', 'MerchantController', '{name}');
             resource($api, 'merchant/deposits', 'MerchantDepositController', '{name}');
             resource($api, 'merchant/withdrawals', 'MerchantWithdrawalController', '{name}');
@@ -67,6 +67,15 @@ $api->version(
             resource($api, 'reseller/deposits', 'ResellerDepositController', '{name}');
             resource($api, 'reseller/withdrawals', 'ResellerWithdrawalController', '{name}');
             resource($api, 'reseller/fund_records', 'ResellerFundRecordController', '{name}');
+
+            $api->get("/report/resellers", [
+                'uses' => "ReportController@reseller",
+                'as' => "report.resellers.index"
+            ]);
+            $api->get("/report/merchants", [
+                'uses' => "ReportController@merchant",
+                'as' => "report.merchants.index"
+            ]);
         });
     }
 );

@@ -21,7 +21,6 @@ class ResellerFundRecordFactory extends Factory
     public function definition()
     {
         return [
-            'type' => $this->faker->numberBetween(0, 3),
             'amount' => $this->faker->numberBetween(1, 1000),
             'created_at' => \Carbon\Carbon::now()
         ];

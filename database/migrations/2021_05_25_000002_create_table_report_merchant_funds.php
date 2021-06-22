@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Query\Expression;
 
 class CreateTableReportMerchantFunds extends Migration
 {
@@ -21,8 +22,10 @@ class CreateTableReportMerchantFunds extends Migration
                   ->onDelete('cascade');
             $table->datetime('start_at');
             $table->datetime('end_at');
-            $table->decimal('turnover', 14, 4);
+            $table->unsignedInteger('turnover');
+            $table->decimal('credit', 14, 4);
             $table->decimal('transaction_fee', 14, 4);
+            $table->json('info')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamps();
         });
     }
