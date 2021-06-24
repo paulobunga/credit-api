@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Auth;
 
 use Closure;
 use Dingo\Api\Routing\Router;
 use Dingo\Api\Auth\Auth as Authentication;
 
-class Authenticate
+class Auth
 {
     /**
      * Router instance.
@@ -37,19 +37,15 @@ class Authenticate
     }
 
     /**
-     * Handle an incoming request.
+     * Perform authentication before a request is executed.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string|null  $guard
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure                 $next
+     *
      * @return mixed
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if ($guard != null) {
-            app('auth')->shouldUse($guard);
-        }
-
         $route = $this->router->getCurrentRoute();
 
         if (!$this->auth->check(false)) {

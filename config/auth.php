@@ -14,7 +14,7 @@ return [
      */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'admins')
+        'guard' => env('AUTH_GUARD', 'admin')
     ],
 
     /*
@@ -35,17 +35,17 @@ return [
      */
 
     'guards' => [
-        'admins' => [
+        'admin' => [
             'driver' => 'jwt',
-            'provider' => 'admins',
+            'provider' => 'admin',
         ],
-        'resellers' => [
+        'reseller' => [
             'driver' => 'jwt',
-            'provider' => 'resellers',
+            'provider' => 'reseller',
         ],
-        'users' => [
+        'merchant' => [
             'driver' => 'jwt',
-            'provider' => 'resellers',
+            'provider' => 'merchant',
         ],
     ],
 
@@ -67,17 +67,17 @@ return [
      */
 
     'providers' => [
-        'admins' => [
+        'admin' => [
             'driver'    => 'eloquent',
             'model'     => \App\Models\Admin::class
         ],
-        'resellers' => [
+        'reseller' => [
             'driver'    => 'eloquent',
             'model'     => \App\Models\Rseller::class
         ],
-        'users' => [
+        'merchant' => [
             'driver'    => 'eloquent',
-            'model'     => \App\Models\User::class
+            'model'     => \App\Models\Merchant::class
         ]
     ],
 

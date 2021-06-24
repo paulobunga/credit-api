@@ -15,7 +15,6 @@ class AdminController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware('api.auth');
     }
 
     public function index()

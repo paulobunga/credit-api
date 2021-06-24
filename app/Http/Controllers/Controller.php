@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Dingo\Api\Routing\Helpers;
 use Laravel\Lumen\Routing\Controller as BaseController;
-use Dingo\Api\Http\Response;
 
 abstract class Controller extends BaseController
 {

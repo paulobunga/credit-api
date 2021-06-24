@@ -81,7 +81,6 @@ $app->middleware([
 ]);
 
 $app->routeMiddleware([
-    'auth' => App\Http\Middleware\Authenticate::class,
     'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
     'role' => Spatie\Permission\Middlewares\RoleMiddleware::class,
 ]);
@@ -96,15 +95,15 @@ $app->routeMiddleware([
 | totally optional, so you are not required to uncomment this line.
 |
  */
-$app->register(App\Providers\AppServiceProvider::class);
-$app->register(App\Providers\AuthServiceProvider::class);
-$app->register(App\Providers\EventServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 $app->register(Spatie\QueryBuilder\QueryBuilderServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
 
 $app->alias('cache', \Illuminate\Cache\CacheManager::class); // if you don't have this already
 
@@ -122,8 +121,9 @@ $app->alias('cache', \Illuminate\Cache\CacheManager::class); // if you don't hav
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__ . '/../routes/web.php';
     require __DIR__ . '/../routes/api.php';
+    require __DIR__ . '/../routes/admin.php';
+    require __DIR__ . '/../routes/merchant.php';
 });
 
 return $app;
