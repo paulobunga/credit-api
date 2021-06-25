@@ -22,7 +22,7 @@ class ResellerFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'email' => $this->faker->unique()->freeEmail,
+            'username' => $this->faker->unique()->freeEmail,
             'password' => $this->faker->password,
             'phone' => $this->faker->phoneNumber,
             'credit' => $this->faker->numberBetween(1, 1000),

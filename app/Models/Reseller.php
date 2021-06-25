@@ -18,7 +18,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     protected $fillable = [
         'name',
-        'email',
+        'username',
         'phone',
         'password',
         'transaction_fee',

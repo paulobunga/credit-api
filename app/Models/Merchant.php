@@ -35,7 +35,7 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
     {
         parent::__construct($attributes);
         $this->merchant_id = Str::uuid();
-        $this->api_key = Str::random(255);
+        $this->api_key = Str::random(30);
     }
 
     public function setPasswordAttribute($value)
