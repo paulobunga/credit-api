@@ -18,8 +18,11 @@ class DepositController extends Controller
 
     public function index()
     {
+        $this->validateSign(request());
         $merchant_deposits = QueryBuilder::for($this->model)
             ->allowedFilters([
+                'merchant_order_id',
+                'order_id'
                 // AllowedFilter::custom('name', new \App\Http\Filters\MerchantFilter),
             ])
             ->paginate($this->perPage);

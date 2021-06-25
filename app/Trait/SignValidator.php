@@ -25,6 +25,7 @@ trait SignValidator
                 throw new \Exception('request sign is invalid', 444);
             }
         }
+
         return $merchant;
     }
 
@@ -32,14 +33,18 @@ trait SignValidator
     {
         ksort($data);
         $str = '';
+
         foreach ($data as $key => $val) {
             if ($key == 'sign') {
                 continue;
             }
+            if (is_array($val) || is_object($val)) {
+                $val = json_encode($val);
+            }
             $str .= "{$key}={$val}&";
         }
         $str .= 'api_key=' .  $key;
-
-        return strtoupper(md5($str));
+        // dd($str);
+        return md5($str);
     }
 }

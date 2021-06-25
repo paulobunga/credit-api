@@ -1,17 +1,14 @@
 <?php
+
 namespace App\Http\Controllers\Merchant;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller as Controller;
+use App\Transformers\Merchant\AuthTransformer;
 
 class AuthController extends Controller
 {
-    public function __construct()
-    {
-        // $this->middleware('api.auth', ['except' => ['login']]);
-    }
-
     /**
      * Get a JWT via given credentials.
      *
@@ -20,10 +17,11 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only(['username', 'password']);
+
         if (!$token = Auth::guard('merchant')->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized Credentials'], 401);
+            return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
-        return $this->respondWithToken($token);
+        return $this->response->item(Auth::guard('merchant')->user(), new AuthTransformer($token));
     }
 
     /**
@@ -31,9 +29,9 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function me()
+    public function me(Request $request)
     {
-        return response()->json(Auth::user());
+        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
     }
 
     /**
@@ -55,22 +53,6 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(Auth::refresh());
-    }
-
-    /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => Auth::factory()->getTTL() * 60,
-        ]);
+        return $this->response->item(Auth::user(), new AuthTransformer(Auth::refresh()));
     }
 }

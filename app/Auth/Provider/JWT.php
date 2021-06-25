@@ -22,7 +22,7 @@ class JWT extends Base
     public function authenticate(Request $request, Route $route)
     {
         if (app('auth')->guest()) {
-            throw new UnauthorizedHttpException('JWTAuth', 'Unauthorized.');
+            throw new UnauthorizedHttpException('JWTAuth', 'Unauthorized');
         }
         $token = $this->getToken($request);
 
