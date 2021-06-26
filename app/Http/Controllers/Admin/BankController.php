@@ -41,7 +41,7 @@ class BankController extends Controller
 
     public function update(Request $request)
     {
-        $bank = $this->model::findOrFail($this->parameters('bank'));
+        $bank = $this->model::where('name', urldecode($this->parameters('bank')))->firstOrFail();
         $this->validate($request, [
             'ident' => "required|unique:banks,ident,{$bank->id}",
             'name' => 'required',
@@ -59,7 +59,7 @@ class BankController extends Controller
 
     public function destroy(Request $request)
     {
-        $bank = $this->model::findOrFail($this->parameters('bank'));
+        $bank = $this->model::where('name', urldecode($this->parameters('bank')))->firstOrFail();
         $bank->delete();
 
         return $this->success();

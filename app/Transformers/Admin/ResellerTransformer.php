@@ -11,7 +11,7 @@ class ResellerTransformer extends TransformerAbstract
         return [
             'id' => $reseller->id,
             'name' => $reseller->name,
-            'email' => $reseller->email,
+            'username' => $reseller->username,
             'phone' => $reseller->phone,
             'credit' => $reseller->credit,
             'coin' => $reseller->coin,
