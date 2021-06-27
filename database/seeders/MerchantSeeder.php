@@ -16,7 +16,7 @@ class MerchantSeeder extends Seeder
         \App\Models\Merchant::create([
             'name' => 'Test Merchant',
             'username' => 'merchant@gmail.com',
-            'password' => '123456',
+            'password' => 'P@ssw0rd',
             'api_whitelist' => [
                 '127.0.0.1',
             ],

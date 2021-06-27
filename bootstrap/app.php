@@ -123,11 +123,18 @@ $app->alias('cache', \Illuminate\Cache\CacheManager::class); // if you don't hav
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    $api = app('Dingo\Api\Routing\Router');
     require __DIR__ . '/../routes/web.php';
-    require __DIR__ . '/../routes/api.php';
-    require __DIR__ . '/../routes/admin.php';
-    require __DIR__ . '/../routes/merchant.php';
 });
+
+$api = app('Dingo\Api\Routing\Router');
+$api->version(
+    'v1',
+    ['middleware' => 'api.throttle', 'limit' => 100, 'expires' => 5],
+    function (\Dingo\Api\Routing\Router $api) {
+        require __DIR__ . '/../routes/api.php';
+        require __DIR__ . '/../routes/admin.php';
+        require __DIR__ . '/../routes/merchant.php';
+    }
+);
 
 return $app;
