@@ -20,7 +20,8 @@ $api->group([
         $api->post('/auth/me', ['as' => 'auth.me', 'uses' => 'AuthController@me']);
         $api->put("/auth/update", ['as' => 'auth.update', 'uses' => 'AuthController@update']);
         $api->put("/auth/renew", ['as' => 'auth.renew', 'uses' => 'AuthController@renew']);
-        # merchant
-        $api->resource('merchants', 'MerchantController', ['only'=>'update']);
+
+        $api->resource('deposits', 'DepositController', ['only' => 'index']);
+        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'store']]);
     });
 });

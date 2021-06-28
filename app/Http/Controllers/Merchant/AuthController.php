@@ -23,6 +23,7 @@ class AuthController extends Controller
         if (!$token = Auth::guard('merchant')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
+
         return $this->response->item(Auth::guard('merchant')->user(), new AuthTransformer($token));
     }
 
