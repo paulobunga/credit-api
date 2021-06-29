@@ -76,11 +76,11 @@ class DepositController extends Controller
         $this->validate($request, [
             'time' => 'required|numeric',
         ]);
-        $deposit = $this->model::with(['merchant', 'resellerBankCard'])->where([
+        $deposit = $this->model::with(['merchant', 'resellerBankCard', 'bank'])->where([
             'merchant_id' => $merchant->id,
             'merchant_order_id' => $request->merchant_order_id,
         ])->firstOrFail();
-
+        
         return view('pay', compact('deposit'));
     }
 }

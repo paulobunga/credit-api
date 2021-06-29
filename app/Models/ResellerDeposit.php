@@ -24,8 +24,8 @@ class ResellerDeposit extends Model
         return $this->belongsTo(PaymentMethod::class);
     }
 
-    public function fundRecords()
+    public function transactions()
     {
-        return $this->morphMany('App\Models\ResellerFundRecord', 'fundable');
+        return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
     }
 }

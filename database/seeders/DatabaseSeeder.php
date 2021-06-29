@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\TransactionMethod;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -21,12 +22,10 @@ class DatabaseSeeder extends Seeder
             ResellerSeeder::class,
             ResellerDepositSeeder::class,
             ResellerWithdrawalSeeder::class,
-            ResellerFundRecordSeeder::class,
             ResellerBankCardSeeder::class,
             MerchantSeeder::class,
             MerchantDepositSeeder::class,
             MerchantWithdrawalSeeder::class,
-            MerchantFundRecordSeeder::class,
             WhiteListSeeder::class,
         ]);
     }

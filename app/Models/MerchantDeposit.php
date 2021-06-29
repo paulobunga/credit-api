@@ -31,8 +31,20 @@ class MerchantDeposit extends Model
         return $this->hasOne(resellerBankCard::class, 'id', 'reseller_bank_card_id');
     }
 
-    public function fundRecords()
+    public function bank()
     {
-        return $this->morphMany('App\Models\MerchantFundRecord', 'fundable');
+        return $this->hasOneThrough(
+            Bank::class,
+            resellerBankCard::class,
+            'id',
+            'id',
+            'reseller_bank_card_id',
+            'bank_id'
+        );
+    }
+
+    public function transactions()
+    {
+        return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
     }
 }

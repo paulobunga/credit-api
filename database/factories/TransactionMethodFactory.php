@@ -4,14 +4,14 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ResellerFundRecordFactory extends Factory
+class TransactionMethodFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = \App\Models\ResellerFundRecord::class;
+    protected $model = \App\Models\TransactionMethod::class;
 
     /**
      * Define the model's default state.
@@ -21,7 +21,7 @@ class ResellerFundRecordFactory extends Factory
     public function definition()
     {
         return [
-            'amount' => $this->faker->numberBetween(1, 1000),
+            'name' => $this->faker->text(10),
             'created_at' => \Carbon\Carbon::now()
         ];
     }
