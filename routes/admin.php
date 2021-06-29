@@ -22,6 +22,7 @@ $api->group([
         $api->resource('banks', 'BankController');
         $api->resource('admins', 'AdminController');
         $api->resource('admin_white_lists', 'AdminWhiteListController');
+        $api->resource('merchant_white_lists', 'MerchantWhiteListController');
 
         $api->resource('merchants', 'MerchantController');
         $api->put("/merchants/renew/{merchant}", ['as' => 'merchants.renew', 'uses' => 'MerchantController@renew']);

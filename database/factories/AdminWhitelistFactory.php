@@ -22,7 +22,6 @@ class AdminWhiteListFactory extends Factory
     {
         return [
             'ip' => $this->faker->ipv4,
-            'status' => $this->faker->boolean,
         ];
     }
 }

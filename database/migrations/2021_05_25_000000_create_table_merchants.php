@@ -18,12 +18,11 @@ class CreateTableMerchants extends Migration
             $table->id();
             $table->string('name');
             $table->string('username')->unique();
-            $table->string('password', 60);
             $table->uuid('merchant_id')->unique();
             $table->string('api_key', 30);
-            $table->json('api_whitelist')->default(new Expression('(JSON_ARRAY())'));
             $table->string('callback_url');
             $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
+            $table->string('password', 60);
             $table->timestamps();
         });
     }

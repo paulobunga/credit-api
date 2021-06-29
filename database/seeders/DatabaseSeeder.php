@@ -17,7 +17,6 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             AdminSeeder::class,
-            AdminWhiteListSeeder::class,
             BankSeeder::class,
             ResellerSeeder::class,
             ResellerDepositSeeder::class,
@@ -28,6 +27,7 @@ class DatabaseSeeder extends Seeder
             MerchantDepositSeeder::class,
             MerchantWithdrawalSeeder::class,
             MerchantFundRecordSeeder::class,
+            WhiteListSeeder::class,
         ]);
     }
 }

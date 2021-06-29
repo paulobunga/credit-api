@@ -10,4 +10,5 @@ $api->group([
     $api->resource('deposits', 'DepositController', [
         'only' => ['index', 'store']
     ]);
+    $api->get("/deposits/pay", ['as' => 'deposits.pay', 'uses' => 'DepositController@pay']);
 });

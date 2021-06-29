@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Transformers\Merchant;
 
 use Illuminate\Database\Eloquent\Model;

@@ -22,7 +22,7 @@ class MerchantDepositFactory extends Factory
     {
         return [
             'merchant_order_id' => $this->faker->uuid,
-            'order_id' => $this->faker->uuid,
+            'order_id' => '#' . $this->faker->randomNumber(8) . time(),
             'amount' => $this->faker->randomNumber(5),
             'status' => $this->faker->boolean,
             'callback_url' => $this->faker->url,

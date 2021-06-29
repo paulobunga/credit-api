@@ -21,7 +21,7 @@ abstract class Controller extends BaseController
     {
         $route = app('request')->route();
 
-        return Arr::get($route[2], $name, $default);
+        return urldecode(Arr::get($route[2], $name, $default));
     }
 
     protected function success()

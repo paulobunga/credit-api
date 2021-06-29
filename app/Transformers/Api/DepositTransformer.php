@@ -6,6 +6,13 @@ use League\Fractal\TransformerAbstract;
 
 class DepositTransformer extends TransformerAbstract
 {
+    protected array $params;
+
+    public function __construct($params)
+    {
+        $this->params = $params;
+    }
+
     public function transform(Model $deposit)
     {
         return [
@@ -18,6 +25,6 @@ class DepositTransformer extends TransformerAbstract
             'status' => $deposit->status,
             'callback_url' => $deposit->callback_url,
             'reference_no' => $deposit->reference_no,
-        ];
+        ] + $this->params;
     }
 }

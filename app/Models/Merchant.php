@@ -21,13 +21,11 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
         'name',
         'username',
         'password',
-        'api_whitelist',
         'callback_url',
         'status',
     ];
 
     protected $casts = [
-        'api_whitelist' => 'array',
         'status' => 'boolean',
     ];
 

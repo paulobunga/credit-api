@@ -5,8 +5,10 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Admin;
 use App\Models\AdminWhiteList;
+use App\Models\Merchant;
+use App\Models\MerchantWhiteList;
 
-class AdminWhiteListSeeder extends Seeder
+class WhiteListSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,8 +18,13 @@ class AdminWhiteListSeeder extends Seeder
     public function run()
     {
         foreach (Admin::all() as $admin) {
-            AdminWhiteList::factory()->create([
+            AdminWhiteList::factory()->count(2)->create([
                 'admin_id' => $admin->id
+            ]);
+        }
+        foreach (Merchant::all() as $merchant) {
+            MerchantWhiteList::factory()->count(2)->create([
+                'merchant_id' => $merchant->id
             ]);
         }
     }

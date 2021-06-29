@@ -120,12 +120,6 @@ $app->alias('cache', \Illuminate\Cache\CacheManager::class); // if you don't hav
 |
  */
 
-$app->router->group([
-    'namespace' => 'App\Http\Controllers',
-], function ($router) {
-    require __DIR__ . '/../routes/web.php';
-});
-
 $api = app('Dingo\Api\Routing\Router');
 $api->version(
     'v1',

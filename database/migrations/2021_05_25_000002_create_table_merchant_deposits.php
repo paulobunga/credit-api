@@ -23,7 +23,7 @@ class CreateTableMerchantDeposits extends Migration
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->string('order_id', 60);
+            $table->string('order_id', 20)->unique();
             $table->string('merchant_order_id', 60);
             $table->decimal('amount', 14, 4);
             $table->unsignedTinyInteger('status')

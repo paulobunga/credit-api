@@ -39,12 +39,10 @@ class AdminWhiteListController extends Controller
                     ]);
                 }),
             ],
-            'status' => 'boolean',
         ]);
         $admin_white_list = $this->model::create([
             'admin_id' => $request->admin_id,
             'ip' => $request->ip,
-            'status' => $request->status,
         ]);
 
         return $this->response->item($admin_white_list, $this->transformer);
@@ -54,23 +52,21 @@ class AdminWhiteListController extends Controller
     {
         $admin_white_list = $this->model::findOrFail($this->parameters('admin_white_list'));
         $this->validate($request, [
-            'admin_id' => 'required|exists:admins,id',
             'ip' => [
                 'required',
                 'ipv4',
-                Rule::unique('admin_white_lists')->where(function ($query) use ($request) {
-                    return $query->where([
-                        'admin_id' => $request->admin_id,
-                        'ip' => $request->ip
-                    ]);
-                }),
+                Rule::unique('admin_white_lists')->where(
+                    function ($query) use ($admin_white_list, $request) {
+                        return $query->where([
+                            'admin_id' => $admin_white_list->id,
+                            'ip' => $request->ip
+                        ]);
+                    }
+                ),
             ],
-            'status' => 'boolean'
         ]);
         $admin_white_list->update([
-            'admin_id' => $request->admin_id,
             'ip' => $request->ip,
-            'status' => $request->status
         ]);
 
         return $this->response->item($admin_white_list, $this->transformer);

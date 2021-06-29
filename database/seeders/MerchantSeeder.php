@@ -17,9 +17,6 @@ class MerchantSeeder extends Seeder
             'name' => 'Test Merchant',
             'username' => 'merchant@gmail.com',
             'password' => 'P@ssw0rd',
-            'api_whitelist' => [
-                '127.0.0.1',
-            ],
             'callback_url' => 'http://google.com.tw',
             'status' => true,
         ]);

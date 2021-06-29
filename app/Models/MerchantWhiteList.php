@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class AdminWhiteList extends Model
+class MerchantWhiteList extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'admin_id',
-        'ip'
+        'merchant_id',
+        'ip',
     ];
 
-    public function admin()
+    public function merchant()
     {
-        return $this->belongsTo(Admin::class);
+        return $this->belongsTo(Merchant::class);
     }
 }

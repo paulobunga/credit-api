@@ -4,14 +4,14 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class MerchantFactory extends Factory
+class MerchantWhiteListFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = \App\Models\Merchant::class;
+    protected $model = \App\Models\MerchantWhiteList::class;
 
     /**
      * Define the model's default state.
@@ -21,11 +21,7 @@ class MerchantFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name,
-            'username' => $this->faker->unique()->userName,
-            'password' => $this->faker->password,
-            'callback_url' => $this->faker->url,
-            'status' => $this->faker->boolean,
+            'ip' => $this->faker->ipv4,
         ];
     }
 }

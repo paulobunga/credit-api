@@ -13,18 +13,13 @@ class MerchantDeposit extends Model
     protected $fillable = [
         'merchant_id',
         'reseller_bank_card_id',
+        'order_id',
         'merchant_order_id',
         'amount',
         'status',
         'callback_url',
         'reference_no'
     ];
-
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        $this->order_id = Str::random(60);
-    }
 
     public function merchant()
     {

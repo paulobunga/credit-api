@@ -13,6 +13,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        if ($adapter = app('api.transformer')->getAdapter()) {
+            $manager = $adapter->getFractal();
+            $manager->setSerializer(new \App\Transformers\Serializer\DataArraySerializer());
+        }
     }
 
     public function boot()
