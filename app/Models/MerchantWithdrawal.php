@@ -9,13 +9,21 @@ class MerchantWithdrawal extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'merchant_id',
+        'order_id',
+        'amount',
+        'status',
+        'info'
+    ];
+
     public function merchant()
     {
         return $this->belongsTo(Merchant::class);
     }
 
-    public function fundRecords()
+    public function transactions()
     {
-        return $this->morphMany('App\Models\MerchantFundRecord', 'fundable');
+        return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
     }
 }

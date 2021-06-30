@@ -6,6 +6,10 @@ use League\Fractal\TransformerAbstract;
 
 class MerchantWithdrawalTransformer extends TransformerAbstract
 {
+    protected $defaultIncludes = [
+        'transactions',
+    ];
+
     public function transform(Model $merchant_withdrawal)
     {
         return [
@@ -15,5 +19,10 @@ class MerchantWithdrawalTransformer extends TransformerAbstract
             'amount' => $merchant_withdrawal->amount,
             'status' => $merchant_withdrawal->status,
         ];
+    }
+
+    public function includeTransactions(Model $merchant_withdrawal)
+    {
+        return $this->collection($merchant_withdrawal->transactions, new TransactionTransformer, false);
     }
 }

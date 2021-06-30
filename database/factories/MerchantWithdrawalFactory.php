@@ -21,7 +21,7 @@ class MerchantWithdrawalFactory extends Factory
     public function definition()
     {
         return [
-            'order_id' => $this->faker->uuid,
+            'order_id' => '#' . $this->faker->randomNumber(8) . time(),
             'amount' => $this->faker->randomNumber(5),
             'status' => $this->faker->boolean,
         ];

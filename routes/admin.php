@@ -29,13 +29,11 @@ $api->group([
 
         $api->resource('merchant_deposits', 'MerchantDepositController');
         $api->resource('merchant_withdrawals', 'MerchantWithdrawalController');
-        $api->resource('merchant_fund_records', 'MerchantFundRecordController');
 
         $api->resource('resellers', 'ResellerController');
         $api->resource('reseller_bank_cards', 'ResellerBankCardController');
         $api->resource('reseller_deposits', 'ResellerDepositController');
         $api->resource('reseller_withdrawals', 'ResellerWithdrawalController');
-        $api->resource('reseller_fund_records', 'ResellerFundRecordController');
 
         $api->get("/report/resellers", [
             'uses' => "ReportController@reseller",
