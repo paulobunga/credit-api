@@ -16,6 +16,11 @@ class Transaction extends Model
         'amount',
     ];
 
+    public function transactionMethod()
+    {
+        return $this->belongsTo(TransactionMethod::class);
+    }
+
     public function merchantDeposits()
     {
         return $this->morphedByMany(MerchantDeposit::class, 'model', 'model_has_transactions');

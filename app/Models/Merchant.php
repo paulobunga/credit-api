@@ -20,6 +20,8 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
     protected $fillable = [
         'name',
         'username',
+        'phone',
+        'transaction_fee',
         'password',
         'callback_url',
         'status',

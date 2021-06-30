@@ -18,15 +18,17 @@ class MerchantDepositSeeder extends Seeder
     {
         foreach (Merchant::all() as $merchant) {
             $reseller_bank_card = ResellerBankCard::inRandomOrder()->first();
-            $transaction_method_id = [
-                1,2,5
-            ];
-            MerchantDeposit::factory()->create([
+            $deposit = MerchantDeposit::factory()->create([
                 'merchant_id' => $merchant->id,
                 'reseller_bank_card_id' => $reseller_bank_card->id
-            ])->transactions()->create([
-                'transaction_method_id' => $transaction_method_id[array_rand($transaction_method_id)],
-                'amount' => rand(20, 10000)
+            ]);
+            $deposit->transactions()->create([
+                'transaction_method_id' => 1,
+                'amount' => $deposit->amount
+            ]);
+            $deposit->transactions()->create([
+                'transaction_method_id' => 5,
+                'amount' => $deposit->amount * $deposit->merchant->transaction_fee
             ]);
         }
     }

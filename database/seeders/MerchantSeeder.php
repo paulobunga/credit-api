@@ -17,6 +17,9 @@ class MerchantSeeder extends Seeder
             'name' => 'Test Merchant',
             'username' => 'merchant@gmail.com',
             'password' => 'P@ssw0rd',
+            'phone' => '+8865721455',
+            'transaction_fee' => 0.01,
+            'credit' => 2000,
             'callback_url' => 'http://google.com.tw',
             'status' => true,
         ]);

@@ -17,13 +17,13 @@ class CreateTableResellers extends Migration
             $table->id();
             $table->string('name');
             $table->string('username')->unique();
-            $table->string('password', 60);
-            $table->string('phone')->unique();
+            $table->string('phone', 20);
             $table->decimal('credit', 14, 4)->default(0);
             $table->decimal('coin', 14, 4)->default(0);
-            $table->decimal('transaction_fee');
+            $table->decimal('transaction_fee', 5, 4)->default(0);
             $table->integer('pending_limit')->default(5);
-            $table->unsignedTinyInteger('status')->default(0)->comment('0:Disabled,1:Enabled');
+            $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
+            $table->string('password', 60);
             $table->timestamps();
         });
     }

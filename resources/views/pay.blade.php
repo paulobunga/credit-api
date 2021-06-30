@@ -113,6 +113,10 @@
                             </div>
                         </div>
                     </div>
+                    <div class="mb-3 row align-items-center">
+                        <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">Amount</label>
+                        <label for="staticEmail" class="col-sm-10 col-form-label fw-bold fs-4 text-warning"><?= $deposit->amount ?></label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -138,7 +142,7 @@
             $('#expiration').show();
         });
         @if($deposit->created_at->addMinutes(15) <= \Carbon\Carbon::now())
-            $('#expiration').show();
+        $('#expiration').show();
         @endif
         var clipboard = new ClipboardJS('.btn');
         clipboard.on('success', function(e) {

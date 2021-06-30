@@ -18,7 +18,8 @@ class MerchantDeposit extends Model
         'amount',
         'status',
         'callback_url',
-        'reference_no'
+        'reference_no',
+        'info'
     ];
 
     public function merchant()

@@ -7,6 +7,10 @@ use League\Fractal\TransformerAbstract;
 
 class DepositTransformer extends TransformerAbstract
 {
+    protected $defaultIncludes = [
+        'transactions',
+    ];
+
     public function transform(Model $deposit)
     {
         return [
@@ -19,5 +23,10 @@ class DepositTransformer extends TransformerAbstract
             'callback_url' => $deposit->callback_url,
             'reference_no' => $deposit->reference_no,
         ];
+    }
+
+    public function includeTransactions(Model $deposit)
+    {
+        return $this->collection($deposit->transactions, new TransactionTransformer, false);
     }
 }

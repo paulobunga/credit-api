@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Transformers\Admin;
 
 use Illuminate\Database\Eloquent\Model;
@@ -6,6 +7,10 @@ use League\Fractal\TransformerAbstract;
 
 class MerchantDepositTransformer extends TransformerAbstract
 {
+    protected $defaultIncludes = [
+        'transactions',
+    ];
+
     public function transform(Model $merchant_deposit)
     {
         return [
@@ -18,5 +23,10 @@ class MerchantDepositTransformer extends TransformerAbstract
             'callback_url' => $merchant_deposit->callback_url,
             'reference_no' => $merchant_deposit->reference_no,
         ];
+    }
+    
+    public function includeTransactions(Model $deposit)
+    {
+        return $this->collection($deposit->transactions, new TransactionTransformer, false);
     }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Query\Expression;
 
 class CreateTableMerchantDeposits extends Migration
 {
@@ -30,6 +31,7 @@ class CreateTableMerchantDeposits extends Migration
                   ->comment('1:Created,2:Waiting to Approve,3:Approved,4:Rejected,5:Enforced,6:Canceled');
             $table->string('callback_url');
             $table->string('reference_no');
+            $table->json('info')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
         });
     }

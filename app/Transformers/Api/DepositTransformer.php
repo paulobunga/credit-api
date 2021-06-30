@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Transformers\Api;
 
 use Illuminate\Database\Eloquent\Model;
@@ -8,7 +9,7 @@ class DepositTransformer extends TransformerAbstract
 {
     protected array $params;
 
-    public function __construct($params)
+    public function __construct($params = [])
     {
         $this->params = $params;
     }

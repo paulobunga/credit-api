@@ -20,8 +20,8 @@ class DepositController extends Controller
 
     public function index()
     {
-        $this->validateSign(request());
-        $merchant_deposits = QueryBuilder::for($this->model)
+        $merchant = $this->validateSign(request());
+        $merchant_deposits = QueryBuilder::for($this->model::where('merchant_id', $merchant->id))
             ->allowedFilters([
                 'merchant_order_id',
                 'order_id'
