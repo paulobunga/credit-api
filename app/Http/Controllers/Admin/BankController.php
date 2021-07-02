@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use App\Exports\BankExport;
 
 class BankController extends Controller
 {
@@ -63,5 +64,10 @@ class BankController extends Controller
         $bank->delete();
 
         return $this->success();
+    }
+
+    public function export()
+    {
+        return new BankExport();
     }
 }

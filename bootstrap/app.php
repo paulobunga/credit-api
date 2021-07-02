@@ -63,6 +63,7 @@ $app->configure('app');
 $app->configure('api');
 $app->configure('cors');
 $app->configure('auth');
+$app->configure('excel');
 $app->configure('permission');
 $app->configure('query-builder');
 /*
@@ -102,6 +103,7 @@ $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 $app->register(Spatie\QueryBuilder\QueryBuilderServiceProvider::class);
+$app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\RouteServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);

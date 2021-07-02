@@ -20,6 +20,7 @@ $api->group([
         $api->resource('permissions', 'PermissionController');
         $api->resource('roles', 'RoleController');
         $api->resource('banks', 'BankController');
+        $api->get('/export/banks', ['as' => 'banks.export', 'uses' => 'BankController@export']);
         $api->resource('admins', 'AdminController');
         $api->resource('admin_white_lists', 'AdminWhiteListController');
         $api->resource('merchant_white_lists', 'MerchantWhiteListController');

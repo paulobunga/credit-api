@@ -7,6 +7,8 @@ use Dingo\Api\Http\Request;
 use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
+use App\Http\Sorts\RelationShipSort;
 
 class AdminWhiteListController extends Controller
 {
@@ -15,11 +17,16 @@ class AdminWhiteListController extends Controller
 
     public function index()
     {
-        $admin_white_lists = QueryBuilder::for($this->model::with('admin'))
-            ->allowedFilters([
+        $admin_white_lists = QueryBuilder::for(
+            $this->model::join('admins', 'admin_white_lists.admin_id', '=', 'admins.id')
+                ->select('admin_white_lists.*')
+                ->sort(request()->get('sort', 'id'))
+        )
+            ->allowedFilters(
                 'id',
                 AllowedFilter::custom('value', new \App\Http\Filters\AdminWhiteListFilter)
-            ])
+            )
+            ->allowedSorts('id', 'ip', 'name')
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($admin_white_lists, $this->transformer);

@@ -7,6 +7,8 @@ use Dingo\Api\Http\Request;
 use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
+use App\Http\Sorts\RelationShipSort;
 
 class MerchantWhiteListController extends Controller
 {
@@ -15,11 +17,15 @@ class MerchantWhiteListController extends Controller
 
     public function index()
     {
-        $merchant_white_lists = QueryBuilder::for($this->model::with('merchant'))
+        $merchant_white_lists = QueryBuilder::for(
+            $this->model::join('merchants', 'merchant_white_lists.merchant_id', '=', 'merchants.id')
+                ->select('merchant_white_lists.*')
+        )
             ->allowedFilters([
                 'id',
                 AllowedFilter::custom('value', new \App\Http\Filters\AdminWhiteListFilter)
             ])
+            ->allowedSorts('id', 'ip', AllowedSort::custom('name', new RelationShipSort(), 'merchants.name'))
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($merchant_white_lists, $this->transformer);
