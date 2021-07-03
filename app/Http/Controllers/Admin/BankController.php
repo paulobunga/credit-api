@@ -15,10 +15,15 @@ class BankController extends Controller
 
     public function index()
     {
-        $banks = QueryBuilder::for($this->model)
+        $banks = QueryBuilder::for(
+            $this->model::filter(
+                request()->get('filter', '{}')
+            )->sort(request()->get('sort', 'id'))
+        )
             ->allowedFilters([
-                'name',
+                'name', 'ident', 'status'
             ])
+            ->allowedSorts('id', 'name', 'ident', 'status')
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($banks, $this->transformer);

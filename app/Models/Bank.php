@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Trait\Sortable;
+use App\Trait\Filterable;
 
 class Bank extends Model
 {
-    use HasFactory, Sortable;
+    use HasFactory, Sortable, Filterable;
 
     protected $fillable = [
         'ident',
@@ -19,10 +20,18 @@ class Bank extends Model
     protected $sortable_fields = [
         'id' => 'id',
         'name' => 'name',
-        'ident' => 'ident'
+        'ident' => 'ident',
+        'status' => 'status'
     ];
 
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    protected $filterable_fields = [
+        'name' => 'like',
+        'ident' => 'like',
+        'status' => '=',
+    ];
+
 }

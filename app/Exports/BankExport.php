@@ -38,8 +38,8 @@ class BankExport extends BaseExport
     public function collection()
     {
         return Bank::select('banks.*')
-            // ->sort(request()->get('sort'))
-            // ->filter(Request::only('search', 'trashed', 'expired', 'status'))
+            ->sort(request()->get('sort', 'id'))
+            ->filter(request()->get('filter', '{}'))
             ->get();
     }
 }
