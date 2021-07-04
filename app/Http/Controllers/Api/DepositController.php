@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
 use App\Trait\SignValidator;
-use Illuminate\Support\Str;
 use App\Transformers\Api\DepositTransformer;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\Rule;
 
 class DepositController extends Controller
 {
@@ -25,23 +25,49 @@ class DepositController extends Controller
             ->allowedFilters([
                 'merchant_order_id',
                 'order_id'
-                // AllowedFilter::custom('name', new \App\Http\Filters\MerchantFilter),
             ])
             ->paginate($this->perPage);
         return $this->response->withPaginator($merchant_deposits, new DepositTransformer);
+    }
+
+    public function show(Request $request)
+    {
+        $merchant = $this->validateSign($request);
+        $deposit = $this->model::where([
+            'merchant_id' => $merchant->id,
+            'merchant_order_id' => $this->parameters('deposit')
+        ])->firstOrFail();
+
+        return $this->response->item($deposit, new DepositTransformer);
     }
 
     public function store(Request $request)
     {
         $merchant = $this->validateSign($request);
         $this->validate($request, [
-            'merchant_order_id' => 'required',
+            'merchant_order_id' => [
+                'required',
+                Rule::unique('merchant_deposits')->where(function ($query) use ($request, $merchant) {
+                    return $query->where([
+                        'merchant_id' => $merchant->id,
+                        'merchant_order_id' => $request->merchant_order_id
+                    ]);
+                }),
+            ],
+            'type' => 'required',
             'amount' => 'numeric|min:10',
         ]);
+     
+        $reseller_bank_card = \App\Models\ResellerBankCard::whereHas(
+            'paymentMethod',
+            function (Builder $query) use ($request) {
+                $query->where('payment_methods.name', strtolower($request->type));
+            }
+        )
+            ->where('status', true)->inRandomOrder()->firstOrFail();
         DB::beginTransaction();
         try {
             $last_order = $this->model::lockForUpdate()->latest()->first();
-            $reseller_bank_card = \App\Models\ResellerBankCard::where('status', true)->inRandomOrder()->firstOrFail();
             $merchant_deposit = $this->model::create([
                 'merchant_id' => $merchant->id,
                 'reseller_bank_card_id' => $reseller_bank_card->id,
@@ -70,6 +96,27 @@ class DepositController extends Controller
         return $this->response->item($merchant_deposit, new DepositTransformer(compact('pay_url')));
     }
 
+    public function update(Request $request)
+    {
+        $this->validate($request, [
+            'reference_no' => "required",
+            'merchant_id' => 'required',
+        ]);
+        $deposit = $this->model::where([
+            'merchant_id' => $request->merchant_id,
+            'merchant_order_id' => $this->parameters('deposit')
+            ])->firstOrFail();
+        if ($deposit->status != 0) {
+            throw new \Exception('deposit is already pending', 510);
+        }
+        $deposit->update([
+            'status' => 1,
+            'reference_no' => $request->reference_no
+        ]);
+
+        return $this->success();
+    }
+
     public function pay(Request $request)
     {
         $merchant = $this->validateSign($request);
@@ -80,7 +127,7 @@ class DepositController extends Controller
             'merchant_id' => $merchant->id,
             'merchant_order_id' => $request->merchant_order_id,
         ])->firstOrFail();
-        
-        return view('pay', compact('deposit'));
+
+        return view($deposit->paymentMethod->name, compact('deposit'));
     }
 }

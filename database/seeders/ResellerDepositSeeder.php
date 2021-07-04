@@ -19,14 +19,12 @@ class ResellerDepositSeeder extends Seeder
     {
         foreach (Reseller::all() as $reseller) {
             $admin = Admin::inRandomOrder()->first();
-            $payment_method = PaymentMethod::inRandomOrder()->first();
             $transaction_method_id = [
-                1,2,3,4
+                1
             ];
             ResellerDeposit::factory()->create([
                 'reseller_id' => $reseller->id,
                 'admin_id' => $admin->id,
-                'payment_method_id' => $payment_method->id
             ])->transactions()->create([
                 'transaction_method_id' => $transaction_method_id[array_rand($transaction_method_id)],
                 'amount' => rand(20, 10000)

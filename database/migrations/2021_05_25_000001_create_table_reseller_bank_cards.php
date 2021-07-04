@@ -24,7 +24,6 @@ class CreateTableResellerBankCards extends Migration
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->unsignedTinyInteger('type')->comment('0:Bank Account,1:UPI,2:Wallet');
             $table->string('account_name', 64);
             $table->string('account_no', 64);
             $table->json('info')->default(new Expression('(JSON_ARRAY())'));

@@ -21,9 +21,9 @@ class ResellerDepositFactory extends Factory
     public function definition()
     {
         return [
+            'order_id' => $this->faker->uuid,
             'amount' => $this->faker->randomNumber(5),
             'status' => $this->faker->boolean,
-            'callback_url' => $this->faker->url,
             'reference_no' => $this->faker->numerify('N-########')
         ];
     }

@@ -56,6 +56,11 @@ class MerchantDeposit extends Model
         );
     }
 
+    public function paymentMethod()
+    {
+        return $this->resellerBankCard->paymentMethod();
+    }
+
     public function transactions()
     {
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');

@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\PaymentMethod;
 
 class CreateTablePaymentMethods extends Migration
 {
@@ -21,14 +22,13 @@ class CreateTablePaymentMethods extends Migration
         });
         // insert data
         $methods = [
-            'BY_CASH',
-            'BY_BANK_TRANSFER',
-            'BY_CREDIT_CARD',
-            'BY_WALLET',
-            'BY_OTHER'
+            'online_bank',
+            'upi',
+            'wallet',
+            'credit_card',
         ];
         foreach ($methods as $method) {
-            DB::table('payment_methods')->insert([
+            PaymentMethod::create([
                 'name' => $method,
             ]);
         }

@@ -12,6 +12,7 @@ class Bank extends Model
     use HasFactory, Sortable, Filterable;
 
     protected $fillable = [
+        'payment_method_id',
         'ident',
         'name',
         'status'
@@ -33,4 +34,9 @@ class Bank extends Model
         'ident' => 'ident',
         'status' => 'status'
     ];
+
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class);
+    }
 }

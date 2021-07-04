@@ -38,6 +38,9 @@ trait SignValidator
             if ($key == 'sign') {
                 continue;
             }
+            if (is_null($val) || $val === '') {
+                continue;
+            }
             if (is_array($val) || is_object($val)) {
                 $val = json_encode($val);
             }

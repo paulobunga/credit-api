@@ -8,7 +8,6 @@ use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
-use App\Http\Sorts\RelationShipSort;
 
 class AdminWhiteListController extends Controller
 {

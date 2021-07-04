@@ -21,7 +21,6 @@ class ResellerBankCardFactory extends Factory
     public function definition()
     {
         return [
-            'type' => $this->faker->numberBetween(0, 2),
             'account_no' => $this->faker->unique()->bankAccountNumber,
             'account_name' => $this->faker->name,
             'status' => $this->faker->boolean,

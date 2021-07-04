@@ -8,7 +8,7 @@ $api->group([
     ],
 ], function ($api) {
     $api->resource('deposits', 'DepositController', [
-        'only' => ['index', 'store']
+        'only' => ['index', 'store', 'show', 'update']
     ]);
-    $api->get("/deposits/pay", ['as' => 'deposits.pay', 'uses' => 'DepositController@pay']);
+    $api->get("/pay/deposits", ['as' => 'deposits.pay', 'uses' => 'DepositController@pay']);
 });

@@ -104,13 +104,13 @@ $app->register(Spatie\Permission\PermissionServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 $app->register(Spatie\QueryBuilder\QueryBuilderServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
+$app->register(SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\RouteServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
 $app->alias('cache', \Illuminate\Cache\CacheManager::class); // if you don't have this already
-
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes

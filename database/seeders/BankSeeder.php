@@ -13,6 +13,9 @@ class BankSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Bank::factory()->count(5)->create();
+        foreach (\App\Models\Bank::factory()->count(10)->make() as $bank) {
+            $bank->payment_method_id = \App\Models\PaymentMethod::inRandomOrder()->first()->id;
+            $bank->save();
+        }
     }
 }

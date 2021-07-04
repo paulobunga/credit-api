@@ -15,10 +15,15 @@ class CreateTableBanks extends Migration
     {
         Schema::create('banks', function (Blueprint $table) {
             $table->id();
-            $table->string('ident', 20)->unique();
+            $table->foreignId('payment_method_id')
+                ->constrained()
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->string('ident', 20)->index();
             $table->string('name');
             $table->unsignedTinyInteger('status');
             $table->timestamps();
+            $table->unique(['payment_method_id', 'ident']);
         });
     }
 

@@ -28,6 +28,18 @@ class ResellerBankCard extends Model
         return $this->belongsTo(Bank::class);
     }
 
+    public function paymentMethod()
+    {
+        return $this->hasOneThrough(
+            PaymentMethod::class,
+            Bank::class,
+            'id',
+            'id',
+            'bank_id',
+            'payment_method_id'
+        );
+    }
+
     protected $casts = [
         'status' => 'boolean',
     ];

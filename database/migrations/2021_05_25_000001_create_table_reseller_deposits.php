@@ -22,14 +22,10 @@ class CreateTableResellerDeposits extends Migration
             $table->foreignId('admin_id')
                 ->nullable()
                 ->constrained();
-            $table->foreignId('payment_method_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+            $table->string('order_id')->unique();
             $table->decimal('amount', 14, 4);
             $table->unsignedTinyInteger('status')
-                  ->comment('1:Created,2:Waiting to Approve,3:Approved,4:Rejected,5:Enforced,6:Canceled');
-            $table->string('callback_url');
+                  ->comment('0:Created,1:Approved,2:Rejected');
             $table->string('reference_no');
             $table->timestamps();
         });

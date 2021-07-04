@@ -33,6 +33,7 @@ class CreateTableMerchantDeposits extends Migration
             $table->string('reference_no');
             $table->json('info')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
+            $table->unique(['merchant_id', 'merchant_order_id']);
         });
     }
 
