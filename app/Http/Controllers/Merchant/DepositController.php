@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Merchant;
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class DepositController extends Controller
@@ -16,10 +14,12 @@ class DepositController extends Controller
 
     public function index()
     {
-        $deposits = QueryBuilder::for($this->model::where('merchant_id', Auth::id()))
-            ->allowedFilters([
-                // AllowedFilter::custom('name', new \App\Http\Filters\MerchantFilter),
-            ])
+        $deposits = QueryBuilder::for(
+            $this->model::join('merchants', 'merchant_deposits.merchant_id', '=', 'merchants.id')
+                ->select('merchant_deposits.*')
+                ->where('merchant_deposits.merchant_id', Auth::id())
+        )
+            ->allowedFilters('name')
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($deposits, $this->transformer);

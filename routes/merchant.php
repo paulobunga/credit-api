@@ -20,6 +20,7 @@ $api->group([
         $api->post('/auth/me', ['as' => 'auth.me', 'uses' => 'AuthController@me']);
         $api->put("/auth/update", ['as' => 'auth.update', 'uses' => 'AuthController@update']);
         $api->put("/auth/renew", ['as' => 'auth.renew', 'uses' => 'AuthController@renew']);
+        $api->put("/auth/whitelist", ['as' => 'auth.whitelist', 'uses' => 'AuthController@whitelist']);
 
         $api->resource('deposits', 'DepositController', ['only' => 'index']);
         $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'store']]);

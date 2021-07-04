@@ -27,6 +27,9 @@ $api->group([
 
         $api->resource('merchants', 'MerchantController');
         $api->put("/merchants/renew/{merchant}", ['as' => 'merchants.renew', 'uses' => 'MerchantController@renew']);
+        $api->put("/merchants/whitelist/{merchant}", [
+            'as' => 'merchants.whitelist', 'uses' => 'MerchantController@whitelist'
+        ]);
 
         $api->resource('merchant_deposits', 'MerchantDepositController');
         $api->resource('merchant_withdrawals', 'MerchantWithdrawalController');

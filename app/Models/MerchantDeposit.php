@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Str;
+use App\Trait\Sortable;
+use App\Trait\Filterable;
 
 class MerchantDeposit extends Model
 {
-    use HasFactory;
+    use HasFactory, Sortable, Filterable;
 
     protected $fillable = [
         'merchant_id',
@@ -20,6 +21,17 @@ class MerchantDeposit extends Model
         'callback_url',
         'reference_no',
         'info'
+    ];
+
+    protected $filterable_fields = [
+        'name' => 'like',
+        'status' => '=',
+    ];
+
+    protected $sortable_fields = [
+        'id' => 'id',
+        'name' => 'name',
+        'status' => 'status'
     ];
 
     public function merchant()

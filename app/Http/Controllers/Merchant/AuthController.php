@@ -64,13 +64,15 @@ class AuthController extends Controller
         $this->validate($request, [
             'name' => "required|unique:merchants,name," . Auth::id(),
             'username' => "required|unique:merchants,username," . Auth::id(),
-            // 'api_whitelist' => 'required|array',
+            'phone' => 'required',
+            'transaction_fee' => 'required|numeric',
             'callback_url' => 'required',
         ]);
         Auth::user()->update([
             'name' => $request->name,
             'username' => $request->username,
-            // 'api_whitelist' => $request->api_whitelist,
+            'phone' => $request->phone,
+            'transaction_fee' => $request->transaction_fee,
             'callback_url' => $request->callback_url,
         ]);
 
@@ -82,6 +84,24 @@ class AuthController extends Controller
         Auth::user()->api_key = Str::random(30);
         Auth::user()->save();
 
+        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+    }
+
+    public function whitelist(Request $request)
+    {
+        $this->validate($request, [
+            'ip' => 'required|array',
+            'ip.*' => 'required|distinct|ipv4',
+        ]);
+        \App\Models\MerchantWhiteList::where('merchant_id', Auth::id())->delete();
+        \App\Models\MerchantWhiteList::insert(
+            collect($request->get('ip'))->map(
+                function ($v) {
+                    return ['merchant_id' => Auth::id(), 'ip' => $v];
+                }
+            )->toArray()
+        );
+        
         return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
     }
 }

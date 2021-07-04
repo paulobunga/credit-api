@@ -30,7 +30,7 @@ class MerchantController extends Controller
             'name' => 'required|unique:merchants,name',
             'username' => 'required|unique:merchants,username',
             'password' => 'required|confirmed',
-            'api_whitelist' => 'required|array',
+            'phone' => 'required',
             'callback_url' => 'required',
             'status' => 'required|boolean'
         ]);
@@ -38,7 +38,7 @@ class MerchantController extends Controller
             'name' => $request->name,
             'username' => $request->username,
             'password' => $request->password,
-            'api_whitelist' => $request->api_whitelist,
+            'phone' => $request->phone,
             'callback_url' => $request->callback_url,
             'status' => $request->status
         ]);
@@ -52,14 +52,14 @@ class MerchantController extends Controller
         $this->validate($request, [
             'name' => "required|unique:merchants,name,{$merchant->id}",
             'username' => "required|unique:merchants,username,{$merchant->id}",
-            'api_whitelist' => 'required|array',
+            'phone' => 'required',
             'callback_url' => 'required',
             'status' => 'required|boolean'
         ]);
         $merchant->update([
             'name' => $request->name,
             'username' => $request->username,
-            'api_whitelist' => $request->api_whitelist,
+            'phone' => $request->phone,
             'callback_url' => $request->callback_url,
             'status' => $request->status
         ]);
@@ -82,5 +82,28 @@ class MerchantController extends Controller
         $merchant->save();
 
         return $this->response->item($merchant, $this->transformer);
+    }
+
+    public function whitelist(Request $request)
+    {
+        $merchant = $this->model::where('id', $this->parameters('merchant'))->firstOrFail();
+        $this->validate($request, [
+            'ip' => 'required|array',
+            'ip.*' => 'required|distinct|ipv4',
+        ]);
+        \App\Models\MerchantWhiteList::where('merchant_id', $merchant->id)->delete();
+        \App\Models\MerchantWhiteList::insert(
+            collect($request->get('ip'))->map(
+                function ($v) use ($merchant) {
+                    return ['merchant_id' => $merchant->id, 'ip' => $v];
+                }
+            )->toArray()
+        );
+        $merchant_white_lists = \App\Models\MerchantWhiteList::where('merchant_id', $merchant->id)->get();
+
+        return $this->response->collection(
+            $merchant_white_lists,
+            \App\Transformers\Admin\MerchantWhiteListTransformer::class
+        );
     }
 }

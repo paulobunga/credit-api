@@ -38,6 +38,11 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
         $this->api_key = Str::random(30);
     }
 
+    public function whiteLists()
+    {
+        return $this->hasMany(MerchantWhiteList::class);
+    }
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;

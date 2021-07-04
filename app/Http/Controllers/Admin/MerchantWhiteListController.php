@@ -7,8 +7,6 @@ use Dingo\Api\Http\Request;
 use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedSort;
-use App\Http\Sorts\RelationShipSort;
 
 class MerchantWhiteListController extends Controller
 {
@@ -20,12 +18,13 @@ class MerchantWhiteListController extends Controller
         $merchant_white_lists = QueryBuilder::for(
             $this->model::join('merchants', 'merchant_white_lists.merchant_id', '=', 'merchants.id')
                 ->select('merchant_white_lists.*')
+                ->filter(request()->get('filter', '{}'))
+                ->sort(request()->get('sort', 'id'))
         )
             ->allowedFilters([
-                'id',
-                AllowedFilter::custom('value', new \App\Http\Filters\AdminWhiteListFilter)
+                'merchant_id',
             ])
-            ->allowedSorts('id', 'ip', AllowedSort::custom('name', new RelationShipSort(), 'merchants.name'))
+            ->allowedSorts('id', 'ip', 'name')
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($merchant_white_lists, $this->transformer);
@@ -34,7 +33,7 @@ class MerchantWhiteListController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'merchant_id' => 'required|exists:admins,id',
+            'merchant_id' => 'required|exists:merchants,id',
             'ip' => [
                 'required',
                 'ipv4',

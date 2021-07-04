@@ -17,13 +17,6 @@ class Bank extends Model
         'status'
     ];
 
-    protected $sortable_fields = [
-        'id' => 'id',
-        'name' => 'name',
-        'ident' => 'ident',
-        'status' => 'status'
-    ];
-
     protected $casts = [
         'status' => 'boolean',
     ];
@@ -34,4 +27,10 @@ class Bank extends Model
         'status' => '=',
     ];
 
+    protected $sortable_fields = [
+        'id' => 'id',
+        'name' => 'name',
+        'ident' => 'ident',
+        'status' => 'status'
+    ];
 }

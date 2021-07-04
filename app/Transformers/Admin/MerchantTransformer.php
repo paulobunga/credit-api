@@ -12,9 +12,9 @@ class MerchantTransformer extends TransformerAbstract
             'id' => $merchant->id,
             'name' => $merchant->name,
             'username' => $merchant->username,
+            'phone' => $merchant->phone,
             'merchant_id' => $merchant->merchant_id,
             'api_key' => $merchant->api_key,
-            'api_whitelist' => $merchant->api_whitelist,
             'callback_url' => $merchant->callback_url,
             'status' => $merchant->status,
         ];

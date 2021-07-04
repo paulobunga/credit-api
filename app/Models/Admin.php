@@ -32,6 +32,11 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    public function whiteLists()
+    {
+        return $this->hasMany(AdminWhiteList::class);
+    }
     
     public function setPasswordAttribute($value)
     {
