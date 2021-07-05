@@ -24,5 +24,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->routeMiddleware([
             'api.auth' => \App\Http\Middleware\Authenticate::class,
         ]);
+        $this->bootBroadCast();
+    }
+
+    protected function bootBroadCast()
+    {
+        $router = app('router');
+        $router->group(['middleware' => 'api.auth:merchant'], function ($router) {
+            $router->get('/broadcasting/auth', ['uses' => '\App\Http\Controllers\BroadcastController@authenticate']);
+            $router->post('/broadcasting/auth', ['uses' => '\App\Http\Controllers\BroadcastController@authenticate']);
+        });
     }
 }
