@@ -133,6 +133,7 @@ $api->version(
         require __DIR__ . '/../routes/api.php';
         require __DIR__ . '/../routes/admin.php';
         require __DIR__ . '/../routes/merchant.php';
+        require __DIR__ . '/../routes/reseller.php';
     }
 );
 

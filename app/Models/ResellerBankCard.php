@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Trait\Sortable;
+use App\Trait\Filterable;
 
 class ResellerBankCard extends Model
 {
-    use HasFactory;
+    use HasFactory, Sortable, Filterable;
 
     protected $fillable = [
         'reseller_id',
@@ -16,6 +18,24 @@ class ResellerBankCard extends Model
         'account_no',
         'account_name',
         'status',
+    ];
+
+    protected $casts = [
+        'status' => 'boolean',
+    ];
+
+    protected $filterable_fields = [
+        'status' => '=',
+        'account_name' => 'like',
+        'account_no' => 'like',
+        'banks.name' => 'like',
+        'banks.type' => '=',
+    ];
+
+    protected $sortable_fields = [
+        'id' => 'id',
+        'name' => 'name',
+        'status' => 'status'
     ];
 
     public function reseller()
@@ -39,9 +59,4 @@ class ResellerBankCard extends Model
             'payment_method_id'
         );
     }
-
-    protected $casts = [
-        'status' => 'boolean',
-    ];
-
 }

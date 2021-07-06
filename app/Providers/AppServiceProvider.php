@@ -30,9 +30,7 @@ class AppServiceProvider extends ServiceProvider
     protected function bootBroadCast()
     {
         $router = app('router');
-        $router->group(['middleware' => 'api.auth:merchant'], function ($router) {
-            $router->get('/broadcasting/auth', ['uses' => '\App\Http\Controllers\BroadcastController@authenticate']);
-            $router->post('/broadcasting/auth', ['uses' => '\App\Http\Controllers\BroadcastController@authenticate']);
-        });
+        $router->get('/broadcasting/auth', ['uses' => '\App\Http\Controllers\BroadcastController@authenticate']);
+        $router->post('/broadcasting/auth', ['uses' => '\App\Http\Controllers\BroadcastController@authenticate']);
     }
 }

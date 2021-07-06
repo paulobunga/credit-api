@@ -11,16 +11,20 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Auth\Authorizable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Trait\HasJWTSubject;
+use Illuminate\Notifications\Notifiable;
 
 class Reseller extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
+    use Notifiable;
 
     protected $fillable = [
         'name',
         'username',
         'phone',
         'password',
+        'credit',
+        'coin',
         'transaction_fee',
         'pending_limit',
         'status',

@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
 
-class DepositNotification extends Notification implements ShouldBroadcast
+class DepositUpdateNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -52,14 +51,22 @@ class DepositNotification extends Notification implements ShouldBroadcast
             'message' => str_replace(
                 ['\r', '\n'],
                 '',
-                "You got a new order {$this->deposit->order_id},
-                please check your account {$this->deposit->resellerBankCard->account_no} with the following info,
-                account number {$this->deposit->account_no},
-                account name {$this->deposit->account_name},
-                amount {$this->deposit->amount},
+                "Your order #{$this->deposit->merchant_order_id} has been {$this->getStatus()}
                 "
             ),
             'time' => $this->deposit->updated_at->toDateTimeString(),
         ];
+    }
+
+    protected function getStatus()
+    {
+        switch ($this->deposit->status) {
+            case 2:
+                return 'approved';
+            case 3:
+                return 'rejected';
+            default:
+                return 'error';
+        }
     }
 }

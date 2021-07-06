@@ -117,7 +117,7 @@ class DepositController extends Controller
             'status' => 1,
             'reference_no' => $request->reference_no
         ]);
-        $deposit->merchant->notify(new \App\Notifications\DepositNotification($deposit));
+        $deposit->reseller->notify(new \App\Notifications\DepositPendingNotification($deposit));
 
         return $this->success();
     }

@@ -28,6 +28,8 @@ class MerchantDeposit extends Model
     protected $filterable_fields = [
         'name' => 'like',
         'status' => '=',
+        'account_name' => 'like',
+        'account_no' => 'like'
     ];
 
     protected $sortable_fields = [
@@ -44,6 +46,18 @@ class MerchantDeposit extends Model
     public function resellerBankCard()
     {
         return $this->hasOne(resellerBankCard::class, 'id', 'reseller_bank_card_id');
+    }
+
+    public function reseller()
+    {
+        return $this->hasOneThrough(
+            Reseller::class,
+            resellerBankCard::class,
+            'id',
+            'id',
+            'reseller_bank_card_id',
+            'reseller_id'
+        );
     }
 
     public function bank()
