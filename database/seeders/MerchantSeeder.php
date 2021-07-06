@@ -14,6 +14,7 @@ class MerchantSeeder extends Seeder
     public function run()
     {
         \App\Models\Merchant::create([
+            'uuid' => '224d4a1f-6fc5-4039-bd81-fcbc7f88c659',
             'name' => 'Test Merchant',
             'username' => 'merchant@gmail.com',
             'password' => 'P@ssw0rd',

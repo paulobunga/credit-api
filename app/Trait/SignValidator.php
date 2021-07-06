@@ -11,12 +11,12 @@ trait SignValidator
     protected function validateSign(Request $request)
     {
         $this->validate($request, [
-            'merchant_id' => 'required',
+            'uuid' => 'required|exists:merchants,uuid',
             'sign' => 'required'
         ], [
             'sign.required' => 'sign is required'
         ]);
-        $merchant = $this->merchant_class::where('merchant_id', $request->merchant_id)->firstOrFail();
+        $merchant = $this->merchant_class::where('uuid', $request->uuid)->firstOrFail();
         $sign = $this->createSign($request->all(), $merchant->api_key);
         if ($sign !== $request->sign) {
             if (env('APP_ENV') == 'local') {

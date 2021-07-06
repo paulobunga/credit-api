@@ -54,6 +54,8 @@ class DepositController extends Controller
                     ]);
                 }),
             ],
+            'account_no' => 'required',
+            'account_name' => 'required_if:type,online_bank',
             'type' => 'required',
             'amount' => 'numeric|min:10',
         ]);
@@ -73,6 +75,8 @@ class DepositController extends Controller
                 'reseller_bank_card_id' => $reseller_bank_card->id,
                 'order_id' => '#' . str_pad($last_order->id + 1, 8, "0", STR_PAD_LEFT) . time(),
                 'merchant_order_id' => $request->merchant_order_id,
+                'account_no' => $request->account_no,
+                'account_name' => $request->get('account_name', ''),
                 'amount' => $request->amount,
                 'status' => 0,
                 'callback_url' => $merchant->callback_url,
@@ -84,7 +88,7 @@ class DepositController extends Controller
         }
         DB::commit();
         $params = [
-            'merchant_id' => $merchant->merchant_id,
+            'uuid' => $merchant->uuid,
             'merchant_order_id' => $merchant_deposit->merchant_order_id,
             'time' => time()
         ];
@@ -113,6 +117,7 @@ class DepositController extends Controller
             'status' => 1,
             'reference_no' => $request->reference_no
         ]);
+        $deposit->merchant->notify(new \App\Notifications\DepositNotification($deposit));
 
         return $this->success();
     }

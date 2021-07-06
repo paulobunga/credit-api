@@ -10,10 +10,10 @@ class MerchantTransformer extends TransformerAbstract
     {
         return [
             'id' => $merchant->id,
+            'uuid' => $merchant->uuid,
             'name' => $merchant->name,
             'username' => $merchant->username,
             'phone' => $merchant->phone,
-            'merchant_id' => $merchant->merchant_id,
             'api_key' => $merchant->api_key,
             'callback_url' => $merchant->callback_url,
             'status' => $merchant->status,

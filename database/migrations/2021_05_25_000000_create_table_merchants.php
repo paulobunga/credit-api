@@ -16,10 +16,10 @@ class CreateTableMerchants extends Migration
     {
         Schema::create('merchants', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->string('name');
             $table->string('username')->unique();
             $table->string('phone', 20);
-            $table->uuid('merchant_id')->unique();
             $table->string('api_key', 30);
             $table->decimal('credit', 14, 4)->default(0);
             $table->decimal('transaction_fee', 5, 4)->default(0);

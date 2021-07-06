@@ -19,9 +19,9 @@ class AuthTransformer extends TransformerAbstract
     {
         return [
             'id' => $merchant->id,
+            'uuid' => $merchant->uuid,
             'name' => $merchant->name,
             'username' => $merchant->username,
-            'merchant_id' => $merchant->merchant_id,
             'phone' => $merchant->phone,
             'transaction_fee' => $merchant->transaction_fee,
             'api_key' => $merchant->api_key,

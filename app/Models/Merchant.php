@@ -12,12 +12,15 @@ use Illuminate\Support\Str;
 use Laravel\Lumen\Auth\Authorizable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Trait\HasJWTSubject;
+use Illuminate\Notifications\Notifiable;
 
 class Merchant extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
+    use Notifiable;
 
     protected $fillable = [
+        'uuid',
         'name',
         'username',
         'phone',
@@ -34,7 +37,7 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->merchant_id = Str::uuid();
+        $this->uuid = $attributes['uuid'] ?? Str::uuid();
         $this->api_key = Str::random(30);
     }
 
