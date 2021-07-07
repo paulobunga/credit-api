@@ -24,5 +24,6 @@ $api->group([
         $api->resource('bankcards', 'BankCardController');
         $api->resource('deposits', 'DepositController', ['only' => ['index', 'update']]);
         $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'store']]);
+        $api->resource('reports', 'ReportController', ['only' => ['index']]);
     });
 });

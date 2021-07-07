@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ReportResellerFund extends Model
+class ReportDailyReseller extends Model
 {
 
     public function reseller()

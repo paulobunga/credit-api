@@ -15,8 +15,8 @@ class DepositController extends Controller
     public function index()
     {
         $deposits = QueryBuilder::for(
-            $this->model::join('merchants', 'merchant_deposits.merchant_id', '=', 'merchants.id')
-                ->select('merchant_deposits.*')
+            $this->model::select('merchant_deposits.*')
+                ->leftjoin('merchants', 'merchant_deposits.merchant_id', '=', 'merchants.id')
                 ->where('merchant_deposits.merchant_id', Auth::id())
         )
             ->allowedFilters('name')

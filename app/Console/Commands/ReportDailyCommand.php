@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Carbon\Exceptions\InvalidArgumentException;
 
 class ReportDailyCommand extends Command
 {
@@ -13,7 +14,7 @@ class ReportDailyCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'report:daily';
+    protected $signature = 'report:daily {date?}';
 
     /**
      * The console command description.
@@ -39,113 +40,131 @@ class ReportDailyCommand extends Command
      */
     public function handle()
     {
-        $this->calResellers();
-        $this->calMerchants();
+        try {
+            $date = $this->argument('date') ?
+                Carbon::parse($this->argument('date'))->toDateString() : date('Y-m-d', strtotime('-1 day'));
+        } catch (InvalidArgumentException $e) {
+            $this->error('invalid argument date');
+            return;
+        }
+        $start_datetime = "{$date} 00:00:00";
+        $end_datetime = "{$date} 23:59:59";
+        $this->calulateResellers($start_datetime, $end_datetime);
+        $this->calulateMerchants($start_datetime, $end_datetime);
     }
 
-    protected function calResellers()
+    protected function calulateResellers($start_datetime, $end_datetime)
     {
         $sql = "
-        WITH report AS (
-            SELECT 
-                r.name,
-                d.reseller_id,
-                f.type,
-                f.amount
-            FROM reseller_fund_records AS f
-            LEFT JOIN reseller_deposits AS d ON d.id =  f.fundable_id 
-            LEFT JOIN resellers AS r ON r.id =  d.reseller_id
-            WHERE f.fundable_type = 'App\\\\Models\\\\ResellerDeposit'
-            UNION ALL
-            SELECT 
-                r.name,
-                d.reseller_id,
-                f.type,
-                f.amount
-            FROM reseller_fund_records AS f
-            LEFT JOIN reseller_withdrawals AS d ON d.id =  f.fundable_id 
-            LEFT JOIN resellers AS r ON r.id =  d.reseller_id
-            WHERE f.fundable_type = 'App\\\\Models\\\\ResellerWithdrawal'
+        WITH daily_transaction AS (        
+            SELECT
+                    t.id, 
+                    m.name,
+                    t.amount,
+                    t.created_at
+            FROM transactions AS t
+            LEFT JOIN transaction_methods AS m ON m.id =  t.transaction_method_id
+            WHERE t.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
         ),
-        report_all AS (
-          SELECT
+        daily_merchant_deposit AS(
+          SELECT 
+                dt.*,
+                md.id AS merchant_deposit_id,
+                md.merchant_order_id,
+                md.reseller_bank_card_id,
+                rbc.account_name,
+                rbc.account_no,
+                rbc.reseller_id
+            FROM daily_transaction AS dt
+            JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'App\\\\Models\\\\MerchantDeposit'
+            LEFT JOIN merchant_deposits AS md ON mht.model_id = md.id
+            LEFT JOIN reseller_bank_cards AS rbc ON md.reseller_bank_card_id = rbc.id
+            LEFT JOIN resellers AS r ON rbc.reseller_id = r.id
+            WHERE dt.name IN ('DEDUCT_CREDIT', 'TOPUP_COIN')
+        ),
+        daily_report AS (
+            SELECT 
                 reseller_id,
-                COUNT(*) AS turnover,
-                SUM(CASE WHEN type=0 THEN amount ELSE 0 END) as total_top_credit,
-                SUM(CASE WHEN type=1 THEN amount ELSE 0 END) as total_withdraw_credit,
-                SUM(CASE WHEN type=2 THEN amount ELSE 0 END) as total_top_coin,
-                SUM(CASE WHEN type=3 THEN amount ELSE 0 END) as total_deduct_coin
-            FROM report 
+                COUNT( DISTINCT merchant_deposit_id) AS turnover,
+                SUM(
+                    CASE WHEN name = 'DEDUCT_CREDIT' THEN -amount
+                    END
+                ) AS credit,
+                SUM(
+                    CASE WHEN name = 'TOPUP_COIN' THEN amount
+                    END
+                ) AS coin
+            FROM daily_merchant_deposit
             GROUP BY reseller_id
         )
-        SELECT * FROM report_all
+        SELECT * FROM daily_report
         ";
+
         $rows = DB::select($sql);
         foreach ($rows as $row) {
-            DB::table('report_reseller_funds')->insert([
+            DB::table('report_daily_resellers')->insert([
                 'reseller_id' => $row->reseller_id,
-                'start_at' => Carbon::now()->startOfDay(),
-                'end_at' => Carbon::now()->endOfDay(),
+                'start_at' => $start_datetime,
+                'end_at' => $end_datetime,
                 'turnover' => $row->turnover,
-                'credit' => $row->total_top_credit - $row->total_withdraw_credit,
-                'coin' => $row->total_top_coin - $row->total_deduct_coin,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
+                'credit' => $row->credit,
+                'coin' => $row->coin,
             ]);
         }
     }
 
-    protected function calMerchants()
+    protected function calulateMerchants($start_datetime, $end_datetime)
     {
         $sql = "
-        WITH report AS (
-            SELECT 
-                r.name,
-                d.merchant_id,
-                f.type,
-                f.amount
-            FROM merchant_fund_records AS f
-            LEFT JOIN merchant_deposits AS d ON d.id =  f.fundable_id 
-            LEFT JOIN merchants AS r ON r.id =  d.merchant_id
-            WHERE f.fundable_type = 'App\\\\Models\\\\MerchantDeposit'
-            UNION ALL
-            SELECT 
-                r.name,
-                d.merchant_id,
-                f.type,
-                f.amount
-            FROM merchant_fund_records AS f
-            LEFT JOIN merchant_withdrawals AS d ON d.id =  f.fundable_id 
-            LEFT JOIN merchants AS r ON r.id =  d.merchant_id
-            WHERE f.fundable_type = 'App\\\\Models\\\\MerchantWithdrawal'
+        WITH daily_transaction AS (        
+            SELECT
+                    t.id, 
+                    m.name,
+                    t.amount,
+                    t.created_at
+            FROM transactions AS t
+            LEFT JOIN transaction_methods AS m ON m.id =  t.transaction_method_id
+            WHERE t.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
         ),
-        report_all AS (
-          SELECT
+        daily_merchant_deposit AS(
+          SELECT 
+                dt.*,
+                md.id AS merchant_deposit_id,
+								md.merchant_id,
+                md.merchant_order_id
+            FROM daily_transaction AS dt
+            JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'App\\\\Models\\\\MerchantDeposit'
+            LEFT JOIN merchant_deposits AS md ON mht.model_id = md.id
+            LEFT JOIN merchants AS m ON md.merchant_id = m.id
+            WHERE dt.name IN ('TOPUP_CREDIT', 'TRANSACTION_FEE')
+        ),
+        daily_report AS (
+            SELECT 
                 merchant_id,
-                COUNT(*) AS turnover,
-                SUM(CASE WHEN type=0 THEN amount ELSE 0 END) as total_top_credit,
-                SUM(CASE WHEN type=1 THEN amount ELSE 0 END) as total_withdraw_credit,
-                SUM(CASE WHEN type=2 THEN amount ELSE 0 END) as total_top_bonus,
-                SUM(CASE WHEN type=3 THEN amount ELSE 0 END) as total_transaction_fee
-            FROM report
+                COUNT( DISTINCT merchant_deposit_id) AS turnover,
+                SUM(
+                    CASE WHEN name = 'TOPUP_CREDIT' THEN amount
+                    END
+                ) AS credit,
+                SUM(
+                    CASE WHEN name = 'TRANSACTION_FEE' THEN -amount
+                    END
+                ) AS transaction_fee
+            FROM daily_merchant_deposit
             GROUP BY merchant_id
         )
-        SELECT * FROM report_all
+        SELECT * FROM daily_report
         ";
+
         $rows = DB::select($sql);
         foreach ($rows as $row) {
-            DB::table('report_merchant_funds')->insert([
+            DB::table('report_daily_merchants')->insert([
                 'merchant_id' => $row->merchant_id,
-                'start_at' => Carbon::now()->startOfDay(),
-                'end_at' => Carbon::now()->endOfDay(),
+                'start_at' => $start_datetime,
+                'end_at' => $end_datetime,
                 'turnover' => $row->turnover,
-                'credit' => $row->total_top_credit - $row->total_withdraw_credit,
-                'transaction_fee' => $row->total_transaction_fee,
-                'info' => json_encode([
-                    'bonus' => $row->total_top_bonus,
-                ]),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
+                'credit' => $row->credit,
+                'transaction_fee' => $row->transaction_fee,
             ]);
         }
     }

@@ -11,7 +11,7 @@ class ReportController extends Controller
 {
     public function reseller()
     {
-        $reports = QueryBuilder::for(\App\Models\ReportResellerFund::class)
+        $reports = QueryBuilder::for(\App\Models\ReportDailyReseller::class)
             ->allowedFilters([
                 // AllowedFilter::custom('name', new \App\Http\Filters\ResellerFilter),
             ])
@@ -24,7 +24,7 @@ class ReportController extends Controller
 
     public function merchant()
     {
-        $reports = QueryBuilder::for(\App\Models\ReportMerchantFund::class)
+        $reports = QueryBuilder::for(\App\Models\ReportDailyMerchant::class)
             ->allowedFilters([
                 // AllowedFilter::custom('name', new \App\Http\Filters\ResellerFilter),
             ])

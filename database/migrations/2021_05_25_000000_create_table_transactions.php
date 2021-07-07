@@ -25,7 +25,7 @@ class CreateTableTransactions extends Migration
         DB::table('transaction_methods')->insert(['name' => 'DEDUCT_CREDIT']);
         DB::table('transaction_methods')->insert(['name' => 'TOPUP_COIN']);
         DB::table('transaction_methods')->insert(['name' => 'DEDUCT_COIN']);
-        DB::table('transaction_methods')->insert(['name' => 'DEDUCT_TRANSACTION_FEE']);
+        DB::table('transaction_methods')->insert(['name' => 'TRANSACTION_FEE']);
         
         Schema::create('model_has_transactions', function (Blueprint $table) {
             $table->unsignedBigInteger('transaction_id');

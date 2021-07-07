@@ -19,15 +19,9 @@ class ResellerDepositSeeder extends Seeder
     {
         foreach (Reseller::all() as $reseller) {
             $admin = Admin::inRandomOrder()->first();
-            $transaction_method_id = [
-                1
-            ];
             ResellerDeposit::factory()->create([
                 'reseller_id' => $reseller->id,
                 'admin_id' => $admin->id,
-            ])->transactions()->create([
-                'transaction_method_id' => $transaction_method_id[array_rand($transaction_method_id)],
-                'amount' => rand(20, 10000)
             ]);
         }
     }

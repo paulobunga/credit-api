@@ -8,6 +8,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use App\Models\TransactionMethod;
 
 class DepositController extends Controller
 {
@@ -20,12 +21,14 @@ class DepositController extends Controller
             $this->model::whereHas('reseller', function (Builder $query) {
                 $query->where('resellers.id', Auth::id());
             })
-                ->select('merchant_deposits.*')
-                ->leftjoin(
-                    'reseller_bank_cards',
-                    'merchant_deposits.reseller_bank_card_id',
-                    '=',
-                    'reseller_bank_cards.id'
+                // ->join(
+                //     'reseller_bank_cards',
+                //     'merchant_deposits.reseller_bank_card_id',
+                //     '=',
+                //     'reseller_bank_cards.id'
+                // )
+                ->select(
+                    'merchant_deposits.*',
                 )
                 ->filter(request()->get('filter', '{}'))
                 ->sort(request()->get('sort', 'id'))
@@ -45,6 +48,7 @@ class DepositController extends Controller
         $this->validate($request, [
             'status' => 'required|numeric',
         ]);
+        $methods = TransactionMethod::all()->pluck('id', 'name');
         DB::beginTransaction();
         try {
             $deposit->update([
@@ -52,16 +56,26 @@ class DepositController extends Controller
             ]);
             // approve
             if ($request->status == 2) {
+                // reseller
                 $transaction = $deposit->transactions()->create([
-                    'transaction_method_id' => 1,
+                    'transaction_method_id' => $methods['DEDUCT_CREDIT'],
                     'amount' => $deposit->amount
                 ]);
-                $deposit->merchant->increment('credit', $transaction->amount);
+                $deposit->reseller->decrement('credit', $transaction ->amount);
                 $transaction = $deposit->transactions()->create([
-                    'transaction_method_id' => 5,
-                    'amount' => $deposit->amount * $deposit->merchant->transaction_fee
+                    'transaction_method_id' => $methods['TOPUP_COIN'],
+                    'amount' => $transaction ->amount
                 ]);
-                $deposit->merchant->decrement('credit', $transaction->amount);
+                $deposit->reseller->increment('coin', $deposit->amount);
+                // merchant
+                $transaction = $deposit->transactions()->create([
+                    'transaction_method_id' => $methods['TOPUP_CREDIT'],
+                    'amount' => $transaction->amount
+                ]);
+                $transaction = $deposit->transactions()->create([
+                    'transaction_method_id' => $methods['TRANSACTION_FEE'],
+                    'amount' => $transaction->amount
+                ]);
             }
         } catch (\Exception $e) {
             DB::rollback();

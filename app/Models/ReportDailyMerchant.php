@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ReportMerchantFund extends Model
+class ReportDailyMerchant extends Model
 {
     public function merchant()
     {

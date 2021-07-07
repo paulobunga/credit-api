@@ -27,6 +27,10 @@ class DepositTransformer extends TransformerAbstract
 
     public function includeTransactions(Model $deposit)
     {
-        return $this->collection($deposit->transactions, new TransactionTransformer, false);
+        return $this->collection(
+            $deposit->transactions->whereIn('transaction_method_id', [1, 5]),
+            new TransactionTransformer,
+            false
+        );
     }
 }
