@@ -13,7 +13,7 @@ class MerchantDepositController extends Controller
     protected $model = \App\Models\MerchantDeposit::class;
     protected $transformer = \App\Transformers\Admin\MerchantDepositTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $merchant_deposits = QueryBuilder::for($this->model)
             // ->allowedFilters([
@@ -54,7 +54,7 @@ class MerchantDepositController extends Controller
                 ]);
                 $transaction = $merchant_deposit->transactions()->create([
                     'transaction_method_id' => $methods['TRANSACTION_FEE'],
-                    'amount' => $transaction->amount
+                    'amount' => $transaction->amount * $merchant_deposit->merchant->transaction_fee
                 ]);
             }
         } catch (\Exception $e) {

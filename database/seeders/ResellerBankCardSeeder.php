@@ -27,6 +27,8 @@ class ResellerBankCardSeeder extends Seeder
                 ]);
                 if ($reseller->name == 'Test Reseller') {
                     $card->status = true;
+                } else {
+                    $card->status = false;
                 }
                 switch ($method->name) {
                     case 'online_bank':

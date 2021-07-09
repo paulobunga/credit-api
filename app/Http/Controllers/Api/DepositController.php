@@ -18,7 +18,7 @@ class DepositController extends Controller
     protected $model = \App\Models\MerchantDeposit::class;
     protected $transformer = \App\Transformers\Api\DepositTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $merchant = $this->validateSign(request());
         $merchant_deposits = QueryBuilder::for($this->model::where('merchant_id', $merchant->id))

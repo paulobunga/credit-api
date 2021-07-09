@@ -13,7 +13,7 @@ class MerchantWhiteListController extends Controller
     protected $model = \App\Models\MerchantWhiteList::class;
     protected $transformer = \App\Transformers\Admin\MerchantWhiteListTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $merchant_white_lists = QueryBuilder::for(
             $this->model::join('merchants', 'merchant_white_lists.merchant_id', '=', 'merchants.id')

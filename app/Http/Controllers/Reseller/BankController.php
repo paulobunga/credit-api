@@ -11,14 +11,14 @@ class BankController extends Controller
     protected $model = \App\Models\Bank::class;
     protected $transformer = \App\Transformers\Reseller\BankTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $banks = QueryBuilder::for(
             $this->model::where('status', true)
                 ->select('banks.*', 'payment_methods.name as type')
                 ->leftjoin('payment_methods', 'banks.payment_method_id', '=', 'payment_methods.id')
                 ->filter(
-                    request()->get('filter', '{}')
+                    $request->get('filter', '{}')
                 )->sort(request()->get('sort', 'id'))
         )
             ->allowedFilters([

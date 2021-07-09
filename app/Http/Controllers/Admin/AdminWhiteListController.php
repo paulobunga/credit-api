@@ -14,7 +14,7 @@ class AdminWhiteListController extends Controller
     protected $model = \App\Models\AdminWhiteList::class;
     protected $transformer = \App\Transformers\Admin\AdminWhiteListTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $admin_white_lists = QueryBuilder::for(
             $this->model::join('admins', 'admin_white_lists.admin_id', '=', 'admins.id')

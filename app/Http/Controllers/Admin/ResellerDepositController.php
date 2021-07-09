@@ -12,7 +12,7 @@ class ResellerDepositController extends Controller
     protected $model = \App\Models\ResellerDeposit::class;
     protected $transformer = \App\Transformers\Admin\ResellerDepositTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $reseller_deposits = QueryBuilder::for($this->model)
             ->allowedFilters([

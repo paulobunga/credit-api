@@ -13,11 +13,11 @@ class BankController extends Controller
     protected $model = \App\Models\Bank::class;
     protected $transformer = \App\Transformers\Admin\BankTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $banks = QueryBuilder::for(
             $this->model::filter(
-                request()->get('filter', '{}')
+                $request->get('filter', '{}')
             )->sort(request()->get('sort', 'id'))
         )
             ->allowedFilters([

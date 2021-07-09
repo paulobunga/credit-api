@@ -15,7 +15,7 @@ class DepositController extends Controller
     protected $model = \App\Models\MerchantDeposit::class;
     protected $transformer = \App\Transformers\Reseller\DepositTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $deposits = QueryBuilder::for(
             $this->model::whereHas('reseller', function (Builder $query) {
@@ -30,8 +30,8 @@ class DepositController extends Controller
                 ->select(
                     'merchant_deposits.*',
                 )
-                ->filter(request()->get('filter', '{}'))
-                ->sort(request()->get('sort', 'id'))
+                ->filter($request->get('filter', '{}'))
+                ->sort($request->get('sort', 'id'))
         )
             ->allowedFilters('name')
             ->paginate($this->perPage);
@@ -64,9 +64,9 @@ class DepositController extends Controller
                 $deposit->reseller->decrement('credit', $transaction ->amount);
                 $transaction = $deposit->transactions()->create([
                     'transaction_method_id' => $methods['TOPUP_COIN'],
-                    'amount' => $transaction ->amount
+                    'amount' => $transaction ->amount * $deposit->reseller->transaction_fee
                 ]);
-                $deposit->reseller->increment('coin', $deposit->amount);
+                $deposit->reseller->increment('coin', $transaction->amount);
                 // merchant
                 $transaction = $deposit->transactions()->create([
                     'transaction_method_id' => $methods['TOPUP_CREDIT'],
@@ -74,7 +74,7 @@ class DepositController extends Controller
                 ]);
                 $transaction = $deposit->transactions()->create([
                     'transaction_method_id' => $methods['TRANSACTION_FEE'],
-                    'amount' => $transaction->amount
+                    'amount' => $transaction->amount * $deposit->merchant->transaction_fee
                 ]);
             }
         } catch (\Exception $e) {

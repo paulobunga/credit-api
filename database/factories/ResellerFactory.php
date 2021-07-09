@@ -27,7 +27,7 @@ class ResellerFactory extends Factory
             'phone' => $this->faker->phoneNumber,
             'credit' => $this->faker->numberBetween(1, 1000),
             'coin' => $this->faker->numberBetween(1, 1000),
-            'transaction_fee' => $this->faker->randomFloat(4, 0, 1),
+            'transaction_fee' => $this->faker->randomFloat(4, 0, 0.03),
             'pending_limit' => $this->faker->numberBetween(1, 5),
             'status' => $this->faker->boolean,
         ];

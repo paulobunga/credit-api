@@ -25,7 +25,7 @@ class MerchantFactory extends Factory
             'username' => $this->faker->unique()->userName,
             'phone' => $this->faker->phoneNumber,
             'credit' => $this->faker->numberBetween(1, 1000),
-            'transaction_fee' => $this->faker->randomFloat(4, 0, 1),
+            'transaction_fee' => $this->faker->randomFloat(4, 0, 0.03),
             'password' => $this->faker->password,
             'callback_url' => $this->faker->url,
             'status' => $this->faker->boolean,

@@ -12,7 +12,7 @@ class ResellerController extends Controller
     protected $model = \App\Models\Reseller::class;
     protected $transformer = \App\Transformers\Admin\ResellerTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $resellers = QueryBuilder::for($this->model)
             ->allowedFilters([

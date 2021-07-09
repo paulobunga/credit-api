@@ -10,7 +10,6 @@ class ReportTransformer extends TransformerAbstract
     {
         return [
             'id' => $report->id,
-            'merchant' => $report->merchant->name,
             'start_at' => $report->start_at,
             'end_at' => $report->end_at,
             'turnover' => $report->turnover,

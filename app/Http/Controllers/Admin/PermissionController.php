@@ -11,7 +11,7 @@ class PermissionController extends Controller
     protected $model = \App\Models\Permission::class;
     protected $transformer = \App\Transformers\Admin\PermissionTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $permissions = QueryBuilder::for($this->model)
             ->allowedFilters(['name'])

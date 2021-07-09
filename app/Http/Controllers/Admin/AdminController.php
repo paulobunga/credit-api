@@ -12,7 +12,7 @@ class AdminController extends Controller
     protected $model = \App\Models\Admin::class;
     protected $transformer = \App\Transformers\Admin\AdminTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $admins = QueryBuilder::for($this->model)
             ->allowedFilters([

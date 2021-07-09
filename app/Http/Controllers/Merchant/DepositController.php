@@ -12,7 +12,7 @@ class DepositController extends Controller
     protected $model = \App\Models\MerchantDeposit::class;
     protected $transformer = \App\Transformers\Merchant\DepositTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $deposits = QueryBuilder::for(
             $this->model::select('merchant_deposits.*')

@@ -12,7 +12,7 @@ class ResellerBankCardController extends Controller
     protected $model = \App\Models\ResellerBankCard::class;
     protected $transformer = \App\Transformers\Admin\ResellerBankCardTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $reseller_bank_card = QueryBuilder::for($this->model)
             ->allowedFilters([

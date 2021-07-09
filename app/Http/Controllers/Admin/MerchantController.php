@@ -13,7 +13,7 @@ class MerchantController extends Controller
     protected $model = \App\Models\Merchant::class;
     protected $transformer = \App\Transformers\Admin\MerchantTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $merchants = QueryBuilder::for($this->model)
             ->allowedFilters([

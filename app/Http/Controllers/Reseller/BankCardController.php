@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Reseller;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Bank;
@@ -13,7 +13,7 @@ class BankCardController extends Controller
     protected $model = \App\Models\ResellerBankCard::class;
     protected $transformer = \App\Transformers\Reseller\BankCardTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $banks = Bank::select('banks.*', 'payment_methods.name as type')
             ->leftjoin('payment_methods', 'banks.payment_method_id', '=', 'payment_methods.id');
@@ -23,8 +23,8 @@ class BankCardController extends Controller
                 ->joinSub($banks, 'banks', function ($join) {
                     $join->on('reseller_bank_cards.bank_id', '=', 'banks.id');
                 })
-                ->filter(request()->get('filter', '{}'))
-                ->sort(request()->get('sort', 'id'))
+                ->filter($request->get('filter', '{}'))
+                ->sort($request->get('sort', 'id'))
         )
             ->allowedFilters([
                 'id',
@@ -39,7 +39,7 @@ class BankCardController extends Controller
 
     public function store(Request $request)
     {
-        $payment_method = \App\Models\PaymentMethod::where('name', $request->type)->firstOrFail();
+        $payment_method = \App\Models\PaymentMethod::where('name', $request->get('type', ''))->firstOrFail();
         $this->validate($request, [
             'bank_id' => "required|exists:banks,id",
             'account_name' => 'nullable',
@@ -60,7 +60,10 @@ class BankCardController extends Controller
 
     public function update(Request $request)
     {
-        $bankcard = $this->model::findOrFail($this->parameters('bankcard'));
+        $bankcard = $this->model::where([
+            'id' => $this->parameters('bankcard'),
+            'reseller_id' => Auth::id()
+        ])->firstOrFail();
         $this->validate($request, [
             'account_name' => 'nullable',
             'account_no' => 'required',

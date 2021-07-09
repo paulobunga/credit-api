@@ -11,7 +11,7 @@ class RoleController extends Controller
     protected $model = \App\Models\Role::class;
     protected $transformer = \App\Transformers\Admin\RoleTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $roles = QueryBuilder::for($this->model)
             ->allowedFilters(['name'])

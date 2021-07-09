@@ -14,7 +14,7 @@ class WithdrawalController extends Controller
     protected $model = \App\Models\MerchantWithdrawal::class;
     protected $transformer = \App\Transformers\Merchant\WithdrawalTransformer::class;
 
-    public function index()
+    public function index(Request $request)
     {
         $withdrawals = QueryBuilder::for($this->model::where('merchant_id', Auth::id()))
             ->allowedFilters([
