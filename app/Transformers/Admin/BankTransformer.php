@@ -12,6 +12,7 @@ class BankTransformer extends TransformerAbstract
             'id' => $bank->id,
             'ident' => $bank->ident,
             'name' => $bank->name,
+            'type' => $bank->type,
             'status' => $bank->status,
         ];
     }

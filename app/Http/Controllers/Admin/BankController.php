@@ -16,9 +16,11 @@ class BankController extends Controller
     public function index(Request $request)
     {
         $banks = QueryBuilder::for(
-            $this->model::filter(
+            $this->model::select('banks.*', 'payment_methods.name as type')
+            ->leftjoin('payment_methods', 'banks.payment_method_id', '=', 'payment_methods.id')
+            ->filter(
                 $request->get('filter', '{}')
-            )->sort(request()->get('sort', 'id'))
+            )->sort($request->get('sort', 'id'))
         )
             ->allowedFilters([
                 'name', 'ident', 'status'

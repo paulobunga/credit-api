@@ -19,11 +19,6 @@ class ResellerDeposit extends Model
         return $this->belongsTo(Admin::class);
     }
 
-    public function paymentMethod()
-    {
-        return $this->belongsTo(PaymentMethod::class);
-    }
-
     public function transactions()
     {
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');

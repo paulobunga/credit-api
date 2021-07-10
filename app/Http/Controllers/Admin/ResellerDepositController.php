@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
 
 class ResellerDepositController extends Controller
 {
@@ -16,7 +15,7 @@ class ResellerDepositController extends Controller
     {
         $reseller_deposits = QueryBuilder::for($this->model)
             ->allowedFilters([
-                // AllowedFilter::custom('name', new \App\Http\Filters\ResellerFilter),
+                'name'
             ])
             ->paginate($this->perPage);
         return $this->response->withPaginator($reseller_deposits, $this->transformer);

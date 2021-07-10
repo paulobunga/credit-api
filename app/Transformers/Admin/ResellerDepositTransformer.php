@@ -12,7 +12,6 @@ class ResellerDepositTransformer extends TransformerAbstract
             'id' => $reseller_deposit->id,
             'reseller' => $reseller_deposit->reseller->name,
             'admin' => $reseller_deposit->admin->name,
-            'payment_method' => $reseller_deposit->paymentMethod->name,
             'amount' => $reseller_deposit->amount,
             'status' => $reseller_deposit->status,
             'callback_url' => $reseller_deposit->callback_url,

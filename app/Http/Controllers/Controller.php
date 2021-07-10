@@ -7,6 +7,7 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 use App\Exceptions\RouteNotFoundException;
 use Dingo\Api\Http\Request;
 use Illuminate\Support\Arr;
+use Dingo\Api\Exception\ValidationHttpException;
 
 abstract class Controller extends BaseController
 {
@@ -15,6 +16,26 @@ abstract class Controller extends BaseController
     public function __construct()
     {
         $this->perPage = min(request()->get('per_page', 10), 100);
+    }
+
+    public function validate(
+        \Illuminate\Http\Request $request,
+        array $rules,
+        array $messages = [],
+        array $customAttributes = []
+    ) {
+        $validator = $this->getValidationFactory()
+            ->make(
+                $request->all(),
+                $rules,
+                $messages,
+                $customAttributes
+            );
+        if ($validator->fails()) {
+            throw new ValidationHttpException(
+                $validator->errors()
+            );
+        }
     }
 
     protected function parameters($name, $default = null)

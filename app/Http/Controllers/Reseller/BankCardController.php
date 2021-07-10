@@ -39,13 +39,14 @@ class BankCardController extends Controller
 
     public function store(Request $request)
     {
-        $payment_method = \App\Models\PaymentMethod::where('name', $request->get('type', ''))->firstOrFail();
         $this->validate($request, [
             'bank_id' => "required|exists:banks,id",
-            'account_name' => 'nullable',
+            'type' => 'required',
+            'account_name' => 'required_if:type,online_bank',
             'account_no' => 'required',
             'status' => 'required|boolean',
         ]);
+        $payment_method = \App\Models\PaymentMethod::where('name', $request->type)->firstOrFail();
         $bankcard = $this->model::create([
             'reseller_id' => Auth::id(),
             'bank_id' => $request->bank_id,
@@ -65,7 +66,7 @@ class BankCardController extends Controller
             'reseller_id' => Auth::id()
         ])->firstOrFail();
         $this->validate($request, [
-            'account_name' => 'nullable',
+            'account_name' => 'required_if:type,online_bank',
             'account_no' => 'required',
             'status' => 'required|boolean',
         ]);

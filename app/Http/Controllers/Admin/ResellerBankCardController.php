@@ -28,17 +28,23 @@ class ResellerBankCardController extends Controller
     {
         $this->validate($request, [
             'reseller' => 'required|exists:resellers,id',
-            'bank_id' => "required|exists:banks,id",
-            'type' => 'numeric|between:0,2',
-            'account_name' => 'required',
-            'account_no' => 'required|numeric',
+            'type' => 'required',
+            'bank_id' => "required",
+            'account_name' => 'required_if:type,online_bank',
+            'account_no' => 'required',
             'status' => 'required|boolean',
         ]);
+        $payment_method = \App\Models\PaymentMethod::where('name', $request->type)->firstOrFail();
+        $bank = \App\Models\Bank::where([
+            'id' => $request->bank_id,
+            'payment_method_id' => $payment_method->id
+        ])->firstOrFail();
+
         $bank = $this->model::create([
             'reseller_id' => $request->reseller,
-            'bank_id' => $request->bank_id,
-            'type' => $request->type,
-            'account_name' => $request->account_name,
+            'bank_id' => $bank->id,
+            'payment_method_id' => $payment_method->id,
+            'account_name' => $request->account_name??'',
             'account_no' => $request->account_no,
             'status' => $request->status
         ]);
@@ -50,18 +56,23 @@ class ResellerBankCardController extends Controller
     {
         $reseller_bank_card = $this->model::findOrFail($this->parameters('reseller_bank_card'));
         $this->validate($request, [
-            'bank_id' => "required|exists:banks,id",
-            'type' => 'numeric|between:0,2',
-            'account_name' => 'required',
-            'account_no' => 'required|numeric',
+            'type' => 'required',
+            'bank_id' => "required",
+            'account_name' => 'required_if:type,online_bank',
+            'account_no' => 'required',
             'status' => 'required|boolean',
         ]);
+        $payment_method = \App\Models\PaymentMethod::where('name', $request->type)->firstOrFail();
+        $bank = \App\Models\Bank::where([
+            'id' => $request->bank_id,
+            'payment_method_id' => $payment_method->id
+        ])->firstOrFail();
 
         $reseller_bank_card->update([
-            'bank_id' => $request->bank_id,
-            'type' => $request->type,
+            'bank_id' => $bank->id,
+            'payment_method_id' => $payment_method->id,
             'account_no' => $request->account_no,
-            'account_name' => $request->account_name,
+            'account_name' => $request->account_name??'',
             'status' => $request->status
         ]);
 
