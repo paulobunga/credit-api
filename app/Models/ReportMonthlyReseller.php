@@ -5,25 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class ResellerWithdrawal extends Model
+class ReportMonthlyReseller extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'reseller_id',
-        'order_id',
-        'amount',
-        'status',
-        'info'
+        'date',
+        'turnover',
+        'payin',
+        'payout',
+        'coin'
     ];
 
     public function reseller()
     {
         return $this->belongsTo(Reseller::class);
-    }
-
-    public function transactions()
-    {
-        return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
     }
 }

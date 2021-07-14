@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Query\Expression;
 
 class CreateTableResellerWithdrawals extends Migration
 {
@@ -22,7 +23,8 @@ class CreateTableResellerWithdrawals extends Migration
             $table->string('order_id')->unique();
             $table->decimal('amount', 14, 4);
             $table->unsignedTinyInteger('status')
-                  ->comment('0:Created,1::Approved,2:Rejected');
+                ->comment('0:Created,1::Approved,2:Rejected');
+            $table->json('info')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
         });
     }

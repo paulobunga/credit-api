@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidArgumentException;
+use App\Models\ReportMonthlyReseller;
+use App\Models\ReportMonthlyMerchant;
 
 class ReportDailyCommand extends Command
 {
@@ -110,6 +112,24 @@ class ReportDailyCommand extends Command
                 'credit' => $row->credit,
                 'coin' => $row->coin,
             ]);
+
+            $month_report = ReportMonthlyReseller::firstOrCreate(
+                [
+                    'date' => Carbon::now()->startOfMonth()->toDateString('Y-m-d'),
+                    'reseller_id' => $row->reseller_id,
+                ],
+                [
+                    'date' => Carbon::now()->startOfMonth()->toDateString('Y-m-d'),
+                    'reseller_id' => $row->reseller_id,
+                    'turnover' => 0,
+                    'payin' => 0,
+                    'payout' => 0,
+                    'coin' => 0,
+                ],
+            );
+            $month_report->increment('turnover', $row->turnover);
+            $month_report->increment('payin', abs($row->credit));
+            $month_report->increment('coin', $row->coin);
         }
     }
 
@@ -166,6 +186,23 @@ class ReportDailyCommand extends Command
                 'credit' => $row->credit,
                 'transaction_fee' => $row->transaction_fee,
             ]);
+            $month_report = ReportMonthlyMerchant::firstOrCreate(
+                [
+                    'date' => Carbon::now()->startOfMonth()->toDateString('Y-m-d'),
+                    'merchant_id' => $row->merchant_id,
+                ],
+                [
+                    'date' => Carbon::now()->startOfMonth()->toDateString('Y-m-d'),
+                    'merchant_id' => $row->merchant_id,
+                    'turnover' => 0,
+                    'payin' => 0,
+                    'payout' => 0,
+                    'coin' => 0,
+                ],
+            );
+            $month_report->increment('turnover', $row->turnover);
+            $month_report->increment('payin', $row->credit);
+            $month_report->increment('payout', abs($row->transaction_fee));
         }
     }
 }

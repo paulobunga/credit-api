@@ -19,7 +19,7 @@ class ResellerSeeder extends Seeder
             'password' => 'P@ssw0rd',
             'phone' => '+8865721455',
             'transaction_fee' => 0.01,
-            'credit' => 2000,
+            'credit' => 2000000,
             'coin' => 0,
             'pending_limit' => 5,
             'status' => true,

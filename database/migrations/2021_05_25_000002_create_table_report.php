@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Query\Expression;
 
-class CreateTableReportDaily extends Migration
+class CreateTableReport extends Migration
 {
     /**
      * Run the migrations.
@@ -29,6 +29,19 @@ class CreateTableReportDaily extends Migration
             $table->timestamp('created_at')->useCurrent();
         });
 
+        Schema::create('report_monthly_merchants', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('merchant_id')
+                  ->constrained()
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
+            $table->date('date');
+            $table->unsignedInteger('turnover');
+            $table->decimal('payin', 14, 4);
+            $table->decimal('payout', 14, 4);
+            $table->timestamp('created_at')->useCurrent();
+        });
+
         Schema::create('report_daily_resellers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reseller_id')
@@ -43,6 +56,20 @@ class CreateTableReportDaily extends Migration
             $table->json('info')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamp('created_at')->useCurrent();
         });
+
+        Schema::create('report_monthly_resellers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('reseller_id')
+                  ->constrained()
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
+            $table->date('date');
+            $table->unsignedInteger('turnover');
+            $table->decimal('payin', 14, 4);
+            $table->decimal('payout', 14, 4);
+            $table->decimal('coin', 14, 4);
+            $table->timestamp('created_at')->useCurrent();
+        });
     }
 
     /**
@@ -54,5 +81,7 @@ class CreateTableReportDaily extends Migration
     {
         Schema::dropIfExists('report_daily_merchants');
         Schema::dropIfExists('report_daily_resellers');
+        Schema::dropIfExists('report_monthly_merchants');
+        Schema::dropIfExists('report_monthly_resellers');
     }
 }

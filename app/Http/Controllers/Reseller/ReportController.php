@@ -23,4 +23,18 @@ class ReportController extends Controller
             \App\Transformers\Reseller\ReportTransformer::class
         );
     }
+
+    public function month(Request $request)
+    {
+        $reports = QueryBuilder::for(
+            \App\Models\ReportMonthlyReseller::class::where('reseller_id', Auth::id())
+                ->limit(6)
+        )
+            ->allowedFilters([])
+            ->paginate($this->perPage);
+        return $this->response->withPaginator(
+            $reports,
+            \App\Transformers\Reseller\ReportMonthlyTransformer::class
+        );
+    }
 }

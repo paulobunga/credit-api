@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Transformers\Merchant;
+namespace App\Transformers\Reseller;
 
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\TransformerAbstract;
@@ -15,15 +15,14 @@ class WithdrawalTransformer extends TransformerAbstract
     {
         return [
             'id' => $withdrawal->id,
-            'name' => $withdrawal->merchant->name,
             'order_id' => $withdrawal->order_id,
             'amount' => $withdrawal->amount,
             'status' => $withdrawal->status,
         ];
     }
 
-    public function includeTransactions(Model $merchant_withdrawal)
+    public function includeTransactions(Model $withdrawal)
     {
-        return $this->collection($merchant_withdrawal->transactions, new TransactionTransformer, false);
+        return $this->collection($withdrawal->transactions, new TransactionTransformer, false);
     }
 }
