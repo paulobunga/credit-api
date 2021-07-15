@@ -35,6 +35,9 @@ $api->group([
         $api->resource('merchant_withdrawals', 'MerchantWithdrawalController');
 
         $api->resource('resellers', 'ResellerController');
+        $api->put("/resellers/deposit/{reseller}", [
+            'as' => 'resellers.deposit', 'uses' => 'ResellerController@deposit'
+        ]);
         $api->resource('reseller_bank_cards', 'ResellerBankCardController');
         $api->resource('reseller_deposits', 'ResellerDepositController');
         $api->resource('reseller_withdrawals', 'ResellerWithdrawalController');

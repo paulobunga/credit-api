@@ -49,7 +49,7 @@ class ResellerController extends Controller
 
     public function update(Request $request)
     {
-        $reseller = $this->model::where('name', urldecode($this->parameters('reseller')))->firstOrFail();
+        $reseller = $this->model::where('name', $this->parameters('reseller'))->firstOrFail();
         $this->validate($request, [
             'name' => "required|unique:resellers,name,{$reseller->id}",
             'username' => "required|unique:resellers,username,{$reseller->id}",
@@ -72,9 +72,20 @@ class ResellerController extends Controller
 
     public function destroy(Request $request)
     {
-        $reseller = $this->model::where('name', urldecode($this->parameters('reseller')))->firstOrFail();
+        $reseller = $this->model::where('name', $this->parameters('reseller'))->firstOrFail();
         $reseller->delete();
 
         return $this->success();
+    }
+
+    public function deposit(Request $request)
+    {
+        $reseller = $this->model::findOrFail($this->parameters('reseller'));
+        $this->validate($request, [
+            'credit' => 'required|numeric',
+        ]);
+        $reseller->increment('credit', $request->credit);
+
+        return $this->response->item($reseller, $this->transformer);
     }
 }
