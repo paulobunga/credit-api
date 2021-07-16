@@ -23,7 +23,7 @@ class BankFactory extends Factory
         return [
             'name' => $this->faker->word . ' bank',
             'ident' => substr($this->faker->unique()->swiftBicNumber, 0, 6),
-            'status' => $this->faker->boolean,
+            'status' => true,
         ];
     }
 }

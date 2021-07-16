@@ -69,35 +69,47 @@ class ReportDailyCommand extends Command
             WHERE t.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
         ),
         daily_merchant_deposit AS(
-          SELECT 
-                dt.*,
-                md.id AS merchant_deposit_id,
-                md.merchant_order_id,
-                md.reseller_bank_card_id,
-                rbc.account_name,
-                rbc.account_no,
-                rbc.reseller_id
+            SELECT 
+                rbc.reseller_id,
+                COUNT( DISTINCT md.id) AS turnover,
+                SUM(
+                    CASE WHEN dt.name = 'DEDUCT_CREDIT' THEN -dt.amount
+                END
+                ) AS credit,
+                SUM(
+                    CASE WHEN dt.name = 'TOPUP_COIN' THEN dt.amount
+                END
+                ) AS coin
             FROM daily_transaction AS dt
             JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'App\\\\Models\\\\MerchantDeposit'
             LEFT JOIN merchant_deposits AS md ON mht.model_id = md.id
             LEFT JOIN reseller_bank_cards AS rbc ON md.reseller_bank_card_id = rbc.id
             LEFT JOIN resellers AS r ON rbc.reseller_id = r.id
             WHERE dt.name IN ('DEDUCT_CREDIT', 'TOPUP_COIN')
+            GROUP BY reseller_id
         ),
+        daily_reseller_withdrawal AS(
+            SELECT 
+                rw.reseller_id,
+                SUM(
+                    CASE WHEN dt.name = 'DEDUCT_COIN' THEN dt.amount
+                    END
+                ) AS withdrawal
+            FROM daily_transaction AS dt
+            JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'App\\\\Models\\\\ResellerWithdrawal'
+            LEFT JOIN reseller_withdrawals AS rw ON mht.model_id = rw.id
+            WHERE dt.name IN ('DEDUCT_COIN')
+                        GROUP BY reseller_id
+          ),
         daily_report AS (
             SELECT 
                 reseller_id,
-                COUNT( DISTINCT merchant_deposit_id) AS turnover,
-                SUM(
-                    CASE WHEN name = 'DEDUCT_CREDIT' THEN -amount
-                    END
-                ) AS credit,
-                SUM(
-                    CASE WHEN name = 'TOPUP_COIN' THEN amount
-                    END
-                ) AS coin
+                COALESCE(daily_merchant_deposit.turnover, 0) AS turnover,
+                COALESCE(daily_merchant_deposit.credit, 0) AS credit,
+                COALESCE(daily_merchant_deposit.coin, 0) AS coin,
+                COALESCE(daily_reseller_withdrawal.withdrawal, 0) AS withdrawal
             FROM daily_merchant_deposit
-            GROUP BY reseller_id
+            LEFT JOIN daily_reseller_withdrawal USING(reseller_id)
         )
         SELECT * FROM daily_report
         ";
@@ -129,6 +141,7 @@ class ReportDailyCommand extends Command
             );
             $month_report->increment('turnover', $row->turnover);
             $month_report->increment('payin', abs($row->credit));
+            $month_report->increment('payout', abs($row->withdrawal));
             $month_report->increment('coin', $row->coin);
         }
     }

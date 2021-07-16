@@ -128,7 +128,7 @@ $app->alias('cache', \Illuminate\Cache\CacheManager::class);
 $api = app('Dingo\Api\Routing\Router');
 $api->version(
     'v1',
-    ['middleware' => 'api.throttle', 'limit' => 100, 'expires' => 5],
+    ['middleware' => 'api.throttle', 'limit' => 1000, 'expires' => 5],
     function (\Dingo\Api\Routing\Router $api) {
         require __DIR__ . '/../routes/api.php';
         require __DIR__ . '/../routes/admin.php';

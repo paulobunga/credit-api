@@ -59,7 +59,7 @@ class DepositController extends Controller
             'type' => 'required',
             'amount' => 'numeric|min:10',
         ]);
-     
+
         $reseller_bank_card = \App\Models\ResellerBankCard::whereHas(
             'paymentMethod',
             function (Builder $query) use ($request) {
@@ -69,11 +69,12 @@ class DepositController extends Controller
             ->where('status', true)->inRandomOrder()->firstOrFail();
         DB::beginTransaction();
         try {
-            $last_order = $this->model::lockForUpdate()->latest()->first();
+            $last_order_id = $this->model::lockForUpdate()->latest()->first()->id ?? 0;
+            $last_order_id += 1;
             $merchant_deposit = $this->model::create([
                 'merchant_id' => $merchant->id,
                 'reseller_bank_card_id' => $reseller_bank_card->id,
-                'order_id' => '#' . str_pad($last_order->id + 1, 8, "0", STR_PAD_LEFT) . time(),
+                'order_id' => '#' . str_pad($last_order_id, 8, "0", STR_PAD_LEFT) . time(),
                 'merchant_order_id' => $request->merchant_order_id,
                 'account_no' => $request->account_no,
                 'account_name' => $request->get('account_name', ''),
@@ -109,7 +110,7 @@ class DepositController extends Controller
         $deposit = $this->model::where([
             'merchant_id' => $request->merchant_id,
             'merchant_order_id' => $this->parameters('deposit')
-            ])->firstOrFail();
+        ])->firstOrFail();
         if ($deposit->status != 0) {
             throw new \Exception('deposit is already pending', 510);
         }

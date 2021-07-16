@@ -70,7 +70,7 @@ class DepositController extends Controller
                 // merchant
                 $transaction = $deposit->transactions()->create([
                     'transaction_method_id' => $methods['TOPUP_CREDIT'],
-                    'amount' => $transaction->amount
+                    'amount' => $deposit->amount
                 ]);
                 $transaction = $deposit->transactions()->create([
                     'transaction_method_id' => $methods['TRANSACTION_FEE'],

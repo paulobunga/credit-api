@@ -15,6 +15,7 @@ class MerchantTransformer extends TransformerAbstract
             'username' => $merchant->username,
             'phone' => $merchant->phone,
             'api_key' => $merchant->api_key,
+            'transaction_fee' => $merchant->transaction_fee,
             'callback_url' => $merchant->callback_url,
             'status' => $merchant->status,
         ];

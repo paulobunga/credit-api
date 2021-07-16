@@ -31,9 +31,10 @@ class WithdrawalController extends Controller
         ]);
         DB::beginTransaction();
         try {
-            $last_order = $this->model::latest()->first();
+            $last_order_id = $this->model::latest()->first()->id?? 0;
+            $last_order_id += 1;
             $withdrawal = $this->model::create([
-                'order_id' => '#' . str_pad($last_order->id + 1, 8, "0", STR_PAD_LEFT) . time(),
+                'order_id' => '#' . str_pad($last_order_id + 1, 8, "0", STR_PAD_LEFT) . time(),
                 'reseller_id' => Auth::id(),
                 'amount' => $request->amount,
                 'status' => 0,
