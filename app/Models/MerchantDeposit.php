@@ -45,14 +45,14 @@ class MerchantDeposit extends Model
 
     public function resellerBankCard()
     {
-        return $this->hasOne(resellerBankCard::class, 'id', 'reseller_bank_card_id');
+        return $this->hasOne(ResellerBankCard::class, 'id', 'reseller_bank_card_id');
     }
 
     public function reseller()
     {
         return $this->hasOneThrough(
             Reseller::class,
-            resellerBankCard::class,
+            ResellerBankCard::class,
             'id',
             'id',
             'reseller_bank_card_id',
@@ -64,7 +64,7 @@ class MerchantDeposit extends Model
     {
         return $this->hasOneThrough(
             Bank::class,
-            resellerBankCard::class,
+            ResellerBankCard::class,
             'id',
             'id',
             'reseller_bank_card_id',
