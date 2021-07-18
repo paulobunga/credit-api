@@ -8,7 +8,6 @@ trait Filterable
 {
     public function scopeFilter($query, $filter)
     {
-        $tableName = $this->getTable();
         $filter = is_array($filter) ? $filter : json_decode(urldecode($filter), true);
         foreach ($filter as $key => $value) {
             if (is_null($value) || $value === '') {

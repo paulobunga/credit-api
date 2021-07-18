@@ -2,8 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\Bank;
-
 class BankExport extends BaseExport
 {
     /**
@@ -16,6 +14,7 @@ class BankExport extends BaseExport
         'id' => 'Bank id',
         'ident' => 'Bank ident',
         'name' => 'Bank name',
+        'type' => 'Type',
         'status' => 'status',
 
     ];
@@ -26,20 +25,11 @@ class BankExport extends BaseExport
             switch ($v) {
                 case 'status':
                     return $bank->$v ? 'Y' : 'N';
+                case 'type':
+                    return $bank->paymentMethod->name;
                 default:
                     return $bank->$v;
             }
         })->toArray();
-    }
-
-    /**
-     * @return \Illuminate\Support\Collection
-     */
-    public function collection()
-    {
-        return Bank::select('banks.*')
-            ->sort(request()->get('sort', 'id'))
-            ->filter(request()->get('filter', '{}'))
-            ->get();
     }
 }

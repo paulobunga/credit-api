@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\ReportDailyCommand::class,
+        \App\Console\Commands\PermissionListCommand::class,
     ];
 
     /**

@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Excel;
+use Spatie\QueryBuilder\QueryBuilder;
 
 abstract class BaseExport implements FromCollection, Responsable, WithHeadings, WithMapping
 {
@@ -31,9 +32,16 @@ abstract class BaseExport implements FromCollection, Responsable, WithHeadings, 
 
     protected $fileName = '';
 
+    protected $data;
+
+    public function __construct($data)
+    {
+        $this->data = $data;
+    }
+
     public function headings(): array
     {
-        return collect(array_values($this->fields))->toArray();
+        return array_values($this->fields);
     }
 
     public function map($model): array
@@ -41,5 +49,13 @@ abstract class BaseExport implements FromCollection, Responsable, WithHeadings, 
         return collect(array_keys($this->fields))->map(function ($v) use ($model) {
             return $model->$v;
         })->toArray();
+    }
+
+    /**
+     * @return \lluminate\Database\Eloquent\Collection
+     */
+    public function collection()
+    {
+        return $this->data;
     }
 }

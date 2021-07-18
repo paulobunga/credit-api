@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,10 +14,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // register custom serializer
         if ($adapter = app('api.transformer')->getAdapter()) {
             $manager = $adapter->getFractal();
             $manager->setSerializer(new \App\Transformers\Serializer\DataArraySerializer());
         }
+        // register custom morph type
+        Relation::morphMap([
+            'merchant.depost' => 'App\Models\MerchantDeposit',
+            'reseller.withdrawal' => 'App\Models\ResellerWithdrawal',
+        ]);
     }
 
     public function boot()

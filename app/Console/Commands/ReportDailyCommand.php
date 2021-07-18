@@ -81,7 +81,7 @@ class ReportDailyCommand extends Command
                 END
                 ) AS coin
             FROM daily_transaction AS dt
-            JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'App\\\\Models\\\\MerchantDeposit'
+            JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'merchant.deposit'
             LEFT JOIN merchant_deposits AS md ON mht.model_id = md.id
             LEFT JOIN reseller_bank_cards AS rbc ON md.reseller_bank_card_id = rbc.id
             LEFT JOIN resellers AS r ON rbc.reseller_id = r.id
@@ -96,7 +96,7 @@ class ReportDailyCommand extends Command
                     END
                 ) AS withdrawal
             FROM daily_transaction AS dt
-            JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'App\\\\Models\\\\ResellerWithdrawal'
+            JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'reseller.withdrawal'
             LEFT JOIN reseller_withdrawals AS rw ON mht.model_id = rw.id
             WHERE dt.name IN ('DEDUCT_COIN')
                         GROUP BY reseller_id
@@ -166,7 +166,7 @@ class ReportDailyCommand extends Command
 								md.merchant_id,
                 md.merchant_order_id
             FROM daily_transaction AS dt
-            JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'App\\\\Models\\\\MerchantDeposit'
+            JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'merchant.deposit'
             LEFT JOIN merchant_deposits AS md ON mht.model_id = md.id
             LEFT JOIN merchants AS m ON md.merchant_id = m.id
             WHERE dt.name IN ('TOPUP_CREDIT', 'TRANSACTION_FEE')
