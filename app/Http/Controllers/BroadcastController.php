@@ -20,8 +20,7 @@ class BroadcastController extends Controller
         if ($guard == null || $id == null) {
             throw new UnauthorizedHttpException('JWTAuth', 'Unauthorized');
         }
-        Auth::shouldUse($guard);
-        if (Auth::guest()) {
+        if (Auth::guard($guard)->guest()) {
             throw new UnauthorizedHttpException('JWTAuth', 'Unauthorized');
         }
 
@@ -29,8 +28,7 @@ class BroadcastController extends Controller
             $this->validateAuthorizationHeader($request);
 
             $token = $this->parseAuthorizationHeader($request);
-            \Log::info($token);
-            if (!$user = app('tymon.jwt.auth')->setToken($token)->authenticate()) {
+            if (!$user = Auth::guard($guard)->setToken($token)->authenticate()) {
                 throw new UnauthorizedHttpException('JWTAuth', 'Unable to authenticate with invalid token.');
             }
         } catch (\Exception $exception) {

@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
 
@@ -60,5 +61,10 @@ class DepositPendingNotification extends Notification implements ShouldBroadcast
             ),
             'time' => $this->deposit->updated_at->toDateTimeString(),
         ];
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return (new BroadcastMessage($this->toArray($notifiable)))->onQueue('echo');
     }
 }

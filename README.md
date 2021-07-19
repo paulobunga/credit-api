@@ -22,3 +22,10 @@ If you discover a security vulnerability within Lumen, please send an e-mail to 
 ## License
 
 The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Queue
+
+How to restart queue worker
+```
+pm2 delete queue.yml && pm2 start queue.yml
+```

@@ -25,7 +25,7 @@ class JWT extends Base
             throw new UnauthorizedHttpException('JWTAuth', 'Unauthorized');
         }
         $token = $this->getToken($request);
-
+        $this->auth = app('auth');
         try {
             if (!$user = $this->auth->setToken($token)->authenticate()) {
                 throw new UnauthorizedHttpException('JWTAuth', 'Unable to authenticate with invalid token.');

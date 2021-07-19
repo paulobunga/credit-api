@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
 
@@ -68,5 +69,10 @@ class DepositUpdateNotification extends Notification implements ShouldBroadcast
             default:
                 return 'error';
         }
+    }
+
+    public function toBroadcast($notifiable)
+    {
+        return (new BroadcastMessage($this->toArray($notifiable)))->onQueue('echo');
     }
 }

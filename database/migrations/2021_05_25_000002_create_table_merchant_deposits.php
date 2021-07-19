@@ -30,11 +30,18 @@ class CreateTableMerchantDeposits extends Migration
             $table->string('account_no', 64);
             $table->decimal('amount', 14, 4);
             $table->unsignedTinyInteger('status')
-                  ->comment('1:Created,2:Waiting to Approve,3:Approved,4:Rejected,5:Enforced,6:Canceled');
+                ->default(0)
+                ->comment('0:Created,1:Pending,2:Approved,3:Rejected,4:Enforced,5:Canceled');
+            $table->unsignedTinyInteger('callback_status')
+                ->default(0)
+                ->comment('0:Created,1:Pending,2:Finish,3:Retry');
+            $table->unsignedTinyInteger('attmepts')
+                ->default(0);
             $table->string('callback_url');
             $table->string('reference_no');
             $table->json('info')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
+            $table->timestamp('notified_at')->nullable();
             $table->unique(['merchant_id', 'merchant_order_id']);
         });
     }

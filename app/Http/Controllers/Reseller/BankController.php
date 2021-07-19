@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Reseller;
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 
 class BankController extends Controller
 {
@@ -15,16 +17,19 @@ class BankController extends Controller
     {
         $banks = QueryBuilder::for(
             $this->model::where('status', true)
-                ->select('banks.*', 'payment_methods.name as type')
-                ->leftjoin('payment_methods', 'banks.payment_method_id', '=', 'payment_methods.id')
-                ->filter(
-                    $request->get('filter', '{}')
-                )->sort(request()->get('sort', 'id'))
         )
+            ->with('paymentMethod')
             ->allowedFilters([
-                'name', 'ident', 'status'
+                AllowedFilter::partial('name', 'banks.name'),
+                AllowedFilter::partial('ident'),
+                AllowedFilter::exact('status')
             ])
-            ->allowedSorts('id', 'name', 'ident', 'status')
+            ->allowedSorts([
+                AllowedSort::field('id', 'banks.id'),
+                AllowedSort::field('name', 'banks.name'),
+                'ident',
+                'status'
+            ])
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($banks, $this->transformer);
