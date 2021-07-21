@@ -20,6 +20,8 @@ class MerchantDeposit extends Model
         'account_name',
         'amount',
         'status',
+        'callback_status',
+        'attempts',
         'callback_url',
         'reference_no',
         'info'

@@ -15,8 +15,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         // register custom serializer
-        if ($adapter = app('api.transformer')->getAdapter()) {
-            $manager = $adapter->getFractal();
+        if ($manager = app('api.transformer')->getFractal()) {
             $manager->setSerializer(new \App\Transformers\Serializer\DataArraySerializer());
         }
         // register custom morph type

@@ -11,7 +11,8 @@ $api->group([
     $api->post('/auth/login', ['as' => 'auth.login', 'uses' => 'AuthController@login']);
     $api->group([
         'middleware' => [
-            'api.auth:merchant'
+            'api.auth:merchant',
+            'whitelist:merchant'
         ]
     ], function ($api) {
         # auth
@@ -22,7 +23,8 @@ $api->group([
         $api->put("/auth/renew", ['as' => 'auth.renew', 'uses' => 'AuthController@renew']);
         $api->put("/auth/whitelist", ['as' => 'auth.whitelist', 'uses' => 'AuthController@whitelist']);
 
-        $api->resource('deposits', 'DepositController', ['only' => 'index']);
+        $api->resource('deposits', 'DepositController', ['only' => ['index']]);
+        $api->put("/deposits/resend/{deposit}", ['as' => 'deposits.resend', 'uses' => 'DepositController@resend']);
         $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'store']]);
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
         $api->get("/reports/month", ['as' => 'reports.month', 'uses' => 'ReportController@month']);

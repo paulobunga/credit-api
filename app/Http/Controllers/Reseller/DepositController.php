@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use App\Models\TransactionMethod;
@@ -53,6 +54,7 @@ class DepositController extends Controller
         try {
             $deposit->update([
                 'status' => $request->status,
+                'callback_status' => 1,
             ]);
             // approve
             if ($request->status == 2) {
@@ -61,10 +63,10 @@ class DepositController extends Controller
                     'transaction_method_id' => $methods['DEDUCT_CREDIT'],
                     'amount' => $deposit->amount
                 ]);
-                $deposit->reseller->decrement('credit', $transaction ->amount);
+                $deposit->reseller->decrement('credit', $transaction->amount);
                 $transaction = $deposit->transactions()->create([
                     'transaction_method_id' => $methods['TOPUP_COIN'],
-                    'amount' => $transaction ->amount * $deposit->reseller->transaction_fee
+                    'amount' => $transaction->amount * $deposit->reseller->transaction_fee
                 ]);
                 $deposit->reseller->increment('coin', $transaction->amount);
                 // merchant
@@ -82,7 +84,14 @@ class DepositController extends Controller
             throw $e;
         }
         DB::commit();
+        // send notification via websocket and stored in notification table
         $deposit->merchant->notify(new \App\Notifications\DepositUpdateNotification($deposit));
+        // push deposit information callback to callback url
+        Queue::push((new \App\Jobs\GuzzleJob(
+            $deposit,
+            new \App\Transformers\Api\DepositTransformer,
+            $deposit->merchant->api_key
+        )));
 
         return $this->response->item($deposit, $this->transformer);
     }

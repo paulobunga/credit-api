@@ -1,19 +1,19 @@
 apps:
-  - name: "callback"
+  - name: "guzzle-http-client"
     script: artisan
     watch: false
     interpreter: php
     args: "queue:listen redis --queue=default"
     restart_delay: 3000
-    error_file: ./storage/logs/callback/error.log
-    out_file: ./storage/logs/callback/out.log
-    pid_file: ./storage/app/callback.pid
+    error_file: ./storage/logs/http/error.log
+    out_file: ./storage/logs/http/out.log
+    pid_file: ./storage/app/http.pid
   - name: "laravel-echo-server"
     script: artisan
     watch: false
     interpreter: php
     args: "queue:listen redis --queue=echo"
     restart_delay: 3000
-    error_file: ./storage/logs/echo/error.log
-    out_file: ./storage/logs/echo/out.log
-    pid_file: ./storage/app/echo.pid 
+    error_file: ./storage/logs/laravel-echo/error.log
+    out_file: ./storage/logs/laravel-echo/out.log
+    pid_file: ./storage/app/laravel-echo.pid 

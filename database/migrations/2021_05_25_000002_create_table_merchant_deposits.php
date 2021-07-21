@@ -35,7 +35,7 @@ class CreateTableMerchantDeposits extends Migration
             $table->unsignedTinyInteger('callback_status')
                 ->default(0)
                 ->comment('0:Created,1:Pending,2:Finish,3:Retry');
-            $table->unsignedTinyInteger('attmepts')
+            $table->unsignedTinyInteger('attempts')
                 ->default(0);
             $table->string('callback_url');
             $table->string('reference_no');
