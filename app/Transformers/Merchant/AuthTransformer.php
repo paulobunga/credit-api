@@ -23,6 +23,7 @@ class AuthTransformer extends TransformerAbstract
             'name' => $merchant->name,
             'username' => $merchant->username,
             'phone' => $merchant->phone,
+            'credit' => $merchant->credit,
             'transaction_fee' => $merchant->transaction_fee,
             'api_key' => $merchant->api_key,
             'api_white_lists' => $merchant->whiteLists->pluck('ip'),

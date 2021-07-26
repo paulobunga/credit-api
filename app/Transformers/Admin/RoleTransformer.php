@@ -6,10 +6,12 @@ use League\Fractal\TransformerAbstract;
 
 class RoleTransformer extends TransformerAbstract
 {
-    public function transform(Model $p)
+    public function transform(Model $role)
     {
         return [
-            'name' => $p->name,
+            'id' => $role->id,
+            'name' => $role->name,
+            'permissions' => $role->getAllPermissions()->pluck('name')
         ];
     }
 }

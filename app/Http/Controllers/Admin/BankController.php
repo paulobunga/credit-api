@@ -19,6 +19,7 @@ class BankController extends Controller
         $banks = QueryBuilder::for($this->model)
             ->with('paymentMethod')
             ->allowedFilters([
+                AllowedFilter::exact('id'),
                 AllowedFilter::partial('name', 'banks.name'),
                 AllowedFilter::partial('ident'),
                 AllowedFilter::exact('status')
@@ -52,7 +53,7 @@ class BankController extends Controller
 
     public function update(Request $request)
     {
-        $bank = $this->model::where('name', urldecode($this->parameters('bank')))->firstOrFail();
+        $bank = $this->model::findOrFail($this->parameters('bank'));
         $this->validate($request, [
             'ident' => "required|unique:banks,ident,{$bank->id}",
             'name' => 'required',
@@ -70,7 +71,7 @@ class BankController extends Controller
 
     public function destroy(Request $request)
     {
-        $bank = $this->model::where('name', urldecode($this->parameters('bank')))->firstOrFail();
+        $bank = $this->model::findOrFail($this->parameters('bank'));
         $bank->delete();
 
         return $this->success();

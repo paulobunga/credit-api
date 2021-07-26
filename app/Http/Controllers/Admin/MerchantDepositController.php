@@ -46,16 +46,18 @@ class MerchantDepositController extends Controller
                     'transaction_method_id' => $methods['DEDUCT_CREDIT'],
                     'amount' => $merchant_deposit->amount
                 ]);
-                $merchant_deposit->reseller->decrement('credit', $transaction ->amount);
+                $merchant_deposit->reseller->decrement('credit', $transaction->amount);
                 // merchant
                 $transaction = $merchant_deposit->transactions()->create([
                     'transaction_method_id' => $methods['TOPUP_CREDIT'],
                     'amount' => $merchant_deposit->amount
                 ]);
+                $merchant_deposit->merchant->increment('credit', $transaction->amount);
                 $transaction = $merchant_deposit->transactions()->create([
                     'transaction_method_id' => $methods['TRANSACTION_FEE'],
                     'amount' => $transaction->amount * $merchant_deposit->merchant->transaction_fee
                 ]);
+                $merchant_deposit->merchant->decrement('credit', $transaction->amount);
             }
         } catch (\Exception $e) {
             DB::rollback();

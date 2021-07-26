@@ -74,10 +74,12 @@ class DepositController extends Controller
                     'transaction_method_id' => $methods['TOPUP_CREDIT'],
                     'amount' => $deposit->amount
                 ]);
+                $deposit->merchant->increment('credit', $transaction->amount);
                 $transaction = $deposit->transactions()->create([
                     'transaction_method_id' => $methods['TRANSACTION_FEE'],
                     'amount' => $transaction->amount * $deposit->merchant->transaction_fee
                 ]);
+                $deposit->merchant->decrement('credit', $transaction->amount);
             }
         } catch (\Exception $e) {
             DB::rollback();

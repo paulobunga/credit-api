@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
 
 class PermissionController extends Controller
 {
@@ -13,11 +12,9 @@ class PermissionController extends Controller
 
     public function index(Request $request)
     {
-        $permissions = QueryBuilder::for($this->model)
-            ->allowedFilters(['name'])
-            ->paginate($this->perPage);
+        $permissions = $this->model::all();
 
-        return $this->response->withPaginator($permissions, $this->transformer);
+        return $this->response->collection($permissions, $this->transformer);
     }
 
     public function store(Request $request)
@@ -35,7 +32,7 @@ class PermissionController extends Controller
 
     public function update(Request $request)
     {
-        $permission = $this->model::where('name', urldecode($this->parameters('permission')))->firstOrFail();
+        $permission = $this->model::where('name', $this->parameters('permission'))->firstOrFail();
         $this->validate($request, [
             'name' => "required|unique:permissions,name,{$permission->id}"
         ]);
@@ -48,7 +45,7 @@ class PermissionController extends Controller
 
     public function destroy(Request $request)
     {
-        $permission = $this->model::where('name', urldecode($this->parameters('permission')))->firstOrFail();
+        $permission = $this->model::where('name', $this->parameters('permission'))->firstOrFail();
         $permission->delete();
 
         return $this->success();

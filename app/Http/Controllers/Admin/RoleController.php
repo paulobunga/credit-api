@@ -23,33 +23,39 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required'
+            'name' => 'required',
+            'permissions' => 'array',
+            'permissions.*' => 'required|string|exists:permissions,name'
         ]);
 
         $role = $this->model::create([
             'name' => $request->name
         ]);
+        $role->syncPermissions($request->permissions);
 
         return $this->response->item($role, $this->transformer);
     }
 
     public function update(Request $request)
     {
-        $role = $this->model::where('name', urldecode($this->parameters('role')))->firstOrFail();
+        $role = $this->model::findOrFail($this->parameters('role'));
         $this->validate($request, [
-            'name' => "required|unique:roles,name,{$role->id}"
+            'name' => "required|unique:roles,name,{$role->id}",
+            'permissions' => 'array',
+            'permissions.*' => 'required|string|exists:permissions,name'
         ]);
 
         $role->update([
             'name' => $request->name
         ]);
+        $role->syncPermissions($request->permissions);
 
         return $this->response->item($role, $this->transformer);
     }
 
     public function destroy(Request $request)
     {
-        $role = $this->model::where('name', urldecode($this->parameters('role')))->firstOrFail();
+        $role = $this->model::findOrFail($this->parameters('role'));
         $role->delete();
 
         return [

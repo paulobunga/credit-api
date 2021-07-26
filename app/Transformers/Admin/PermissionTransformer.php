@@ -10,6 +10,7 @@ class PermissionTransformer extends TransformerAbstract
     {
         return [
             'name' => $p->name,
+            'group' => $p->group,
         ];
     }
 }

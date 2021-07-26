@@ -66,6 +66,21 @@ class DepositController extends Controller
                 $query->where('payment_methods.name', strtolower($request->type));
             }
         )
+            ->whereHas(
+                'merchantDeposits',
+                function (Builder $query) {
+                    $query->where('merchant_deposits.status', '<', 2);
+                },
+                '<',
+                5
+            )
+            ->whereDoesntHave(
+                'merchantDeposits',
+                function (Builder $query) use ($request) {
+                    $query->where('merchant_deposits.status', '<', 2)
+                        ->where('merchant_deposits.amount', '=', $request->amount);
+                }
+            )
             ->where('status', true)->inRandomOrder()->firstOrFail();
         DB::beginTransaction();
         try {

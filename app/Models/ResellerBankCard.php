@@ -48,6 +48,11 @@ class ResellerBankCard extends Model
         return $this->belongsTo(Bank::class);
     }
 
+    public function merchantDeposits()
+    {
+        return $this->hasMany(MerchantDeposit::class);
+    }
+
     public function paymentMethod()
     {
         return $this->hasOneThrough(
