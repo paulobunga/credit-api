@@ -7,6 +7,7 @@ use Dingo\Api\Http\Request;
 use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 
 class MerchantWhiteListController extends Controller
 {
@@ -15,16 +16,20 @@ class MerchantWhiteListController extends Controller
 
     public function index(Request $request)
     {
-        $merchant_white_lists = QueryBuilder::for(
-            $this->model::join('merchants', 'merchant_white_lists.merchant_id', '=', 'merchants.id')
-                ->select('merchant_white_lists.*')
-                ->filter(request()->get('filter', '{}'))
-                ->sort(request()->get('sort', 'id'))
-        )
+        $merchant_white_lists = QueryBuilder::for($this->model)
+            ->with('merchant')
+            ->join('merchants', 'merchants.id', '=', 'merchant_white_lists.merchant_id')
+            ->select('merchant_white_lists.*', 'merchants.name')
             ->allowedFilters([
-                'merchant_id',
+                AllowedFilter::exact('id'),
+                AllowedFilter::partial('name', 'merchants.name'),
+                AllowedFilter::partial('ip'),
             ])
-            ->allowedSorts('id', 'ip', 'name')
+            ->allowedSorts([
+                AllowedSort::field('id', 'merchant_white_lists.id'),
+                AllowedSort::field('name', 'merchants.name'),
+                'ip',
+            ])
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($merchant_white_lists, $this->transformer);

@@ -19,7 +19,6 @@ class PermissionAndRoleSeeder extends Seeder
         // create default permission based on route
         Artisan::call('permission:list');
         
-        Role::create(['name' => 'Super Admin']);
         Role::create(['name' => 'Market']);
         Role::create(['name' => 'IT']);
     }

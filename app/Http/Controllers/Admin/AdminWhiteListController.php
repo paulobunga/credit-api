@@ -16,16 +16,19 @@ class AdminWhiteListController extends Controller
 
     public function index(Request $request)
     {
-        $admin_white_lists = QueryBuilder::for(
-            $this->model::join('admins', 'admin_white_lists.admin_id', '=', 'admins.id')
-                ->select('admin_white_lists.*')
-                ->sort(request()->get('sort', 'id'))
-        )
+        $admin_white_lists = QueryBuilder::for($this->model)
+            ->join('admins', 'admin_white_lists.admin_id', '=', 'admins.id')
+            ->select('admin_white_lists.*', 'admins.name')
             ->allowedFilters(
-                'id',
-                AllowedFilter::custom('value', new \App\Http\Filters\AdminWhiteListFilter)
+                AllowedFilter::exact('id'),
+                AllowedFilter::partial('name', 'admins.name'),
+                AllowedFilter::partial('ip'),
             )
-            ->allowedSorts('id', 'ip', 'name')
+            ->allowedSorts([
+                AllowedSort::field('id', 'admin_white_lists.id'),
+                AllowedSort::field('name', 'admins.name'),
+                'ip',
+            ])
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($admin_white_lists, $this->transformer);

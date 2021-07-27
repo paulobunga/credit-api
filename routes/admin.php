@@ -10,7 +10,8 @@ $api->group([
     $api->post('/auth/login', ['as' => 'auth.login', 'uses' => 'AuthController@login']);
     $api->group([
         'middleware' => [
-            'api.auth:admin'
+            'api.auth:admin',
+            'whitelist:admin',
         ],
     ], function ($api) {
         $api->post('/auth/logout', ['as' => 'auth.logout', 'uses' => 'AuthController@logout']);

@@ -18,9 +18,18 @@ class AuthController extends Controller
     {
         $credentials = $request->only(['username', 'password']);
 
-        if (!$token = Auth::attempt($credentials)) {
+        if (!$token = Auth::guard('admin')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
+
+        if (
+            !Auth::guard('admin')->user()->hasRole('Super Admin') &&
+            !in_array($request->ip(), Auth::guard('admin')->user()->whiteLists->pluck('ip')->toArray())
+        ) {
+            Auth::guard('admin')->logout();
+            return response()->json(['message' => 'Unauthorized IP Address!'], 401);
+        }
+
         return $this->response->item(Auth::user(), new AuthTransformer($token));
     }
 

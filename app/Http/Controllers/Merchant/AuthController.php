@@ -24,6 +24,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
 
+        if (!in_array($request->ip(), Auth::guard('merchant')->user()->whiteLists->pluck('ip')->toArray())) {
+            Auth::guard('merchant')->logout();
+            return response()->json(['message' => 'Unauthorized IP Address!'], 401);
+        }
+
         return $this->response->item(Auth::guard('merchant')->user(), new AuthTransformer($token));
     }
 
@@ -101,7 +106,7 @@ class AuthController extends Controller
                 }
             )->toArray()
         );
-        
+
         return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
     }
 }

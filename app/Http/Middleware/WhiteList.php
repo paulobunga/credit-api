@@ -30,6 +30,9 @@ class WhiteList
                 Auth::id()
             )->pluck('ip')->toArray();
         } elseif ($guard == 'admin') {
+            if (Auth::user()->hasRole('Super Admin')) {
+                return $next($request);
+            }
             $white_lists = AdminWhiteList::where(
                 'admin_id',
                 Auth::id()
@@ -39,6 +42,7 @@ class WhiteList
         }
 
         if (!in_array($request->ip(), $white_lists)) {
+            \Log::error($request->ip() . " is not in {$guard}[" . Auth::id() . '] white list ' . json_encode($white_lists) . '.');
             throw new UnauthorizedHttpException('WhiteList', 'Unauthorized IP Address!');
         }
 

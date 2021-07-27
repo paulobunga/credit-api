@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Admin;
 
 class CreateTableAdmins extends Migration
 {
@@ -23,12 +24,13 @@ class CreateTableAdmins extends Migration
         });
 
         // insert default administrator
-        DB::table('admins')->insert([
+        $admin = Admin::create([
             'name' => 'administrator',
             'username' => 'admin@gmail.com',
-            'password' => app('hash')->make('P@ssw0rd'),
-            'status' => 1,
+            'password' => 'P@ssw0rd',
+            'status' => true,
         ]);
+        $admin->assignRole('Super Admin');
     }
 
     /**

@@ -22,8 +22,8 @@ class AdminFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'username' => $this->faker->unique()->userName,
-            'password' => '123456',
+            'username' => $this->faker->numerify('test###@gmail.com'),
+            'password' => 'P@ssw0rd',
             'status' => $this->faker->boolean,
         ];
     }
