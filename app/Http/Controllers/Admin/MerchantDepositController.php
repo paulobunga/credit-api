@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
-use Illuminate\Support\Facades\DB;
 use App\Models\TransactionMethod;
 
 class MerchantDepositController extends Controller
@@ -30,40 +29,13 @@ class MerchantDepositController extends Controller
             'admin_id' => 'required|exists:admins,id',
             'status' => 'required|numeric',
         ]);
-        $methods = TransactionMethod::all()->pluck('id', 'name');
-        DB::beginTransaction();
-        try {
-            $merchant_deposit->update([
-                'status' => $request->status,
-                'info' => [
-                    'admin_id' => $request->admin_id
-                ]
-            ]);
-            // enforce
-            if ($request->status == 4) {
-                // reseller
-                $transaction = $merchant_deposit->transactions()->create([
-                    'transaction_method_id' => $methods['DEDUCT_CREDIT'],
-                    'amount' => $merchant_deposit->amount
-                ]);
-                $merchant_deposit->reseller->decrement('credit', $transaction->amount);
-                // merchant
-                $transaction = $merchant_deposit->transactions()->create([
-                    'transaction_method_id' => $methods['TOPUP_CREDIT'],
-                    'amount' => $merchant_deposit->amount
-                ]);
-                $merchant_deposit->merchant->increment('credit', $transaction->amount);
-                $transaction = $merchant_deposit->transactions()->create([
-                    'transaction_method_id' => $methods['TRANSACTION_FEE'],
-                    'amount' => $transaction->amount * $merchant_deposit->merchant->transaction_fee
-                ]);
-                $merchant_deposit->merchant->decrement('credit', $transaction->amount);
-            }
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
+
+        $merchant_deposit->update([
+            'status' => $request->status,
+            'info' => [
+                'admin_id' => $request->admin_id
+            ]
+        ]);
 
         return $this->response->item($merchant_deposit, $this->transformer);
     }

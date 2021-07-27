@@ -18,22 +18,19 @@ class DepositController extends Controller
 
     public function index(Request $request)
     {
-        $deposits = QueryBuilder::for(
-            $this->model::whereHas('reseller', function (Builder $query) {
+        $deposits = QueryBuilder::for($this->model)
+            ->join(
+                'reseller_bank_cards',
+                'merchant_deposits.reseller_bank_card_id',
+                '=',
+                'reseller_bank_cards.id'
+            )
+            ->whereHas('reseller', function (Builder $query) {
                 $query->where('resellers.id', Auth::id());
             })
-                // ->join(
-                //     'reseller_bank_cards',
-                //     'merchant_deposits.reseller_bank_card_id',
-                //     '=',
-                //     'reseller_bank_cards.id'
-                // )
-                ->select(
-                    'merchant_deposits.*',
-                )
-                ->filter($request->get('filter', '{}'))
-                ->sort($request->get('sort', 'id'))
-        )
+            ->select(
+                'merchant_deposits.*',
+            )
             ->allowedFilters('name')
             ->paginate($this->perPage);
 
@@ -49,43 +46,11 @@ class DepositController extends Controller
         $this->validate($request, [
             'status' => 'required|numeric',
         ]);
-        $methods = TransactionMethod::all()->pluck('id', 'name');
-        DB::beginTransaction();
-        try {
-            $deposit->update([
-                'status' => $request->status,
-                'callback_status' => 1,
-            ]);
-            // approve
-            if ($request->status == 2) {
-                // reseller
-                $transaction = $deposit->transactions()->create([
-                    'transaction_method_id' => $methods['DEDUCT_CREDIT'],
-                    'amount' => $deposit->amount
-                ]);
-                $deposit->reseller->decrement('credit', $transaction->amount);
-                $transaction = $deposit->transactions()->create([
-                    'transaction_method_id' => $methods['TOPUP_COIN'],
-                    'amount' => $transaction->amount * $deposit->reseller->transaction_fee
-                ]);
-                $deposit->reseller->increment('coin', $transaction->amount);
-                // merchant
-                $transaction = $deposit->transactions()->create([
-                    'transaction_method_id' => $methods['TOPUP_CREDIT'],
-                    'amount' => $deposit->amount
-                ]);
-                $deposit->merchant->increment('credit', $transaction->amount);
-                $transaction = $deposit->transactions()->create([
-                    'transaction_method_id' => $methods['TRANSACTION_FEE'],
-                    'amount' => $transaction->amount * $deposit->merchant->transaction_fee
-                ]);
-                $deposit->merchant->decrement('credit', $transaction->amount);
-            }
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
+
+        $deposit->update([
+            'status' => $request->status,
+            'callback_status' => 1,
+        ]);
         // send notification via websocket and stored in notification table
         $deposit->merchant->notify(new \App\Notifications\DepositUpdateNotification($deposit));
         // push deposit information callback to callback url

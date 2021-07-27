@@ -14,11 +14,12 @@ class ResellerSeeder extends Seeder
     public function run()
     {
         \App\Models\Reseller::create([
+            'level' => \App\Models\Reseller::getLevelID('reseller'),
             'name' => 'Test Reseller',
             'username' => 'reseller@gmail.com',
             'password' => 'P@ssw0rd',
             'phone' => '+8865721455',
-            'transaction_fee' => 0.01,
+            'commission_percentage' => 0.003,
             'credit' => 2000000,
             'coin' => 0,
             'pending_limit' => 5,

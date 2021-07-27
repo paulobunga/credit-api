@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Trait\Sortable;
@@ -9,7 +10,7 @@ use App\Trait\Filterable;
 
 class MerchantDeposit extends Model
 {
-    use HasFactory, Sortable, Filterable;
+    use HasFactory;
 
     protected $fillable = [
         'merchant_id',
@@ -27,17 +28,13 @@ class MerchantDeposit extends Model
         'info'
     ];
 
-    protected $filterable_fields = [
-        'name' => 'like',
-        'status' => '=',
-        'account_name' => 'like',
-        'account_no' => 'like'
-    ];
-
-    protected $sortable_fields = [
-        'id' => 'id',
-        'name' => 'name',
-        'status' => 'status'
+    protected const STATUS = [
+        'CREATED' => 0,
+        'PENDING' => 1,
+        'APPROVED' => 2,
+        'REJECTED' => 3,
+        'ENFORCED' => 4,
+        'CANCELED' => 5,
     ];
 
     public function merchant()
@@ -82,5 +79,46 @@ class MerchantDeposit extends Model
     public function transactions()
     {
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
+    }
+
+    public function setStatusAttribute($value)
+    {
+        $methods = TransactionMethod::all()->pluck('id', 'name');
+        DB::beginTransaction();
+        try {
+            $this->attributes['status'] = $value;
+            // approve or enforce
+            if ($value == self::STATUS['APPROVED'] || $value == self::STATUS['ENFORCED']) {
+                // reseller
+                $transaction = $this->transactions()->create([
+                    'transaction_method_id' => $methods['DEDUCT_CREDIT'],
+                    'amount' => $this->amount
+                ]);
+                $this->reseller->decrement('credit', $transaction->amount);
+                if ($value == self::STATUS['APPROVED']) {
+                    $transaction = $this->transactions()->create([
+                        'transaction_method_id' => $methods['TOPUP_COIN'],
+                        'amount' => $transaction->amount * $this->reseller->commission_percentage
+                    ]);
+                    $this->reseller->increment('coin', $transaction->amount);
+                }
+                // merchant
+                $transaction = $this->transactions()->create([
+                    'transaction_method_id' => $methods['TOPUP_CREDIT'],
+                    'amount' => $this->amount
+                ]);
+                $this->merchant->increment('credit', $transaction->amount);
+                $transaction = $this->transactions()->create([
+                    'transaction_method_id' => $methods['TRANSACTION_FEE'],
+                    'amount' => $transaction->amount * $this->merchant->transaction_fee
+                ]);
+                $this->merchant->decrement('credit', $transaction->amount);
+            }
+        } catch (\Exception $e) {
+            \Log::info($e->getMessage());
+            DB::rollback();
+            throw $e;
+        }
+        DB::commit();
     }
 }

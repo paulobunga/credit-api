@@ -19,13 +19,14 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     use Notifiable;
 
     protected $fillable = [
+        'level',
         'name',
         'username',
         'phone',
         'password',
         'credit',
         'coin',
-        'transaction_fee',
+        'commission_percentage',
         'pending_limit',
         'status',
     ];
@@ -35,12 +36,23 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     ];
 
     protected $casts = [
-        'status' => 'boolean',
+    ];
+
+    protected const LEVELS = [
+        'referrer' => 0,
+        'master agent' => 1,
+        'agent' => 2,
+        'reseller' => 3
     ];
 
     public function bankCards()
     {
         return $this->hasMany(ResellerBankCard::class);
+    }
+
+    public static function getLevelID($level)
+    {
+        return self::LEVELS[$level] ?? null;
     }
 
     public function setPasswordAttribute($value)

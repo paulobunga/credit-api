@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Transformers\Admin;
 
 use Illuminate\Database\Eloquent\Model;
@@ -10,12 +11,13 @@ class ResellerTransformer extends TransformerAbstract
     {
         return [
             'id' => $reseller->id,
+            'level' => $reseller->level,
             'name' => $reseller->name,
             'username' => $reseller->username,
             'phone' => $reseller->phone,
             'credit' => $reseller->credit,
             'coin' => $reseller->coin,
-            'transaction_fee' => $reseller->transaction_fee,
+            'commission_percentage' => $reseller->commission_percentage,
             'pending_limit' => $reseller->pending_limit,
             'status' => $reseller->status,
         ];

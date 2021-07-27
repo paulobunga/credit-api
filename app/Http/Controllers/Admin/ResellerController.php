@@ -30,7 +30,7 @@ class ResellerController extends Controller
             'username' => 'required|unique:resellers,username',
             'phone' => 'required|unique:resellers,phone',
             'password' => 'required|confirmed',
-            'transaction_fee' => 'required|numeric',
+            'commission_percentage' => 'required|numeric',
             'pending_limit' => 'required|numeric',
             'status' => 'required|boolean'
         ]);
@@ -39,7 +39,7 @@ class ResellerController extends Controller
             'username' => $request->username,
             'phone' => $request->phone,
             'password' => $request->password,
-            'transaction_fee' => $request->transaction_fee,
+            'commission_percentage' => $request->commission_percentage,
             'pending_limit' => $request->pending_limit,
             'status' => $request->status,
         ]);
@@ -54,7 +54,7 @@ class ResellerController extends Controller
             'name' => "required|unique:resellers,name,{$reseller->id}",
             'username' => "required|unique:resellers,username,{$reseller->id}",
             'phone' => "required|unique:resellers,phone,{$reseller->id}",
-            'transaction_fee' => 'required|numeric',
+            'commission_percentage' => 'required|numeric',
             'pending_limit' => 'required|numeric',
             'status' => 'required|boolean'
         ]);
@@ -62,7 +62,7 @@ class ResellerController extends Controller
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
-            'transaction_fee' => $request->transaction_fee,
+            'commission_percentage' => $request->commission_percentage,
             'pending_limit' => $request->pending_limit,
             'status' => $request->status,
         ]);
