@@ -28,6 +28,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         'coin',
         'commission_percentage',
         'pending_limit',
+        'downline_slot',
         'status',
     ];
 

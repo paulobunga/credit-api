@@ -18,8 +18,18 @@ class PermissionAndRoleSeeder extends Seeder
     {
         // create default permission based on route
         Artisan::call('permission:list');
-        
-        Role::create(['name' => 'Market']);
-        Role::create(['name' => 'IT']);
+        $role = Role::create(['name' => 'Market']);
+        $role->givePermissionTo(
+            Permission::whereNotIn('name', ['admin.permissions.index'])->pluck('name')->toArray()
+        );
+        $role = Role::create(['name' => 'IT']);
+        $role->givePermissionTo(
+            Permission::whereNotIn('name', [
+                'admin.admins.index',
+                'admin.admins.store',
+                'admin.admins.update',
+                'admin.admins.destory',
+            ])->pluck('name')->toArray()
+        );
     }
 }

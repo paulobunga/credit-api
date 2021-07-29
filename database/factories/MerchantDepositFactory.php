@@ -26,9 +26,8 @@ class MerchantDepositFactory extends Factory
             'account_no' => $this->faker->bankAccountNumber,
             'account_name' => $this->faker->name,
             'amount' => $this->faker->randomNumber(5),
-            'status' => $this->faker->boolean,
             'callback_url' => $this->faker->url,
-            'reference_no' => $this->faker->numerify('N-########')
+            'reference_no' => $this->faker->numerify('N-########'),
         ];
     }
 }

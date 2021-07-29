@@ -37,6 +37,13 @@ class MerchantDeposit extends Model
         'CANCELED' => 5,
     ];
 
+    protected const CALLBACK_STATUS = [
+        'CREATED' => 0,
+        'PENDING' => 1,
+        'FINISH' => 2,
+        'FAILED' => 3,
+    ];
+
     public function merchant()
     {
         return $this->belongsTo(Merchant::class);
@@ -98,7 +105,7 @@ class MerchantDeposit extends Model
                 if ($value == self::STATUS['APPROVED']) {
                     $transaction = $this->transactions()->create([
                         'transaction_method_id' => $methods['TOPUP_COIN'],
-                        'amount' => $transaction->amount * $this->reseller->commission_percentage
+                        'amount' => $this->amount * $this->reseller->commission_percentage
                     ]);
                     $this->reseller->increment('coin', $transaction->amount);
                 }
@@ -110,7 +117,7 @@ class MerchantDeposit extends Model
                 $this->merchant->increment('credit', $transaction->amount);
                 $transaction = $this->transactions()->create([
                     'transaction_method_id' => $methods['TRANSACTION_FEE'],
-                    'amount' => $transaction->amount * $this->merchant->transaction_fee
+                    'amount' => $this->amount * $this->merchant->transaction_fee
                 ]);
                 $this->merchant->decrement('credit', $transaction->amount);
             }

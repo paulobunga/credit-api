@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 
 class ResellerController extends Controller
 {
@@ -16,7 +17,16 @@ class ResellerController extends Controller
     {
         $resellers = QueryBuilder::for($this->model)
             ->allowedFilters([
-                AllowedFilter::custom('name', new \App\Http\Filters\ResellerFilter),
+                AllowedFilter::exact('id'),
+                AllowedFilter::partial('name'),
+                AllowedFilter::exact('level'),
+                AllowedFilter::exact('status')
+            ])
+            ->allowedSorts([
+                AllowedSort::field('id', 'id'),
+                AllowedSort::field('name', 'name'),
+                'level',
+                'status'
             ])
             ->paginate($this->perPage);
 
@@ -26,22 +36,28 @@ class ResellerController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
+            'level' => 'required|between:0,3',
+            'upline' => 'required_unless:level,0',
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
             'phone' => 'required|unique:resellers,phone',
             'password' => 'required|confirmed',
             'commission_percentage' => 'required|numeric',
             'pending_limit' => 'required|numeric',
-            'status' => 'required|boolean'
+            'downline_slot' => 'required|numeric',
+            // 'status' => 'required|boolean'
         ]);
         $reseller = $this->model::create([
+            'level' => $request->level,
+            'upline' => $request->get('upline', 0),
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
             'password' => $request->password,
             'commission_percentage' => $request->commission_percentage,
             'pending_limit' => $request->pending_limit,
-            'status' => $request->status,
+            'downline_slot' => $request->downline_slot,
+            'status' => $request->level > 2 ? 0 : 1,
         ]);
 
         return $this->response->item($reseller, $this->transformer);

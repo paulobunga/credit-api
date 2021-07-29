@@ -26,6 +26,7 @@ class AuthController extends Controller
             !Auth::guard('admin')->user()->hasRole('Super Admin') &&
             !in_array($request->ip(), Auth::guard('admin')->user()->whiteLists->pluck('ip')->toArray())
         ) {
+            \Log::error($request->ip() . " is not in admin[" . Auth::id() . '] white list.');
             Auth::guard('admin')->logout();
             return response()->json(['message' => 'Unauthorized IP Address!'], 401);
         }
