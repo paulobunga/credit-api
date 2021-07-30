@@ -9,6 +9,7 @@
         "dingo/api": "^3.0.0",
         "doctrine/dbal": "^3.1",
         "fruitcake/laravel-cors": "^2.0",
+        "guzzlehttp/guzzle": "^7.0",
         "illuminate/notifications": "^8.49",
         "illuminate/redis": "^8.49",
         "laravel/lumen-framework": "^8.0",
@@ -16,8 +17,8 @@
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^4.0",
         "spatie/laravel-query-builder": "^3.4",
-        "tymon/jwt-auth": "dev-develop",
-        "guzzlehttp/guzzle": "^7.0"
+        "spatie/laravel-settings": "^2.1",
+        "tymon/jwt-auth": "dev-develop"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -30,7 +31,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/helpers.php"
+        ]
     },
     "autoload-dev": {
         "classmap": [

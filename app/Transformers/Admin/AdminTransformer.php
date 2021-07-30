@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Transformers\Admin;
 
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,7 @@ class AdminTransformer extends TransformerAbstract
             'id' => $admin->id,
             'name' => $admin->name,
             'username' => $admin->username,
+            'role' => $admin->roles[0]->name ?? '--',
             'status' => $admin->status,
         ];
     }

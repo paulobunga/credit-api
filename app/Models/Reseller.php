@@ -39,11 +39,17 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     protected $casts = [
     ];
 
-    protected const LEVELS = [
+    public const LEVEL = [
         'referrer' => 0,
         'master agent' => 1,
         'agent' => 2,
         'reseller' => 3
+    ];
+
+    public const STATUS = [
+        'inactive' => 0,
+        'active' => 1,
+        'disabled' => 2,
     ];
 
     public function bankCards()
@@ -53,7 +59,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     public static function getLevelID($level)
     {
-        return self::LEVELS[$level] ?? null;
+        return self::LEVEL[$level] ?? null;
     }
 
     public function setPasswordAttribute($value)

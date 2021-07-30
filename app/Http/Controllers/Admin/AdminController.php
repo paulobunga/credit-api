@@ -28,9 +28,12 @@ class AdminController extends Controller
         $this->validate($request, [
             'name' => 'required|unique:admins,name',
             'username' => 'required|unique:admins,username',
+            'role' => 'required',
             'password' => 'required|confirmed',
             'status' => 'boolean'
         ]);
+
+        $role = \App\Models\Role::findOrFail($request->role);
 
         $admin = $this->model::create([
             'name' => $request->name,
@@ -38,6 +41,7 @@ class AdminController extends Controller
             'password' => $request->password,
             'status' => $request->status,
         ]);
+        $admin->syncRoles($role);
 
         return $this->response->item($admin, $this->transformer);
     }
@@ -45,16 +49,22 @@ class AdminController extends Controller
     public function update(Request $request)
     {
         $admin = $this->model::where('name', $this->parameters('admin'))->firstOrFail();
+        if ($admin->id == 1) {
+            throw new \Exception('Default Administrator cannot be edited!', 405);
+        }
         $this->validate($request, [
             'name' => "required|unique:admins,name,{$admin->id}",
             'username' => "required|unique:admins,username,{$admin->id}",
+            'role' => 'required',
             'status' => 'boolean'
         ]);
+        $role = \App\Models\Role::findOrFail($request->role);
         $admin->update([
             'name' => $request->name,
             'username' => $request->username,
             'status' => $request->status,
         ]);
+        $admin->syncRoles($role);
 
         return $this->response->item($admin, $this->transformer);
     }
@@ -62,6 +72,9 @@ class AdminController extends Controller
     public function destroy(Request $request)
     {
         $admin = $this->model::where('name', $this->parameters('admin'))->firstOrFail();
+        if ($admin->id == 1) {
+            throw new \Exception('Default Administrator cannot be removed!', 405);
+        }
         $admin->delete();
 
         return $this->success();

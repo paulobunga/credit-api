@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
+use App\Models\Reseller;
+use App\Settings\CommissionSetting;
 
 class ResellerController extends Controller
 {
@@ -25,6 +27,11 @@ class ResellerController extends Controller
             ->allowedSorts([
                 AllowedSort::field('id', 'id'),
                 AllowedSort::field('name', 'name'),
+                'username',
+                'phone',
+                'credit',
+                'coin',
+                'commission_percentage',
                 'level',
                 'status'
             ])
@@ -42,11 +49,11 @@ class ResellerController extends Controller
             'username' => 'required|unique:resellers,username',
             'phone' => 'required|unique:resellers,phone',
             'password' => 'required|confirmed',
-            'commission_percentage' => 'required|numeric',
-            'pending_limit' => 'required|numeric',
-            'downline_slot' => 'required|numeric',
-            // 'status' => 'required|boolean'
         ]);
+        $commission_setting = app(\App\Settings\CommissionSetting::class);
+        $reseller_setting = app(\App\Settings\ResellerSetting::class);
+        $agent_setting = app(\App\Settings\AgentSetting::class);
+
         $reseller = $this->model::create([
             'level' => $request->level,
             'upline' => $request->get('upline', 0),
@@ -54,10 +61,12 @@ class ResellerController extends Controller
             'username' => $request->username,
             'phone' => $request->phone,
             'password' => $request->password,
-            'commission_percentage' => $request->commission_percentage,
-            'pending_limit' => $request->pending_limit,
-            'downline_slot' => $request->downline_slot,
-            'status' => $request->level > 2 ? 0 : 1,
+            'commission_percentage' => $commission_setting->getDefaultPercentage($request->level),
+            'pending_limit' => $reseller_setting->getDefaultPendingLimit($request->level),
+            'downline_slot' => $agent_setting->getDefaultDownLineSlot($request->level),
+            'status' => ($request->level == Reseller::LEVEL['reseller']) ?
+                Reseller::STATUS['inactive'] :
+                Reseller::STATUS['active'],
         ]);
 
         return $this->response->item($reseller, $this->transformer);
@@ -67,12 +76,15 @@ class ResellerController extends Controller
     {
         $reseller = $this->model::where('name', $this->parameters('reseller'))->firstOrFail();
         $this->validate($request, [
+            'level' => 'required',
             'name' => "required|unique:resellers,name,{$reseller->id}",
             'username' => "required|unique:resellers,username,{$reseller->id}",
             'phone' => "required|unique:resellers,phone,{$reseller->id}",
             'commission_percentage' => 'required|numeric',
-            'pending_limit' => 'required|numeric',
-            'status' => 'required|boolean'
+            'pending_limit' =>
+            'required|numeric|max:' . app(\App\Settings\ResellerSetting::class)->max_pending_limit,
+            'downline_slot' =>
+            'required_with:level,1,2|numeric|max:' . app(\App\Settings\AgentSetting::class)->max_downline_slot
         ]);
         $reseller->update([
             'name' => $request->name,
@@ -80,7 +92,7 @@ class ResellerController extends Controller
             'phone' => $request->phone,
             'commission_percentage' => $request->commission_percentage,
             'pending_limit' => $request->pending_limit,
-            'status' => $request->status,
+            'downline_slot' => in_array($request->level, [1, 2]) ? $request->downline_slot : 0,
         ]);
 
         return $this->response->item($reseller, $this->transformer);
@@ -89,6 +101,9 @@ class ResellerController extends Controller
     public function destroy(Request $request)
     {
         $reseller = $this->model::where('name', $this->parameters('reseller'))->firstOrFail();
+        if ($reseller->id == 1) {
+            throw new \Exception('Default referrer cannot be removed!', 405);
+        }
         $reseller->delete();
 
         return $this->success();

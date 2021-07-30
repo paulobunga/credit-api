@@ -67,6 +67,7 @@ $app->configure('excel');
 $app->configure('permission');
 $app->configure('query-builder');
 $app->configure('broadcasting');
+$app->configure('settings');
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -103,6 +104,7 @@ $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
+$app->register(Spatie\LaravelSettings\LaravelSettingsServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
 $app->register(Spatie\QueryBuilder\QueryBuilderServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
@@ -110,7 +112,7 @@ $app->register(SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
-$app->register(App\Providers\RouteServiceProvider::class);
+// $app->register(App\Providers\RouteServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 

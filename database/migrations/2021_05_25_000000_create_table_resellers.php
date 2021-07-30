@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+USE App\Models\Reseller;
 
 class CreateTableResellers extends Migration
 {
@@ -29,6 +30,16 @@ class CreateTableResellers extends Migration
             $table->string('password', 60);
             $table->timestamps();
         });
+
+        // create default referrer
+        Reseller::create([
+            'level' => 0,
+            'name' => 'company',
+            'username' => 'company@gmail.com',
+            'phone' => '0936188590',
+            'password' => 'P@ssw0rd',
+            'status' => Reseller::STATUS['active'],
+        ]);
     }
 
     /**

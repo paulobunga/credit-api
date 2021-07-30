@@ -7,7 +7,7 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 use App\Exceptions\RouteNotFoundException;
 use Dingo\Api\Http\Request;
 use Illuminate\Support\Arr;
-use Dingo\Api\Exception\ValidationHttpException;
+use App\Exceptions\ValidationHttpException;
 
 abstract class Controller extends BaseController
 {
