@@ -23,7 +23,7 @@ $api->group([
         $api->resource('banks', 'BankController', ['except' => ['show']]);
         $api->get('/export/banks', ['as' => 'banks.export', 'uses' => 'BankController@export']);
         $api->resource('admins', 'AdminController', ['except' => ['show']]);
-        $api->resource('admin_white_lists', 'AdminWhiteListController', ['except' => ['show']]);
+        $api->resource('settings', 'SettingController', ['except' => ['show']]);
         $api->resource('merchant_white_lists', 'MerchantWhiteListController', ['except' => ['show']]);
 
         $api->resource('merchants', 'MerchantController', ['except' => ['show']]);

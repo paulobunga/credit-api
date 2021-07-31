@@ -18,7 +18,7 @@ class ResellerBankCardSeeder extends Seeder
     public function run()
     {
         $methods = \App\Models\PaymentMethod::all();
-        foreach (Reseller::all() as $reseller) {
+        foreach (Reseller::where('level', 3)->get() as $reseller) {
             foreach ($methods as $method) {
                 $bank = Bank::where('payment_method_id', $method->id)->inRandomOrder()->first();
                 $card = ResellerBankCard::factory()->make([

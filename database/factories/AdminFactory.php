@@ -22,7 +22,7 @@ class AdminFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'username' => $this->faker->numerify('test###@gmail.com'),
+            'username' => $this->faker->numerify('admin###@gmail.com'),
             'password' => 'P@ssw0rd',
             'status' => $this->faker->boolean,
         ];

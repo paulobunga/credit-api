@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
         }
         // register custom morph type
         Relation::morphMap([
-            'merchant.depost' => 'App\Models\MerchantDeposit',
+            'merchant.deposit' => 'App\Models\MerchantDeposit',
             'reseller.withdrawal' => 'App\Models\ResellerWithdrawal',
         ]);
     }

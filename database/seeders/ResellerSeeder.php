@@ -3,6 +3,10 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Reseller;
+use App\Settings\AgentSetting;
+use App\Settings\CommissionSetting;
+use App\Settings\ResellerSetting;
 
 class ResellerSeeder extends Seeder
 {
@@ -11,20 +15,34 @@ class ResellerSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
-    {
+    public function run(
+        ResellerSetting $rs,
+        CommissionSetting $cs,
+        AgentSetting $as
+    ) {
         \App\Models\Reseller::create([
-            'level' => \App\Models\Reseller::getLevelID('reseller'),
+            'level' => Reseller::LEVEL['reseller'],
             'name' => 'Test Reseller',
             'username' => 'reseller@gmail.com',
             'password' => 'P@ssw0rd',
             'phone' => '+8865721455',
-            'commission_percentage' => 0.003,
             'credit' => 2000000,
             'coin' => 0,
-            'pending_limit' => 5,
+            'pending_limit' => $rs->default_pending_limit,
+            'commission_percentage' => $cs->reseller_percentage,
+            'downline_slot' => 0,
             'status' => true,
         ]);
-        \App\Models\Reseller::factory()->count(4)->create();
+        $reseller = null;
+        foreach (Reseller::LEVEL as $level) {
+            $reseller = Reseller::factory()->create([
+                'username' => "reseller{$level}@gmail.com",
+                'upline_id' => $reseller ? $reseller->id : 0,
+                'level' => $level,
+                'pending_limit' => $rs->getDefaultPendingLimit($level),
+                'commission_percentage' => $cs->getDefaultPercentage($level),
+                'downline_slot' => $as->getDefaultDownLineSlot($level),
+            ]);
+        }
     }
 }

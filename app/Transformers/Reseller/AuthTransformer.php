@@ -19,13 +19,14 @@ class AuthTransformer extends TransformerAbstract
     {
         return [
             'id' => $reseller->id,
+            'level' => $reseller->level,
             'name' => $reseller->name,
             'username' => $reseller->username,
             'phone' => $reseller->phone,
-            'transaction_fee' => $reseller->transaction_fee,
             'credit' => $reseller->credit,
             'coin' => $reseller->coin,
             'pending_limit' => $reseller->pending_limit,
+            'commission_percentage' => $reseller->commission_percentage,
             'status' => $reseller->status,
             'access_token' => $this->token,
             'token_type' => 'bearer',

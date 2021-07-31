@@ -30,14 +30,15 @@ class ResellerFactory extends Factory
         
         return [
             'name' => $this->faker->name,
-            'username' => $this->faker->unique()->freeEmail,
-            'password' => $this->faker->password,
+            'username' => $this->faker->numerify('reseller##@gmail.com'),
+            'password' => 'P@ssw0rd',
             'level' => $level[0]['level'],
             'phone' => $this->faker->phoneNumber,
             'credit' => $this->faker->numberBetween(1, 1000),
             'coin' => $this->faker->numberBetween(1, 1000),
-            'commission_percentage' => $level[0]['commission_percentage'],
-            'pending_limit' => $this->faker->numberBetween(1, 5),
+            'pending_limit' => 0,
+            'commission_percentage' => 0,
+            'downline_slot' => 0,
             'status' => $this->faker->numberBetween(0, 2),
         ];
     }

@@ -26,13 +26,15 @@ class ResellerController extends Controller
             ])
             ->allowedSorts([
                 AllowedSort::field('id', 'id'),
+                'level',
                 AllowedSort::field('name', 'name'),
                 'username',
                 'phone',
                 'credit',
                 'coin',
+                'pending_limit',
                 'commission_percentage',
-                'level',
+                'downline_slot',
                 'status'
             ])
             ->paginate($this->perPage);

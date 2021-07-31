@@ -7,6 +7,7 @@ use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class MerchantController extends Controller
 {
@@ -92,14 +93,19 @@ class MerchantController extends Controller
     {
         $merchant = $this->model::where('id', $this->parameters('merchant'))->firstOrFail();
         $this->validate($request, [
-            'ip' => 'required|array',
-            'ip.*' => 'required|distinct|ipv4',
+            'ip' => 'array',
+            'ip.*' => 'distinct|ipv4',
         ]);
         \App\Models\MerchantWhiteList::where('merchant_id', $merchant->id)->delete();
         \App\Models\MerchantWhiteList::insert(
             collect($request->get('ip'))->map(
                 function ($v) use ($merchant) {
-                    return ['merchant_id' => $merchant->id, 'ip' => $v];
+                    return [
+                        'merchant_id' => $merchant->id,
+                        'ip' => $v,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ];
                 }
             )->toArray()
         );

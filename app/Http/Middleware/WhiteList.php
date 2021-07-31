@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use App\Models\AdminWhiteList;
 use App\Models\MerchantWhiteList;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
@@ -33,10 +32,11 @@ class WhiteList
             if (Auth::user()->hasRole('Super Admin')) {
                 return $next($request);
             }
-            $white_lists = AdminWhiteList::where(
-                'admin_id',
-                Auth::id()
-            )->pluck('ip')->toArray();
+            // $white_lists = AdminWhiteList::where(
+            //     'admin_id',
+            //     Auth::id()
+            // )->pluck('ip')->toArray();
+            $white_lists = [];
         } else {
             return $next($request);
         }

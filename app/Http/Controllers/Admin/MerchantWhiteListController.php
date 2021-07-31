@@ -22,6 +22,7 @@ class MerchantWhiteListController extends Controller
             ->select('merchant_white_lists.*', 'merchants.name')
             ->allowedFilters([
                 AllowedFilter::exact('id'),
+                AllowedFilter::exact('merchant_id', 'merchants.id'),
                 AllowedFilter::partial('name', 'merchants.name'),
                 AllowedFilter::partial('ip'),
             ])
