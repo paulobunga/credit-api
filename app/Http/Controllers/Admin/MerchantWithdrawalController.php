@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\DB;
 
 class MerchantWithdrawalController extends Controller
@@ -16,7 +17,7 @@ class MerchantWithdrawalController extends Controller
     {
         $merchant_withdrawals = QueryBuilder::for($this->model)
             ->allowedFilters([
-                // AllowedFilter::custom('name', new \App\Http\Filters\MerchantFilter),
+                AllowedFilter::partial('name')
             ])
             ->paginate($this->perPage);
         return $this->response->withPaginator($merchant_withdrawals, $this->transformer);

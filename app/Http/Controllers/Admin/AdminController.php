@@ -16,7 +16,7 @@ class AdminController extends Controller
     {
         $admins = QueryBuilder::for($this->model)
             ->allowedFilters([
-                AllowedFilter::custom('name', new \App\Http\Filters\AdminFilter),
+                AllowedFilter::partial('name'),
             ])
             ->paginate($this->perPage);
 

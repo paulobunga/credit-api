@@ -13,20 +13,7 @@ class CreateTableTransactions extends Migration
      * @return void
      */
     public function up()
-    {
-        Schema::create('transaction_methods', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 30)
-                ->comment('0:Top up Credit,1: Deduct Credit, 2: Top up Coin, 3:Deduct Coin');
-            $table->timestamp('created_at')->useCurrent();;
-            $table->index('name');
-        });
-        DB::table('transaction_methods')->insert(['name' => 'TOPUP_CREDIT']);
-        DB::table('transaction_methods')->insert(['name' => 'DEDUCT_CREDIT']);
-        DB::table('transaction_methods')->insert(['name' => 'TOPUP_COIN']);
-        DB::table('transaction_methods')->insert(['name' => 'DEDUCT_COIN']);
-        DB::table('transaction_methods')->insert(['name' => 'TRANSACTION_FEE']);
-        
+    {        
         Schema::create('model_has_transactions', function (Blueprint $table) {
             $table->unsignedBigInteger('transaction_id');
             $table->unsignedBigInteger('model_id');
@@ -40,7 +27,9 @@ class CreateTableTransactions extends Migration
 
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_method_id')->constrained()->onDelete('cascade');;
+            $table->unsignedBigInteger('user_id');
+            $table->string('user_type', 20);
+            $table->unsignedTinyInteger('type');
             $table->decimal('amount', 14, 4);
             $table->timestamp('created_at')->useCurrent();
         });
@@ -55,6 +44,5 @@ class CreateTableTransactions extends Migration
     {
         Schema::dropIfExists('transactions');
         Schema::dropIfExists('model_has_transactions');
-        Schema::dropIfExists('transaction_methods');
     }
 }

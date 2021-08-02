@@ -12,22 +12,22 @@ class Transaction extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'transaction_method_id',
+        'user_id',
+        'user_type',
+        'type',
         'amount',
     ];
 
-    public function transactionMethod()
-    {
-        return $this->belongsTo(TransactionMethod::class);
-    }
+    public const TYPE = [
+        'DEDUCT_CREDIT' => 0,
+        'TOPUP_CREDIT' => 1,
+        'DEDUCT_COIN' => 2,
+        'COMMISSION' => 3,
+        'TRANSACTION_FEE' => 4,
+    ];
 
-    public function merchantDeposits()
+    public function getTypeAttribute()
     {
-        return $this->morphedByMany(MerchantDeposit::class, 'model', 'model_has_transactions');
-    }
-
-    public function resellerDeposits()
-    {
-        return $this->morphedByMany(ResellerDeposit::class, 'model', 'model_has_transactions');
+        return array_search($this->type, self::TYPE);
     }
 }

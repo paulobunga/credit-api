@@ -36,8 +36,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         'password',
     ];
 
-    protected $casts = [
-    ];
+    protected $casts = [];
 
     public const LEVEL = [
         'referrer' => 0,
@@ -57,9 +56,19 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         return $this->hasMany(ResellerBankCard::class);
     }
 
-    public static function getLevelID($level)
+    public function agent()
     {
-        return self::LEVEL[$level] ?? null;
+        return $this->belongsTo(Reseller::class, 'upline_id', 'id');
+    }
+
+    public function getMasterAgent()
+    {
+        return $this->agent->agent ?? null;
+    }
+
+    public function transactions()
+    {
+        return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
     }
 
     public function setPasswordAttribute($value)

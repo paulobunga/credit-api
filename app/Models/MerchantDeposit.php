@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Trait\Sortable;
-use App\Trait\Filterable;
+use App\Models\Transaction;
 
 class MerchantDeposit extends Model
 {
@@ -90,36 +89,83 @@ class MerchantDeposit extends Model
 
     public function setStatusAttribute($value)
     {
-        $methods = TransactionMethod::all()->pluck('id', 'name');
         DB::beginTransaction();
         try {
             $this->attributes['status'] = $value;
             // approve or enforce
-            if ($value == self::STATUS['APPROVED'] || $value == self::STATUS['ENFORCED']) {
+            if (in_array($value, [self::STATUS['APPROVED'], self::STATUS['ENFORCED']])) {
+                // merchant add credit and deduct transaction fee
+                $this->transactions()->create([
+                    'user_id' => $this->merchant_id,
+                    'user_type' => 'merchant',
+                    'type' => Transaction::TYPE['TOPUP_CREDIT'],
+                    'amount' => $this->amount
+                ]);
+                $this->transactions()->create([
+                    'user_id' => $this->merchant_id,
+                    'user_type' => 'merchant',
+                    'type' => Transaction::TYPE['TRANSACTION_FEE'],
+                    'amount' => - ($this->amount * $this->merchant->transaction_fee)
+                ]);
+                $this->merchant->increment(
+                    'credit',
+                    $this->merchant->credit - $this->amount * $this->merchant->transaction_fee
+                );
                 // reseller
-                $transaction = $this->transactions()->create([
-                    'transaction_method_id' => $methods['DEDUCT_CREDIT'],
-                    'amount' => $this->amount
+                $this->transactions()->create([
+                    'user_id' => $this->reseller->id,
+                    'user_type' => 'reseller',
+                    'type' => Transaction::TYPE['DEDUCT_CREDIT'],
+                    'amount' => - ($this->amount)
                 ]);
-                $this->reseller->decrement('credit', $transaction->amount);
-                if ($value == self::STATUS['APPROVED']) {
-                    $transaction = $this->transactions()->create([
-                        'transaction_method_id' => $methods['TOPUP_COIN'],
-                        'amount' => $this->amount * $this->reseller->commission_percentage
-                    ]);
-                    $this->reseller->increment('coin', $transaction->amount);
+                // commission
+                $rows = DB::select("
+                WITH recursive recuresive_resellers ( id, upline_id, level, name, commission_percentage ) AS (
+                    SELECT
+                        id,
+                        upline_id,
+                        level,
+                        name,
+                        commission_percentage 
+                    FROM
+                        resellers 
+                    WHERE
+                        id = :id
+                    UNION ALL
+                    SELECT
+                        r.id,
+                        r.upline_id,
+                        r.level,
+                        r.name,
+                        r.commission_percentage 
+                    FROM
+                        resellers r
+                        INNER JOIN recuresive_resellers ON r.id = recuresive_resellers.upline_id 
+                )
+                SELECT
+                    id AS user_id,
+                    'reseller' AS user_type,
+                    :type AS type,
+                    :amount * commission_percentage AS amount 
+                FROM
+                    recuresive_resellers
+                ORDER BY user_id DESC
+                ", [
+                    'id' => $this->reseller->id,
+                    'amount' => $this->amount,
+                    'type' => Transaction::TYPE['COMMISSION']
+                ]);
+                foreach ($rows as $row) {
+                    if ($row->user_id == $this->reseller->id) {
+                        $this->reseller->update([
+                            'credit' => $this->reseller->credit - $this->amount,
+                            'coin' => $this->reseller->coin + $row->amount
+                        ]);
+                        continue;
+                    }
+                    DB::table('resellers')->where('id', $row->user_id)->increment('coin', $row->amount);
                 }
-                // merchant
-                $transaction = $this->transactions()->create([
-                    'transaction_method_id' => $methods['TOPUP_CREDIT'],
-                    'amount' => $this->amount
-                ]);
-                $this->merchant->increment('credit', $transaction->amount);
-                $transaction = $this->transactions()->create([
-                    'transaction_method_id' => $methods['TRANSACTION_FEE'],
-                    'amount' => $this->amount * $this->merchant->transaction_fee
-                ]);
-                $this->merchant->decrement('credit', $transaction->amount);
+                DB::table('transactions')->insert(json_decode(json_encode($rows), true));
             }
         } catch (\Exception $e) {
             \Log::info($e->getMessage());

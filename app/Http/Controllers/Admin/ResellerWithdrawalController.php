@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\DB;
 
 class ResellerWithdrawalController extends Controller
@@ -16,9 +17,10 @@ class ResellerWithdrawalController extends Controller
     {
         $reseller_withdrawals = QueryBuilder::for($this->model)
             ->allowedFilters([
-                // AllowedFilter::custom('name', new \App\Http\Filters\resellerFilter),
+                AllowedFilter::partial('name'),
             ])
             ->paginate($this->perPage);
+
         return $this->response->withPaginator($reseller_withdrawals, $this->transformer);
     }
 

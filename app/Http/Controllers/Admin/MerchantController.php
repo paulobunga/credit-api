@@ -18,7 +18,7 @@ class MerchantController extends Controller
     {
         $merchants = QueryBuilder::for($this->model)
             ->allowedFilters([
-                AllowedFilter::custom('name', new \App\Http\Filters\MerchantFilter),
+                AllowedFilter::partial('name'),
             ])
             ->paginate($this->perPage);
 

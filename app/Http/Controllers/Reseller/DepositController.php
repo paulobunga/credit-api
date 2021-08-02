@@ -8,8 +8,6 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
-use App\Models\TransactionMethod;
 
 class DepositController extends Controller
 {

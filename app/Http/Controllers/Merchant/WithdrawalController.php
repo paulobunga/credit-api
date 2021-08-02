@@ -18,7 +18,7 @@ class WithdrawalController extends Controller
     {
         $withdrawals = QueryBuilder::for($this->model::where('merchant_id', Auth::id()))
             ->allowedFilters([
-                // AllowedFilter::custom('name', new \App\Http\Filters\MerchantFilter),
+                AllowedFilter::partial('name'),
             ])
             ->paginate($this->perPage);
 

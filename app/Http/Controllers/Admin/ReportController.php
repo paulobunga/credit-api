@@ -13,7 +13,7 @@ class ReportController extends Controller
     {
         $reports = QueryBuilder::for(\App\Models\ReportDailyReseller::class)
             ->allowedFilters([
-                // AllowedFilter::custom('name', new \App\Http\Filters\ResellerFilter),
+                AllowedFilter::partial('name'),
             ])
             ->paginate($this->perPage);
         return $this->response->withPaginator(
@@ -26,7 +26,7 @@ class ReportController extends Controller
     {
         $reports = QueryBuilder::for(\App\Models\ReportDailyMerchant::class)
             ->allowedFilters([
-                // AllowedFilter::custom('name', new \App\Http\Filters\ResellerFilter),
+                AllowedFilter::partial('name'),
             ])
             ->paginate($this->perPage);
         return $this->response->withPaginator(

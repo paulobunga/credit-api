@@ -25,7 +25,7 @@ class MerchantDepositFactory extends Factory
             'order_id' => '#' . $this->faker->randomNumber(8) . time(),
             'account_no' => $this->faker->bankAccountNumber,
             'account_name' => $this->faker->name,
-            'amount' => $this->faker->randomNumber(5),
+            'amount' => 100,
             'callback_url' => $this->faker->url,
             'reference_no' => $this->faker->numerify('N-########'),
         ];
