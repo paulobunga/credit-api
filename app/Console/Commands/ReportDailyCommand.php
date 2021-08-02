@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Carbon\Exceptions\InvalidArgumentException;
 use App\Models\ReportMonthlyReseller;
 use App\Models\ReportMonthlyMerchant;
+use App\Models\Transaction;
 
 class ReportDailyCommand extends Command
 {
@@ -25,6 +26,7 @@ class ReportDailyCommand extends Command
      */
     protected $description = 'Gnerate daily report';
 
+    protected $type = Transaction::TYPE;
     /**
      * Create a new command instance.
      *
@@ -51,7 +53,7 @@ class ReportDailyCommand extends Command
         }
         $start_datetime = "{$date} 00:00:00";
         $end_datetime = "{$date} 23:59:59";
-        $this->calulateResellers($start_datetime, $end_datetime);
+        // $this->calulateResellers($start_datetime, $end_datetime);
         $this->calulateMerchants($start_datetime, $end_datetime);
     }
 
@@ -61,45 +63,45 @@ class ReportDailyCommand extends Command
         WITH daily_transaction AS (        
             SELECT
                     t.id, 
-                    m.name,
+                    t.user_id,
+                    t.user_type, 
+                    t.type,
                     t.amount,
                     t.created_at
             FROM transactions AS t
-            LEFT JOIN transaction_methods AS m ON m.id =  t.transaction_method_id
             WHERE t.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
         ),
         daily_merchant_deposit AS(
             SELECT 
-                rbc.reseller_id,
+                dt.user_id AS reseller_id,
                 COUNT( DISTINCT md.id) AS turnover,
                 SUM(
-                    CASE WHEN dt.name = 'DEDUCT_CREDIT' THEN -dt.amount
+                    CASE WHEN dt.type = {$this->type['DEDUCT_CREDIT']} THEN dt.amount
                 END
                 ) AS credit,
                 SUM(
-                    CASE WHEN dt.name = 'TOPUP_COIN' THEN dt.amount
+                    CASE WHEN dt.type = {$this->type['COMMISSION']} THEN dt.amount
                 END
                 ) AS coin
             FROM daily_transaction AS dt
             JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'merchant.deposit'
             LEFT JOIN merchant_deposits AS md ON mht.model_id = md.id
-            LEFT JOIN reseller_bank_cards AS rbc ON md.reseller_bank_card_id = rbc.id
-            LEFT JOIN resellers AS r ON rbc.reseller_id = r.id
-            WHERE dt.name IN ('DEDUCT_CREDIT', 'TOPUP_COIN')
+            LEFT JOIN resellers AS r ON dt.user_id = r.id
+            WHERE dt.type IN ({$this->type['DEDUCT_CREDIT']}, {$this->type['COMMISSION']})
             GROUP BY reseller_id
         ),
         daily_reseller_withdrawal AS(
             SELECT 
                 rw.reseller_id,
                 SUM(
-                    CASE WHEN dt.name = 'DEDUCT_COIN' THEN dt.amount
+                    CASE WHEN dt.type = {$this->type['DEDUCT_COIN']} THEN dt.amount
                     END
                 ) AS withdrawal
             FROM daily_transaction AS dt
             JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'reseller.withdrawal'
             LEFT JOIN reseller_withdrawals AS rw ON mht.model_id = rw.id
-            WHERE dt.name IN ('DEDUCT_COIN')
-                        GROUP BY reseller_id
+            WHERE dt.type IN ({$this->type['DEDUCT_COIN']})
+            GROUP BY reseller_id
           ),
         daily_report AS (
             SELECT 
@@ -152,35 +154,36 @@ class ReportDailyCommand extends Command
         WITH daily_transaction AS (        
             SELECT
                     t.id, 
-                    m.name,
+                    t.user_id,
+                    t.user_type, 
+                    t.type,
                     t.amount,
                     t.created_at
             FROM transactions AS t
-            LEFT JOIN transaction_methods AS m ON m.id =  t.transaction_method_id
             WHERE t.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
         ),
         daily_merchant_deposit AS(
           SELECT 
                 dt.*,
                 md.id AS merchant_deposit_id,
-								md.merchant_id,
+                md.merchant_id,
                 md.merchant_order_id
             FROM daily_transaction AS dt
             JOIN model_has_transactions AS mht ON dt.id = mht.transaction_id AND mht.model_type = 'merchant.deposit'
             LEFT JOIN merchant_deposits AS md ON mht.model_id = md.id
             LEFT JOIN merchants AS m ON md.merchant_id = m.id
-            WHERE dt.name IN ('TOPUP_CREDIT', 'TRANSACTION_FEE')
+            WHERE dt.type IN ({$this->type['TOPUP_CREDIT']}, {$this->type['TRANSACTION_FEE']})
         ),
         daily_report AS (
             SELECT 
                 merchant_id,
                 COUNT( DISTINCT merchant_deposit_id) AS turnover,
                 SUM(
-                    CASE WHEN name = 'TOPUP_CREDIT' THEN amount
+                    CASE WHEN type = {$this->type['TOPUP_CREDIT']} THEN amount
                     END
                 ) AS credit,
                 SUM(
-                    CASE WHEN name = 'TRANSACTION_FEE' THEN -amount
+                    CASE WHEN type = {$this->type['TRANSACTION_FEE']} THEN amount
                     END
                 ) AS transaction_fee
             FROM daily_merchant_deposit

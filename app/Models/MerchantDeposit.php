@@ -156,6 +156,12 @@ class MerchantDeposit extends Model
                     'type' => Transaction::TYPE['COMMISSION']
                 ]);
                 foreach ($rows as $row) {
+                    $this->transactions()->create([
+                        'user_id' => $row->user_id,
+                        'user_type' => 'reseller',
+                        'type' => Transaction::TYPE['COMMISSION'],
+                        'amount' => $row->amount
+                    ]);
                     if ($row->user_id == $this->reseller->id) {
                         $this->reseller->update([
                             'credit' => $this->reseller->credit - $this->amount,
@@ -165,7 +171,6 @@ class MerchantDeposit extends Model
                     }
                     DB::table('resellers')->where('id', $row->user_id)->increment('coin', $row->amount);
                 }
-                DB::table('transactions')->insert(json_decode(json_encode($rows), true));
             }
         } catch (\Exception $e) {
             \Log::info($e->getMessage());
