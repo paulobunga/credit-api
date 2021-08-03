@@ -9,6 +9,7 @@ $api->group([
     ],
 ], function ($api) {
     $api->post('/auth/login', ['as' => 'auth.login', 'uses' => 'AuthController@login']);
+    $api->post('/auth/register', ['as' => 'auth.register', 'uses' => 'AuthController@register']);
     $api->group([
         'middleware' => [
             'api.auth:reseller'

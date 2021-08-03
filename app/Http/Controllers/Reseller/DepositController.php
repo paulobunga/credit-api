@@ -29,7 +29,9 @@ class DepositController extends Controller
             ->select(
                 'merchant_deposits.*',
             )
-            ->allowedFilters('name')
+            ->allowedFilters([
+                'name'
+            ])
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($deposits, $this->transformer);

@@ -3,7 +3,9 @@
 namespace App\Transformers\Reseller;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use League\Fractal\TransformerAbstract;
+use App\Models\Transaction;
 
 class DepositTransformer extends TransformerAbstract
 {
@@ -28,7 +30,14 @@ class DepositTransformer extends TransformerAbstract
     public function includeTransactions(Model $deposit)
     {
         return $this->collection(
-            $deposit->transactions->whereIn('transaction_method_id', [2, 3]),
+            $deposit->transactions()
+                ->whereIn('transactions.type', [
+                    Transaction::TYPE['DEDUCT_CREDIT'],
+                    Transaction::TYPE['COMMISSION'],
+                ])
+                ->where('user_type', 'reseller')
+                ->where('user_id', Auth::id())
+                ->get(),
             new TransactionTransformer,
             false
         );

@@ -28,6 +28,6 @@ class Transaction extends Model
 
     public function getTypeAttribute()
     {
-        return array_search($this->type, self::TYPE);
+        return array_search($this->attributes['type'], self::TYPE);
     }
 }
