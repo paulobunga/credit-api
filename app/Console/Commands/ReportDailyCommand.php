@@ -53,7 +53,7 @@ class ReportDailyCommand extends Command
         }
         $start_datetime = "{$date} 00:00:00";
         $end_datetime = "{$date} 23:59:59";
-        // $this->calulateResellers($start_datetime, $end_datetime);
+        $this->calulateResellers($start_datetime, $end_datetime);
         $this->calulateMerchants($start_datetime, $end_datetime);
     }
 

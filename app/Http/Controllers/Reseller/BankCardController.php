@@ -19,13 +19,11 @@ class BankCardController extends Controller
             ->leftjoin('payment_methods', 'banks.payment_method_id', '=', 'payment_methods.id');
         $bankcards = QueryBuilder::for(
             $this->model::where('reseller_id', Auth::id())
-                ->select('reseller_bank_cards.*')
-                ->joinSub($banks, 'banks', function ($join) {
-                    $join->on('reseller_bank_cards.bank_id', '=', 'banks.id');
-                })
-                ->filter($request->get('filter', '{}'))
-                ->sort($request->get('sort', 'id'))
         )
+            ->joinSub($banks, 'banks', function ($join) {
+                $join->on('reseller_bank_cards.bank_id', '=', 'banks.id');
+            })
+            ->select('reseller_bank_cards.*')
             ->allowedFilters([
                 'id',
                 'name',

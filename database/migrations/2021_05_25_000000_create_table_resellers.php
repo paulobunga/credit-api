@@ -38,7 +38,7 @@ class CreateTableResellers extends Migration
             'username' => 'company@gmail.com',
             'phone' => '0936188590',
             'password' => 'P@ssw0rd',
-            'status' => Reseller::STATUS['active'],
+            'status' => Reseller::STATUS['ACTIVE'],
         ]);
     }
 

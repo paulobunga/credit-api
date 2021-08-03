@@ -8,7 +8,6 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use App\Models\Reseller;
-use App\Settings\CommissionSetting;
 
 class ResellerController extends Controller
 {
@@ -49,7 +48,7 @@ class ResellerController extends Controller
             'upline' => 'required_unless:level,0',
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
-            'phone' => 'required|unique:resellers,phone',
+            'phone' => 'required',
             'password' => 'required|confirmed',
         ]);
         $commission_setting = app(\App\Settings\CommissionSetting::class);
@@ -66,9 +65,9 @@ class ResellerController extends Controller
             'commission_percentage' => $commission_setting->getDefaultPercentage($request->level),
             'pending_limit' => $reseller_setting->getDefaultPendingLimit($request->level),
             'downline_slot' => $agent_setting->getDefaultDownLineSlot($request->level),
-            'status' => ($request->level == Reseller::LEVEL['reseller']) ?
-                Reseller::STATUS['inactive'] :
-                Reseller::STATUS['active'],
+            'status' => ($request->level == Reseller::LEVEL['RESELLER']) ?
+                Reseller::STATUS['INACTIVE'] :
+                Reseller::STATUS['ACTIVE'],
         ]);
 
         return $this->response->item($reseller, $this->transformer);
@@ -81,7 +80,7 @@ class ResellerController extends Controller
             'level' => 'required',
             'name' => "required|unique:resellers,name,{$reseller->id}",
             'username' => "required|unique:resellers,username,{$reseller->id}",
-            'phone' => "required|unique:resellers,phone,{$reseller->id}",
+            'phone' => "required",
             'commission_percentage' => 'required|numeric',
             'pending_limit' =>
             'required|numeric|max:' . app(\App\Settings\ResellerSetting::class)->max_pending_limit,

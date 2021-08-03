@@ -20,6 +20,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     protected $fillable = [
         'level',
+        'upline_id',
         'name',
         'username',
         'phone',
@@ -39,16 +40,16 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     protected $casts = [];
 
     public const LEVEL = [
-        'referrer' => 0,
-        'master agent' => 1,
-        'agent' => 2,
-        'reseller' => 3
+        'REFERRER' => 0,
+        'AGENT_MASTER' => 1,
+        'AGENT' => 2,
+        'RESELLER' => 3
     ];
 
     public const STATUS = [
-        'inactive' => 0,
-        'active' => 1,
-        'disabled' => 2,
+        'INACTIVE' => 0,
+        'ACTIVE' => 1,
+        'DISABLED' => 2,
     ];
 
     public function bankCards()

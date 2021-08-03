@@ -21,7 +21,7 @@ class ResellerSeeder extends Seeder
         AgentSetting $as
     ) {
         \App\Models\Reseller::create([
-            'level' => Reseller::LEVEL['reseller'],
+            'level' => Reseller::LEVEL['RESELLER'],
             'name' => 'Test Reseller',
             'username' => 'reseller@gmail.com',
             'password' => 'P@ssw0rd',
@@ -38,10 +38,13 @@ class ResellerSeeder extends Seeder
                 'username' => "reseller{$level}@gmail.com",
                 'upline_id' => $reseller ? $reseller->id : 0,
                 'level' => $level,
-                'credit' => $level < Reseller::LEVEL['reseller'] ? 0 : 200000,
+                'credit' => $level < Reseller::LEVEL['RESELLER'] ? 0 : 200000,
                 'pending_limit' => $rs->getDefaultPendingLimit($level),
                 'commission_percentage' => $cs->getDefaultPercentage($level),
                 'downline_slot' => $as->getDefaultDownLineSlot($level),
+                'status' => $level ==  Reseller::LEVEL['RESELLER'] ?
+                    Reseller::STATUS['INACTIVE'] :
+                    Reseller::STATUS['ACTIVE']
             ]);
         }
     }

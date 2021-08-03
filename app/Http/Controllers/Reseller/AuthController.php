@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller as Controller;
 use App\Transformers\Reseller\AuthTransformer;
 use App\Models\Reseller;
+use App\Models\ResellerActivateCode;
 
 class AuthController extends Controller
 {
@@ -39,16 +40,16 @@ class AuthController extends Controller
         $agent_setting = app(\App\Settings\AgentSetting::class);
 
         Reseller::create([
-            'level' => Reseller::LEVEL['reseller'],
+            'level' => Reseller::LEVEL['RESELLER'],
             'upline' => 0,
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
             'password' => $request->password,
-            'commission_percentage' => $commission_setting->getDefaultPercentage(Reseller::LEVEL['reseller']),
-            'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['reseller']),
-            'downline_slot' => $agent_setting->getDefaultDownLineSlot(Reseller::LEVEL['reseller']),
-            'status' =>  Reseller::STATUS['inactive']
+            'commission_percentage' => $commission_setting->getDefaultPercentage(Reseller::LEVEL['RESELLER']),
+            'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
+            'downline_slot' => $agent_setting->getDefaultDownLineSlot(Reseller::LEVEL['RESELLER']),
+            'status' =>  Reseller::STATUS['INACTIVE']
         ]);
 
         return $this->success();
@@ -97,6 +98,30 @@ class AuthController extends Controller
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
+        ]);
+
+        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+    }
+
+    public function activate(Request $request)
+    {
+        $this->validate($request, [
+            'code' => 'required',
+        ]);
+        $code = ResellerActivateCode::where([
+            'code' => $request->code,
+            'status' => ResellerActivateCode::STATUS['PENDING']
+        ])->where('expired_at', '>', \Carbon\Carbon::now())
+            ->firstOrFail();
+
+        $code->update([
+            'active_reseller_id' => Auth::id(),
+            'status' => ResellerActivateCode::STATUS['ACTIVATED'],
+            'activated_at' => \Carbon\Carbon::now()
+        ]);
+        Auth::user()->update([
+            'upline_id' => $code->reseller_id,
+            'status' => Reseller::STATUS['ACTIVE'],
         ]);
 
         return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));

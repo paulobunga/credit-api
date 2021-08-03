@@ -20,7 +20,9 @@ $api->group([
         $api->post('/auth/refresh', ['as' => 'auth.refresh', 'uses' => 'AuthController@refresh']);
         $api->post('/auth/me', ['as' => 'auth.me', 'uses' => 'AuthController@me']);
         $api->put("/auth/update", ['as' => 'auth.update', 'uses' => 'AuthController@update']);
+        $api->put("/auth/activate", ['as' => 'auth.activate', 'uses' => 'AuthController@activate']);
 
+        $api->resource('activate_codes', 'ActivateCodeController', ['only' => ['index', 'store']]);
         $api->resource('banks', 'BankController', ['only' => ['index']]);
         $api->resource('bankcards', 'BankCardController');
         $api->resource('deposits', 'DepositController', ['only' => ['index', 'update']]);

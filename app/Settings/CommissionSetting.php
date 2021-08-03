@@ -25,13 +25,13 @@ class CommissionSetting extends Settings
     public function getDefaultPercentage($level)
     {
         switch ($level) {
-            case Reseller::LEVEL['referrer']:
+            case Reseller::LEVEL['REFERRER']:
                 return $this->referrer_percentage;
-            case Reseller::LEVEL['master agent']:
+            case Reseller::LEVEL['AGENT_MASTER']:
                 return $this->master_agent_percentage;
-            case Reseller::LEVEL['agent']:
+            case Reseller::LEVEL['AGENT']:
                 return $this->agent_percentage;
-            case Reseller::LEVEL['reseller']:
+            case Reseller::LEVEL['RESELLER']:
                 return $this->reseller_percentage;
             default:
                 return 0;
