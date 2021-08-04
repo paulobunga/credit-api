@@ -7,6 +7,7 @@ return [
      * put them (manually) here.
      */
     'settings' => [
+        \App\Settings\AdminSetting::class,
         \App\Settings\AgentSetting::class,
         \App\Settings\CommissionSetting::class,
         \App\Settings\ResellerSetting::class

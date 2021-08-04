@@ -59,7 +59,7 @@ class DepositPendingNotification extends Notification implements ShouldBroadcast
                 amount {$this->deposit->amount},
                 "
             ),
-            'time' => $this->deposit->updated_at->toDateTimeString(),
+            // 'time' => $this->deposit->updated_at->toDateTimeString(),
         ];
     }
 

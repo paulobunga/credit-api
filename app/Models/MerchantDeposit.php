@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Queue;
 use App\Models\Transaction;
 
 class MerchantDeposit extends Model
@@ -27,7 +28,7 @@ class MerchantDeposit extends Model
         'info'
     ];
 
-    protected const STATUS = [
+    public const STATUS = [
         'CREATED' => 0,
         'PENDING' => 1,
         'APPROVED' => 2,
@@ -36,7 +37,7 @@ class MerchantDeposit extends Model
         'CANCELED' => 5,
     ];
 
-    protected const CALLBACK_STATUS = [
+    public const CALLBACK_STATUS = [
         'CREATED' => 0,
         'PENDING' => 1,
         'FINISH' => 2,
@@ -94,6 +95,7 @@ class MerchantDeposit extends Model
             $this->attributes['status'] = $value;
             // approve or enforce
             if (in_array($value, [self::STATUS['APPROVED'], self::STATUS['ENFORCED']])) {
+                $this->attributes['callback_status'] = self::CALLBACK_STATUS['PENDING'];
                 // merchant add credit and deduct transaction fee
                 $this->transactions()->create([
                     'user_id' => $this->merchant_id,
@@ -178,5 +180,21 @@ class MerchantDeposit extends Model
             throw $e;
         }
         DB::commit();
+        // send notification
+        switch ($value) {
+            case self::STATUS['PENDING']:
+                $this->reseller->notify(new \App\Notifications\DepositPendingNotification($this));
+                break;
+            case self::STATUS['APPROVED']:
+            case self::STATUS['ENFORCED']:
+                $this->merchant->notify(new \App\Notifications\DepositUpdateNotification($this));
+                // push deposit information callback to callback url
+                Queue::push((new \App\Jobs\GuzzleJob(
+                    $this,
+                    new \App\Transformers\Api\DepositTransformer,
+                    $this->merchant->api_key
+                )));
+                break;
+        }
     }
 }

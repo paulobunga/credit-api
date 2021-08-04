@@ -33,11 +33,6 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
         'status' => 'boolean',
     ];
 
-    public function whiteLists()
-    {
-        return $this->hasMany(AdminWhiteList::class);
-    }
-    
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;

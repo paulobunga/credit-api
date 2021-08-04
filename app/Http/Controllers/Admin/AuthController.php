@@ -24,7 +24,7 @@ class AuthController extends Controller
 
         if (
             !Auth::guard('admin')->user()->hasRole('Super Admin') &&
-            !in_array($request->ip(), Auth::guard('admin')->user()->whiteLists->pluck('ip')->toArray())
+            !in_array($request->ip(), app(\App\Settings\AdminSetting::class)->white_lists)
         ) {
             \Log::error($request->ip() . " is not in admin[" . Auth::id() . '] white list.');
             Auth::guard('admin')->logout();

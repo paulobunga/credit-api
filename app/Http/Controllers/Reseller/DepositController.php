@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Database\Eloquent\Builder;
 
 class DepositController extends Controller
@@ -49,16 +48,7 @@ class DepositController extends Controller
 
         $deposit->update([
             'status' => $request->status,
-            'callback_status' => 1,
         ]);
-        // send notification via websocket and stored in notification table
-        $deposit->merchant->notify(new \App\Notifications\DepositUpdateNotification($deposit));
-        // push deposit information callback to callback url
-        Queue::push((new \App\Jobs\GuzzleJob(
-            $deposit,
-            new \App\Transformers\Api\DepositTransformer,
-            $deposit->merchant->api_key
-        )));
 
         return $this->response->item($deposit, $this->transformer);
     }

@@ -10,12 +10,14 @@ use App\Transformers\Api\DepositTransformer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
+use \App\Models\MerchantDeposit;
+use Carbon\Carbon;
 
 class DepositController extends Controller
 {
     use SignValidator;
 
-    protected $model = \App\Models\MerchantDeposit::class;
+    protected $model = MerchantDeposit::class;
     protected $transformer = \App\Transformers\Api\DepositTransformer::class;
 
     public function index(Request $request)
@@ -94,7 +96,7 @@ class DepositController extends Controller
                 'account_no' => $request->account_no,
                 'account_name' => $request->get('account_name', ''),
                 'amount' => $request->amount,
-                'status' => 0,
+                'status' => MerchantDeposit::STATUS['PENDING'],
                 'callback_url' => $merchant->callback_url,
                 'reference_no' => ''
             ]);
@@ -130,10 +132,9 @@ class DepositController extends Controller
             throw new \Exception('deposit is already pending', 510);
         }
         $deposit->update([
-            'status' => 1,
+            'status' => MerchantDeposit::STATUS['PENDING'],
             'reference_no' => $request->reference_no
         ]);
-        $deposit->reseller->notify(new \App\Notifications\DepositPendingNotification($deposit));
 
         return $this->success();
     }

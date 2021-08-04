@@ -32,11 +32,7 @@ class WhiteList
             if (Auth::user()->hasRole('Super Admin')) {
                 return $next($request);
             }
-            // $white_lists = AdminWhiteList::where(
-            //     'admin_id',
-            //     Auth::id()
-            // )->pluck('ip')->toArray();
-            $white_lists = [];
+            $white_lists = app(\App\Settings\AdminSetting::class)->white_lists;
         } else {
             return $next($request);
         }
