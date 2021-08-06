@@ -96,9 +96,12 @@ class DepositController extends Controller
                 'account_no' => $request->account_no,
                 'account_name' => $request->get('account_name', ''),
                 'amount' => $request->amount,
-                'status' => MerchantDeposit::STATUS['PENDING'],
+                'status' => MerchantDeposit::STATUS['CREATED'],
                 'callback_url' => $merchant->callback_url,
                 'reference_no' => ''
+            ]);
+            $merchant_deposit->update([
+                'status' => MerchantDeposit::STATUS['PENDING']
             ]);
         } catch (\Exception $e) {
             DB::rollback();

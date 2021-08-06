@@ -20,7 +20,20 @@ class ResellerSeeder extends Seeder
         CommissionSetting $cs,
         AgentSetting $as
     ) {
+        $reseller = \App\Models\Reseller::create([
+            'level' => Reseller::LEVEL['AGENT_MASTER'],
+            'name' => 'Test Master Agent',
+            'username' => 'master@gmail.com',
+            'password' => 'P@ssw0rd',
+            'phone' => '+8865721455',
+            'credit' => 0,
+            'pending_limit' => 0,
+            'commission_percentage' => $cs->master_agent_percentage,
+            'downline_slot' => 1,
+            'status' => true,
+        ]);
         \App\Models\Reseller::create([
+            'upline_id' => $reseller->id,
             'level' => Reseller::LEVEL['RESELLER'],
             'name' => 'Test Reseller',
             'username' => 'reseller@gmail.com',
@@ -32,7 +45,6 @@ class ResellerSeeder extends Seeder
             'downline_slot' => 0,
             'status' => true,
         ]);
-        $reseller = null;
         foreach (Reseller::LEVEL as $level) {
             $reseller = Reseller::factory()->create([
                 'username' => "reseller{$level}@gmail.com",

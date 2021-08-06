@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Merchant;
 
 use App\Http\Controllers\Controller;
+use App\Models\MerchantDeposit;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Queue;
 
 class DepositController extends Controller
 {
-    protected $model = \App\Models\MerchantDeposit::class;
+    protected $model = MerchantDeposit::class;
     protected $transformer = \App\Transformers\Merchant\DepositTransformer::class;
 
     public function index(Request $request)
@@ -35,7 +36,7 @@ class DepositController extends Controller
 
         $deposit->update([
             'attempts' => 0,
-            'callback_status' => 1,
+            'callback_status' => MerchantDeposit::CALLBACK_STATUS['PENDING'],
         ]);
 
         // push deposit information callback to callback url
