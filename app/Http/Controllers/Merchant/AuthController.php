@@ -25,6 +25,7 @@ class AuthController extends Controller
         }
 
         if (!in_array($request->ip(), Auth::guard('merchant')->user()->whiteLists->pluck('ip')->toArray())) {
+            \Log::error($request->ip() . " is not in merchant[" . Auth::id() . '] white list.');
             Auth::guard('merchant')->logout();
             return response()->json(['message' => 'Unauthorized IP Address!'], 401);
         }

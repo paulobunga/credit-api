@@ -90,18 +90,16 @@ class DepositController extends Controller
             $last_order_id += 1;
             $merchant_deposit = $this->model::create([
                 'merchant_id' => $merchant->id,
+                'reseller_id' => $reseller_bank_card->reseller_id,
                 'reseller_bank_card_id' => $reseller_bank_card->id,
                 'order_id' => '#' . str_pad($last_order_id, 8, "0", STR_PAD_LEFT) . time(),
                 'merchant_order_id' => $request->merchant_order_id,
                 'account_no' => $request->account_no,
                 'account_name' => $request->get('account_name', ''),
                 'amount' => $request->amount,
-                'status' => MerchantDeposit::STATUS['CREATED'],
+                'status' => MerchantDeposit::STATUS['PENDING'],
                 'callback_url' => $merchant->callback_url,
                 'reference_no' => ''
-            ]);
-            $merchant_deposit->update([
-                'status' => MerchantDeposit::STATUS['PENDING']
             ]);
         } catch (\Exception $e) {
             DB::rollback();

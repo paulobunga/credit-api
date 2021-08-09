@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Observers\ResellerWithdrawalObserver;
+use App\Models\Transaction;
 
 class ResellerWithdrawal extends Model
 {
-    use HasFactory;
+    use ResellerWithdrawalObserver;
 
     protected $fillable = [
         'reseller_id',
@@ -15,6 +16,12 @@ class ResellerWithdrawal extends Model
         'amount',
         'status',
         'info'
+    ];
+
+    public const STATUS = [
+        'PENDING' => 0,
+        'APPROVED' => 1,
+        'REJECTED' => 2,
     ];
 
     public function reseller()

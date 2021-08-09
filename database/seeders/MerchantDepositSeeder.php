@@ -10,6 +10,12 @@ use App\Models\PaymentMethod;
 
 class MerchantDepositSeeder extends Seeder
 {
+    protected $faker;
+
+    public function __construct()
+    {
+        $this->faker = \Faker\Factory::create();
+    }
     /**
      * Run the database seeds.
      *
@@ -18,15 +24,20 @@ class MerchantDepositSeeder extends Seeder
     public function run()
     {
         $payment_count = PaymentMethod::count();
-        $card_count = ResellerBankCard::count()/$payment_count;
+        $card_count = ResellerBankCard::count() / $payment_count;
         foreach (Merchant::all() as $merchant) {
             $reseller_bank_card = ResellerBankCard::find($merchant->id % $card_count + $payment_count);
-            $deposit = MerchantDeposit::factory()->create([
+            MerchantDeposit::create([
+                'merchant_order_id' => $this->faker->uuid,
+                'account_no' => $this->faker->bankAccountNumber,
+                'account_name' => $this->faker->name,
+                'amount' => 100,
+                'callback_url' => $this->faker->url,
+                'reference_no' => $this->faker->numerify('N-########'),
                 'merchant_id' => $merchant->id,
+                'reseller_id' => $reseller_bank_card->reseller->id,
                 'reseller_bank_card_id' => $reseller_bank_card->id,
-            ]);
-            $deposit->update([
-                'status' => 2
+                'status' => MerchantDeposit::STATUS['APPROVED'],
             ]);
         }
     }

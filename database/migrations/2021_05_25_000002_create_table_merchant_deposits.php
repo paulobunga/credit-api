@@ -20,11 +20,12 @@ class CreateTableMerchantDeposits extends Migration
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->unsignedBigInteger('reseller_id')->default(0);
             $table->foreignId('reseller_bank_card_id')
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->string('order_id', 20)->unique();
+            $table->string('order_id', 40)->unique();
             $table->string('merchant_order_id', 60);
             $table->string('account_name', 64)->default('');
             $table->string('account_no', 64);

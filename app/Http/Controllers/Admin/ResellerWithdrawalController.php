@@ -31,26 +31,12 @@ class ResellerWithdrawalController extends Controller
             'admin_id' => 'required|exists:admins,id',
             'status' => 'required|numeric',
         ]);
-        DB::beginTransaction();
-        try {
-            $reseller_withdrawal->update([
-                'status' => $request->status,
-                'info' => [
-                    'admin_id' => $request->admin_id
-                ]
-            ]);
-            if ($request->status == 1) {
-                $transaction = $reseller_withdrawal->transactions()->create([
-                    'transaction_method_id' => 4,
-                    'amount' => $reseller_withdrawal->amount
-                ]);
-                $reseller_withdrawal->reseller->decrement('coin', $transaction->amount);
-            }
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
+        $reseller_withdrawal->update([
+            'status' => $request->status,
+            'info' => [
+                'admin_id' => $request->admin_id
+            ]
+        ]);
 
         return $this->response->item($reseller_withdrawal, $this->transformer);
     }

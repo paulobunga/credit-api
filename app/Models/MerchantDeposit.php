@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Facades\Queue;
+use Illuminate\Database\Eloquent\Builder;
+use App\Observers\MerchantDepositObserver;
 use App\Models\Transaction;
 
 class MerchantDeposit extends Model
 {
-    use HasFactory;
-
+    use MerchantDepositObserver;
+    
     protected $fillable = [
         'merchant_id',
+        'reseller_id',
         'reseller_bank_card_id',
         'order_id',
         'merchant_order_id',
@@ -56,14 +56,7 @@ class MerchantDeposit extends Model
 
     public function reseller()
     {
-        return $this->hasOneThrough(
-            Reseller::class,
-            ResellerBankCard::class,
-            'id',
-            'id',
-            'reseller_bank_card_id',
-            'reseller_id'
-        );
+        return $this->belongsTo(Reseller::class);
     }
 
     public function bank()
@@ -88,113 +81,8 @@ class MerchantDeposit extends Model
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
     }
 
-    public function setStatusAttribute($value)
+    public function scopeCreatedAtBetween(Builder $query, $from, $to): Builder
     {
-        DB::beginTransaction();
-        try {
-            $this->attributes['status'] = $value;
-            // approve or enforce
-            if (in_array($value, [self::STATUS['APPROVED'], self::STATUS['ENFORCED']])) {
-                $this->attributes['callback_status'] = self::CALLBACK_STATUS['PENDING'];
-                // merchant add credit and deduct transaction fee
-                $this->transactions()->create([
-                    'user_id' => $this->merchant_id,
-                    'user_type' => 'merchant',
-                    'type' => Transaction::TYPE['TOPUP_CREDIT'],
-                    'amount' => $this->amount
-                ]);
-                $this->transactions()->create([
-                    'user_id' => $this->merchant_id,
-                    'user_type' => 'merchant',
-                    'type' => Transaction::TYPE['TRANSACTION_FEE'],
-                    'amount' => - ($this->amount * $this->merchant->transaction_fee)
-                ]);
-                $this->merchant->increment(
-                    'credit',
-                    $this->merchant->credit - $this->amount * $this->merchant->transaction_fee
-                );
-                // reseller
-                $this->transactions()->create([
-                    'user_id' => $this->reseller->id,
-                    'user_type' => 'reseller',
-                    'type' => Transaction::TYPE['DEDUCT_CREDIT'],
-                    'amount' => - ($this->amount)
-                ]);
-                // commission
-                $rows = DB::select("
-                WITH recursive recuresive_resellers ( id, upline_id, level, name, commission_percentage ) AS (
-                    SELECT
-                        id,
-                        upline_id,
-                        level,
-                        name,
-                        commission_percentage 
-                    FROM
-                        resellers 
-                    WHERE
-                        id = :id
-                    UNION ALL
-                    SELECT
-                        r.id,
-                        r.upline_id,
-                        r.level,
-                        r.name,
-                        r.commission_percentage 
-                    FROM
-                        resellers r
-                        INNER JOIN recuresive_resellers ON r.id = recuresive_resellers.upline_id 
-                )
-                SELECT
-                    id AS user_id,
-                    'reseller' AS user_type,
-                    :type AS type,
-                    :amount * commission_percentage AS amount 
-                FROM
-                    recuresive_resellers
-                ORDER BY user_id DESC
-                ", [
-                    'id' => $this->reseller->id,
-                    'amount' => $this->amount,
-                    'type' => Transaction::TYPE['COMMISSION']
-                ]);
-                foreach ($rows as $row) {
-                    $this->transactions()->create([
-                        'user_id' => $row->user_id,
-                        'user_type' => 'reseller',
-                        'type' => Transaction::TYPE['COMMISSION'],
-                        'amount' => $row->amount
-                    ]);
-                    if ($row->user_id == $this->reseller->id) {
-                        $this->reseller->update([
-                            'credit' => $this->reseller->credit - $this->amount,
-                            'coin' => $this->reseller->coin + $row->amount
-                        ]);
-                        continue;
-                    }
-                    DB::table('resellers')->where('id', $row->user_id)->increment('coin', $row->amount);
-                }
-            }
-        } catch (\Exception $e) {
-            \Log::info($e->getMessage());
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
-        // send notification
-        switch ($value) {
-            case self::STATUS['PENDING']:
-                $this->reseller->notify(new \App\Notifications\DepositPendingNotification($this));
-                break;
-            case self::STATUS['APPROVED']:
-            case self::STATUS['ENFORCED']:
-                $this->merchant->notify(new \App\Notifications\DepositUpdateNotification($this));
-                // push deposit information callback to callback url
-                Queue::push((new \App\Jobs\GuzzleJob(
-                    $this,
-                    new \App\Transformers\Api\DepositTransformer,
-                    $this->merchant->api_key
-                )));
-                break;
-        }
+        return $query->whereBetween('merchant_deposits.created_at', [$from, $to]);
     }
 }

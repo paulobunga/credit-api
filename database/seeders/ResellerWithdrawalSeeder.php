@@ -8,6 +8,10 @@ use App\Models\ResellerWithdrawal;
 
 class ResellerWithdrawalSeeder extends Seeder
 {
+    public function __construct()
+    {
+        $this->faker = \Faker\Factory::create();
+    }
     /**
      * Run the database seeds.
      *
@@ -16,8 +20,13 @@ class ResellerWithdrawalSeeder extends Seeder
     public function run()
     {
         foreach (Reseller::all() as $reseller) {
-            ResellerWithdrawal::factory()->create([
-                'reseller_id' => $reseller->id
+            ResellerWithdrawal::create([
+                'reseller_id' => $reseller->id,
+                'amount' => $this->faker->randomNumber(5),
+                'status' => $this->faker->numberBetween(
+                    ResellerWithdrawal::STATUS['PENDING'],
+                    ResellerWithdrawal::STATUS['REJECTED']
+                ),
             ]);
         }
     }

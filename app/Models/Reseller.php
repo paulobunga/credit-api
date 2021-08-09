@@ -37,7 +37,9 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         'password',
     ];
 
-    protected $casts = [];
+    protected $casts = [
+        'commission_percentage' => 'float'
+    ];
 
     public const LEVEL = [
         'REFERRER' => 0,

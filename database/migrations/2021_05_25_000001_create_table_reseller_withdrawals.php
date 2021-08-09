@@ -20,7 +20,7 @@ class CreateTableResellerWithdrawals extends Migration
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->string('order_id')->unique();
+            $table->string('order_id', 40)->unique();
             $table->decimal('amount', 14, 4);
             $table->unsignedTinyInteger('status')
                 ->comment('0:Created,1::Approved,2:Rejected');

@@ -19,10 +19,12 @@ class MerchantSeeder extends Seeder
             'username' => 'merchant@gmail.com',
             'password' => 'P@ssw0rd',
             'phone' => '+8865721455',
-            'credit' => 2000,
+            'credit' => 20000,
             'callback_url' => 'http://google.com.tw',
             'status' => true,
         ]);
-        \App\Models\Merchant::factory()->count(3)->create();
+        \App\Models\Merchant::factory()->count(3)->create([
+            'credit' => 3000,
+        ]);
     }
 }

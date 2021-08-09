@@ -47,7 +47,7 @@ trait SignValidator
             $str .= "{$key}={$val}&";
         }
         $str .= 'api_key=' .  $key;
-        // dd($str);
+
         return md5($str);
     }
 }
