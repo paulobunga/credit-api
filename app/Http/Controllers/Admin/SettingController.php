@@ -8,6 +8,7 @@ use Dingo\Api\Http\Request;
 class SettingController extends Controller
 {
     protected $model = \App\Models\Setting::class;
+
     protected $transformer = \App\Transformers\Admin\SettingTransformer::class;
 
     protected function getSetting($key = null)
@@ -28,32 +29,40 @@ class SettingController extends Controller
         }
     }
 
-    // public function store(Request $request)
-    // {
-    //     $this->validate($request, [
-    //         'name' => 'required|unique:admins,name',
-    //         'username' => 'required|unique:admins,username',
-    //         'role' => 'required',
-    //         'password' => 'required|confirmed',
-    //         'status' => 'boolean'
-    //     ]);
-
-    //     $role = \App\Models\Role::findOrFail($request->role);
-
-    //     $admin = $this->model::create([
-    //         'name' => $request->name,
-    //         'username' => $request->username,
-    //         'password' => $request->password,
-    //         'status' => $request->status,
-    //     ]);
-    //     $admin->syncRoles($role);
-
-    //     return $this->response->item($admin, $this->transformer);
-    // }
-
     public function update(Request $request)
     {
-        $setting = $this->getSetting($this->parameters('setting'));
+        $rules = [
+            'admin' => [
+                'white_lists' => 'array',
+                'white_lists.*' => 'distinct|ipv4',
+            ],
+            'agent' => [
+                'default_downline_slot' => 'required|numeric|gte:0',
+                'max_downline_slot' => 'required|numeric|gte:default_downline_slot',
+            ],
+            'commission' => [
+                'referrer_percentage' => 'required|numeric|gte:0',
+                'master_agent_percentage' => 'required|numeric|gte:0',
+                'agent_percentage' => 'required|numeric|gte:0',
+                'reseller_percentage' => 'required|numeric|gte:0',
+                'total_percentage' => 'required|numeric|min:' .
+                    $request->get('referrer_percentage', 0) 
+                    + $request->get('master_agent_percentage', 0)
+                    + $request->get('agent_percentage', 0)
+                    + $request->get('reseller_percentage', 0)
+            ],
+            'currency' => [
+                'types' => 'array',
+                'types.*' => 'required',
+            ],
+            'reseller' => [
+                'default_pending_limit' => 'required|numeric|gte:0',
+                'max_pending_limit' => 'required|numeric|gte:default_pending_limit',
+            ],
+        ];
+        $key = $this->parameters('setting');
+        $this->validate($request, $rules[$key] ?? null);
+        $setting = $this->getSetting($key);
         foreach ($request->all() as $key => $val) {
             $setting->{$key} = $val;
         }
@@ -62,15 +71,4 @@ class SettingController extends Controller
 
         return ['data' => $setting->toArray()];
     }
-
-    // public function destroy(Request $request)
-    // {
-    //     $admin = $this->model::where('name', $this->parameters('admin'))->firstOrFail();
-    //     if ($admin->id == 1) {
-    //         throw new \Exception('Default Administrator cannot be removed!', 405);
-    //     }
-    //     $admin->delete();
-
-    //     return $this->success();
-    // }
 }
