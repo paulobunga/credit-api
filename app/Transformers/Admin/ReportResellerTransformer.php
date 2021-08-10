@@ -10,7 +10,7 @@ class ReportResellerTransformer extends TransformerAbstract
     {
         return [
             'id' => $report->id,
-            'reseller' => $report->reseller->name,
+            'name' => $report->reseller->name,
             'start_at' => $report->start_at,
             'end_at' => $report->end_at,
             'turnover' => $report->turnover,

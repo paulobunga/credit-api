@@ -26,7 +26,10 @@ class MerchantDepositController extends Controller
                 AllowedFilter::partial('merchant_name', 'merchants.name'),
                 AllowedFilter::partial('reseller_name', 'resellers.name'),
                 AllowedFilter::partial('status', 'merchant_deposits.status'),
-                AllowedFilter::scope('created_at_between'),
+                AllowedFilter::callback(
+                    'created_at_between',
+                    fn ($query, $v) => $query->whereBetween('merchant_deposits.created_at', $v)
+                ),
             ])
             ->allowedSorts([
                 AllowedSort::field('id', 'merchant_deposits.id'),

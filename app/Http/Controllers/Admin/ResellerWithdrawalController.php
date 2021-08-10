@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Illuminate\Support\Facades\DB;
 
 class ResellerWithdrawalController extends Controller
 {
@@ -16,8 +15,25 @@ class ResellerWithdrawalController extends Controller
     public function index(Request $request)
     {
         $reseller_withdrawals = QueryBuilder::for($this->model)
+            ->with([
+                'reseller'
+            ])
+            ->join('resellers', 'resellers.id', '=', 'reseller_withdrawals.id')
+            ->select('reseller_withdrawals.*', 'resellers.name')
             ->allowedFilters([
-                AllowedFilter::partial('name'),
+                AllowedFilter::partial('name', 'resellers.name'),
+                AllowedFilter::exact('status'),
+                AllowedFilter::callback(
+                    'created_at_between',
+                    fn ($query, $v) => $query->whereBetween('reseller_withdrawals.created_at', $v)
+                ),
+            ])
+            ->allowedSorts([
+                'id',
+                'name',
+                'order_id',
+                'amount',
+                'status'
             ])
             ->paginate($this->perPage);
 

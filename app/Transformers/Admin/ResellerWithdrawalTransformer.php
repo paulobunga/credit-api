@@ -19,6 +19,7 @@ class ResellerWithdrawalTransformer extends TransformerAbstract
             'order_id' => $reseller_withdrawal->order_id,
             'amount' => $reseller_withdrawal->amount,
             'status' => $reseller_withdrawal->status,
+            'created_at' => $reseller_withdrawal->created_at->toDateTimeString(),
         ];
     }
 

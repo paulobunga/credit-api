@@ -15,8 +15,21 @@ class AdminController extends Controller
     public function index(Request $request)
     {
         $admins = QueryBuilder::for($this->model)
+            ->with([
+                'roles'
+            ])
+            ->join('roles', 'roles.id', '=', 'admins.id')
+            ->select('admins.*', 'roles.name AS role')
             ->allowedFilters([
                 AllowedFilter::partial('name'),
+                AllowedFilter::partial('role', 'roles.name'),
+            ])
+            ->allowedSorts([
+                'id',
+                'name',
+                'username',
+                'status',
+                'role',
             ])
             ->paginate($this->perPage);
 

@@ -10,7 +10,7 @@ use App\Models\Transaction;
 class MerchantDeposit extends Model
 {
     use MerchantDepositObserver;
-    
+
     protected $fillable = [
         'merchant_id',
         'reseller_id',
@@ -79,10 +79,5 @@ class MerchantDeposit extends Model
     public function transactions()
     {
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
-    }
-
-    public function scopeCreatedAtBetween(Builder $query, $from, $to): Builder
-    {
-        return $query->whereBetween('merchant_deposits.created_at', [$from, $to]);
     }
 }

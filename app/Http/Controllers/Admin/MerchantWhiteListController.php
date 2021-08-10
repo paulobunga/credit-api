@@ -7,7 +7,6 @@ use Dingo\Api\Http\Request;
 use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedSort;
 
 class MerchantWhiteListController extends Controller
 {
@@ -27,8 +26,8 @@ class MerchantWhiteListController extends Controller
                 AllowedFilter::partial('ip'),
             ])
             ->allowedSorts([
-                AllowedSort::field('id', 'merchant_white_lists.id'),
-                AllowedSort::field('name', 'merchants.name'),
+                'id',
+                'name',
                 'ip',
             ])
             ->paginate($this->perPage);
