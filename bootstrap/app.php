@@ -84,10 +84,9 @@ $app->middleware([
 ]);
 
 $app->routeMiddleware([
-    'permission' => Spatie\Permission\Middlewares\PermissionMiddleware::class,
-    'role' => Spatie\Permission\Middlewares\RoleMiddleware::class,
     'domain' =>  \App\Http\Middleware\CheckDomain::class,
     'whitelist' =>  \App\Http\Middleware\WhiteList::class,
+    'role_or_permission' => \App\Http\Middleware\RoleOrPermissionMiddleware::class,
 ]);
 
 /*

@@ -12,6 +12,7 @@ $api->group([
         'middleware' => [
             'api.auth:admin',
             'whitelist:admin',
+            'role_or_permission:Super Admin',
         ],
     ], function ($api) {
         $api->post('/auth/logout', ['as' => 'auth.logout', 'uses' => 'AuthController@logout']);

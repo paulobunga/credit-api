@@ -14,8 +14,8 @@ class ActivateCodeTransformer extends TransformerAbstract
             'reseller' => $m->activeReseller->name ?? '--',
             'code' => $m->code,
             'status' => $m->status,
-            'expired_at' => $m->expired_at,
-            'activated_at' => $m->activated_at,
+            'expired_at' => (string)$m->expired_at,
+            'activated_at' => (string)$m->activated_at,
         ];
     }
 }
