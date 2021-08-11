@@ -21,6 +21,7 @@ class CreateTableResellers extends Migration
             $table->string('name');
             $table->string('username')->unique();
             $table->string('phone', 20);
+            $table->string('currency', 10);
             $table->decimal('credit', 14, 4)->default(0);
             $table->decimal('coin', 14, 4)->default(0);
             $table->decimal('commission_percentage', 5, 4)->default(0);
@@ -37,6 +38,7 @@ class CreateTableResellers extends Migration
             'name' => 'company',
             'username' => 'company@gmail.com',
             'phone' => '0936188590',
+            'currency' => 'VND',
             'password' => 'P@ssw0rd',
             'status' => Reseller::STATUS['ACTIVE'],
         ]);

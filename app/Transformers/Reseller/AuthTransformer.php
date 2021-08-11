@@ -23,6 +23,7 @@ class AuthTransformer extends TransformerAbstract
             'name' => $reseller->name,
             'username' => $reseller->username,
             'phone' => $reseller->phone,
+            'currency' => $reseller->currency,
             'credit' => $reseller->credit,
             'coin' => $reseller->coin,
             'pending_limit' => $reseller->pending_limit,

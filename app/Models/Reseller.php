@@ -24,6 +24,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         'name',
         'username',
         'phone',
+        'currency',
         'password',
         'credit',
         'coin',

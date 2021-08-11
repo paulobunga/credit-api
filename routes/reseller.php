@@ -8,6 +8,7 @@ $api->group([
         "domain:" . env('PRIVATE_DOMAIN'),
     ],
 ], function ($api) {
+    $api->get('/auth/setting', ['as' => 'auth.setting', 'uses' => 'AuthController@setting']);
     $api->post('/auth/login', ['as' => 'auth.login', 'uses' => 'AuthController@login']);
     $api->post('/auth/register', ['as' => 'auth.register', 'uses' => 'AuthController@register']);
     $api->group([
