@@ -12,7 +12,6 @@ class ResellerActivateCode extends Model
     use HasFactory;
 
     public $timestamps = false;
-    protected $dateFormat = 'Y-m-d H:i:s';
 
     protected $fillable = [
         'reseller_id',
@@ -30,8 +29,8 @@ class ResellerActivateCode extends Model
     ];
 
     protected $casts = [
-        'expired_at'  => 'datetime',
-        'activated_at' => 'datetime',
+        'expired_at'  => 'datetime:Y-m-d H:i:s',
+        'activated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     protected static function boot()

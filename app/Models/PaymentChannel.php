@@ -21,6 +21,11 @@ class PaymentChannel extends Model
 
     public function getBanksAttribute()
     {
-        return explode(',', $this->attributes['banks']);
+        return Bank::whereIn('id', explode(',', $this->attributes['banks']))->get();
+    }
+
+    public function getPaymentMethodsAttribute()
+    {
+        return array_map(fn ($v) => array_search($v, self::METHOD), explode(',', $this->attributes['payment_methods']));
     }
 }

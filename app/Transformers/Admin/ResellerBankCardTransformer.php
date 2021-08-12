@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Transformers\Admin;
 
 use Illuminate\Database\Eloquent\Model;
@@ -6,16 +7,18 @@ use League\Fractal\TransformerAbstract;
 
 class ResellerBankCardTransformer extends TransformerAbstract
 {
-    public function transform(Model $reseller_bank_card)
+    public function transform(Model $m)
     {
         return [
-            'id' => $reseller_bank_card->id,
-            'reseller' => $reseller_bank_card->reseller->name,
-            'bank' => $reseller_bank_card->bank->name,
-            'bank_id' => $reseller_bank_card->bank->id,
-            'account_no' => $reseller_bank_card->account_no,
-            'account_name' => $reseller_bank_card->account_name,
-            'status' => $reseller_bank_card->status,
+            'id' => $m->id,
+            'reseller_name' => $m->reseller->name,
+            'bank_id' => $m->bank->id,
+            'bank_name' => $m->bank->name,
+            'payment_channel_id' => $m->payment_channel_id,
+            'channel' => $m->paymentChannel->name,
+            'account_no' => substr_replace($m->account_no, str_repeat('*', strlen($m->account_no) - 6), 0, -6),
+            'account_name' => $m->account_name,
+            'status' => $m->status,
         ];
     }
 }

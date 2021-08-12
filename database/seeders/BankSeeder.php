@@ -44,6 +44,7 @@ class BankSeeder extends Seeder
                     'payment_methods' => implode(',', $ch['methods']),
                     'banks' => implode(',', Bank::inRandomOrder()->limit(5)->pluck('id')->toArray()),
                     'currency' => $currency,
+                    'status' => true,
                 ]);
             }
         }

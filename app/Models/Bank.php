@@ -17,6 +17,8 @@ class Bank extends Model
 
     protected $casts = [
         'status' => 'boolean',
+        'created_at'  => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public function paymentChannels()

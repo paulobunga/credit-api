@@ -35,12 +35,13 @@ $api->group([
 
         $api->resource('merchant_deposits', 'MerchantDepositController', ['only' => ['index', 'update']]);
         $api->resource('merchant_withdrawals', 'MerchantWithdrawalController', ['only' => ['index']]);
+        $api->resource('payment_channels', 'PaymentChannelController', ['except' => ['show']]);
 
         $api->resource('resellers', 'ResellerController', ['except' => ['show']]);
         $api->put("/resellers/deposit/{reseller}", [
             'as' => 'resellers.deposit', 'uses' => 'ResellerController@deposit'
         ]);
-        $api->resource('reseller_bank_cards', 'ResellerBankCardController', ['except' => ['show']]);
+        $api->resource('reseller_bank_cards', 'ResellerBankCardController', ['only' => ['index', 'update', 'destroy']]);
         // $api->resource('reseller_deposits', 'ResellerDepositController');
         $api->resource('reseller_withdrawals', 'ResellerWithdrawalController', ['only' => ['index', 'update']]);
 

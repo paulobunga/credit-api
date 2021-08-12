@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Merchant;
 use App\Models\ResellerBankCard;
 use App\Models\MerchantDeposit;
-use App\Models\PaymentMethod;
+use App\Models\PaymentChannel;
 
 class MerchantDepositSeeder extends Seeder
 {
@@ -23,7 +23,7 @@ class MerchantDepositSeeder extends Seeder
      */
     public function run()
     {
-        $payment_count = PaymentMethod::count();
+        $payment_count = count(PaymentChannel::METHOD);
         $card_count = ResellerBankCard::count() / $payment_count;
         foreach (Merchant::all() as $merchant) {
             $reseller_bank_card = ResellerBankCard::find($merchant->id % $card_count + $payment_count);

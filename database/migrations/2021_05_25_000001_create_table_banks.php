@@ -26,6 +26,7 @@ class CreateTableBanks extends Migration
             $table->string('currency', 10);
             $table->text('payment_methods');
             $table->text('banks');
+            $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
             $table->timestamp('created_at')->useCurrent();
             $table->unique(['name', 'currency']);
         });
