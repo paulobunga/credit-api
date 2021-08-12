@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\ReportDailyCommand::class,
         \App\Console\Commands\PermissionListCommand::class,
+        \App\Console\Commands\ActivateCheckCommand::class,
     ];
 
     /**
@@ -25,6 +26,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        # Generate daily report
+        $schedule->command('Report:run daily')
+            ->name('ReportDaily')
+            ->runInBackground()
+            ->dailyAt('02:00');
+        # Activate code check
+        $schedule->command('Activate:check')
+            ->name('ActivateCheck')
+            ->runInBackground()
+            ->everyMinute();
     }
 }
