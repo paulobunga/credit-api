@@ -17,7 +17,7 @@ class BankController extends Controller
     public function index(Request $request)
     {
         $banks = QueryBuilder::for($this->model)
-            ->with('paymentMethod')
+            ->with('paymentChannels')
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name', 'banks.name'),

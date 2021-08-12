@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
             MerchantSeeder::class,
             MerchantDepositSeeder::class,
             MerchantWithdrawalSeeder::class,
-            WhiteListSeeder::class,
             ReportSeeder::class,
         ]);
     }

@@ -21,7 +21,10 @@ class MerchantWhiteListFactory extends Factory
     public function definition()
     {
         return [
-            'ip' => $this->faker->ipv4,
+            'ip' => [
+                $this->faker->ipv4,
+                $this->faker->ipv4,
+            ],
         ];
     }
 }

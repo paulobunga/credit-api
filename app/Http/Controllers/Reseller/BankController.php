@@ -18,7 +18,6 @@ class BankController extends Controller
         $banks = QueryBuilder::for(
             $this->model::where('status', true)
         )
-            ->with('paymentMethod')
             ->allowedFilters([
                 AllowedFilter::partial('name', 'banks.name'),
                 AllowedFilter::partial('ident'),

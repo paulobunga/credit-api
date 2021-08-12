@@ -12,7 +12,7 @@ class ResellerBankCard extends Model
     protected $fillable = [
         'reseller_id',
         'bank_id',
-        'type',
+        'payment_channel_id',
         'account_no',
         'account_name',
         'status',
@@ -37,15 +37,8 @@ class ResellerBankCard extends Model
         return $this->hasMany(MerchantDeposit::class);
     }
 
-    public function paymentMethod()
+    public function paymentChannel()
     {
-        return $this->hasOneThrough(
-            PaymentMethod::class,
-            Bank::class,
-            'id',
-            'id',
-            'bank_id',
-            'payment_method_id'
-        );
+        return $this->belongsTo(PaymentChannel::class);
     }
 }

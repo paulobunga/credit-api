@@ -27,7 +27,7 @@ class WhiteList
             $white_lists = MerchantWhiteList::where(
                 'merchant_id',
                 Auth::id()
-            )->pluck('ip')->toArray();
+            )->first()->ip ?? [];
         } elseif ($guard == 'admin') {
             if (Auth::user()->hasRole('Super Admin')) {
                 return $next($request);

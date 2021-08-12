@@ -24,6 +24,10 @@ class CreateTableResellerBankCards extends Migration
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->foreignId('payment_channel_id')
+                ->constrained()
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
             $table->string('account_name', 64)->default('');
             $table->string('account_no', 64);
             $table->json('info')->default(new Expression('(JSON_ARRAY())'));

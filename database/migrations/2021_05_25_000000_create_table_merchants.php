@@ -28,6 +28,16 @@ class CreateTableMerchants extends Migration
             $table->string('password', 60);
             $table->timestamps();
         });
+
+        Schema::create('merchant_white_lists', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('merchant_id')
+                ->constrained()
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->json('ip')->default(new Expression('(JSON_ARRAY())'));
+            $table->timestamp('created_at')->useCurrent();
+        });
     }
 
     /**
@@ -37,6 +47,7 @@ class CreateTableMerchants extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('merchant_white_lists');
         Schema::dropIfExists('merchants');
     }
 }

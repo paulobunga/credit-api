@@ -15,15 +15,19 @@ class CreateTableBanks extends Migration
     {
         Schema::create('banks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('payment_method_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->string('ident', 20)->index();
-            $table->string('name');
+            $table->string('ident', 30)->unique()->index();
+            $table->string('name', 100);
             $table->unsignedTinyInteger('status');
             $table->timestamps();
-            $table->unique(['payment_method_id', 'ident']);
+        });
+        Schema::create('payment_channels', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 40);
+            $table->string('currency', 10);
+            $table->text('payment_methods');
+            $table->text('banks');
+            $table->timestamp('created_at')->useCurrent();
+            $table->unique(['name', 'currency']);
         });
     }
 
@@ -34,6 +38,7 @@ class CreateTableBanks extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('payment_channels');
         Schema::dropIfExists('banks');
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller as Controller;
 use App\Transformers\Merchant\AuthTransformer;
-use App\Models\Merchant;
+use App\Models\MerchantWhiteList;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -24,8 +24,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
 
-        if (!in_array($request->ip(), Auth::guard('merchant')->user()->whiteLists->pluck('ip')->toArray())) {
-            \Log::error($request->ip() . " is not in merchant[" . Auth::id() . '] white list.');
+        if (!in_array(
+            $request->ip(),
+            MerchantWhiteList::where('merchant_id', Auth::guard('merchant')->id())->first()->ip ?? []
+        )) {
+            \Log::error($request->ip() . " is not in merchant[" . Auth::guard('merchant')->id() . '] white list.');
             Auth::guard('merchant')->logout();
             return response()->json(['message' => 'Unauthorized IP Address!'], 401);
         }
@@ -99,13 +102,9 @@ class AuthController extends Controller
             'ip' => 'required|array',
             'ip.*' => 'required|distinct|ipv4',
         ]);
-        \App\Models\MerchantWhiteList::where('merchant_id', Auth::id())->delete();
-        \App\Models\MerchantWhiteList::insert(
-            collect($request->get('ip'))->map(
-                function ($v) {
-                    return ['merchant_id' => Auth::id(), 'ip' => $v];
-                }
-            )->toArray()
+        \App\Models\MerchantWhiteList::updateOrCreate(
+            ['merchant_id' => Auth::id()],
+            ['ip' => $request->ip],
         );
 
         return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));

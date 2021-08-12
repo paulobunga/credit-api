@@ -3,6 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Bank;
+use App\Models\PaymentChannel;
+use App\Settings\CurrencySetting;
 
 class BankSeeder extends Seeder
 {
@@ -11,12 +14,38 @@ class BankSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(CurrencySetting $setting)
     {
-        $count = \App\Models\PaymentMethod::count();
-        foreach (\App\Models\Bank::factory()->count(16)->make() as $key => $bank) {
-            $bank->payment_method_id = $key % $count + 1;
-            $bank->save();
+        Bank::factory()->count(11)->create();
+        $channels = [
+            'NETBANK' => [
+                'methods' => [
+                    PaymentChannel::METHOD['TRANSFER'],
+                ],
+                'currency' => ['IND', 'VND'],
+            ],
+            'UPI' => [
+                'methods' => [
+                    PaymentChannel::METHOD['QRCODE'],
+                ],
+                'currency' => ['IND'],
+            ],
+            'WALLET' => [
+                'methods' => [
+                    PaymentChannel::METHOD['TRANSFER'],
+                ],
+                'currency' => ['USDT'],
+            ],
+        ];
+        foreach ($channels as $name => $ch) {
+            foreach ($ch['currency'] as $currency) {
+                PaymentChannel::create([
+                    'name' => $name,
+                    'payment_methods' => implode(',', $ch['methods']),
+                    'banks' => implode(',', Bank::inRandomOrder()->limit(5)->pluck('id')->toArray()),
+                    'currency' => $currency,
+                ]);
+            }
         }
     }
 }

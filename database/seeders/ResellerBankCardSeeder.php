@@ -3,13 +3,17 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Reseller;
-use App\Models\Bank;
-use App\Models\ResellerBankCard;
 use Illuminate\Support\Str;
+use App\Models\Reseller;
+use App\Models\PaymentChannel;
+use App\Models\ResellerBankCard;
 
 class ResellerBankCardSeeder extends Seeder
 {
+    public function __construct()
+    {
+        $this->faker = \Faker\Factory::create();
+    }
     /**
      * Run the database seeds.
      *
@@ -17,27 +21,20 @@ class ResellerBankCardSeeder extends Seeder
      */
     public function run()
     {
-        $methods = \App\Models\PaymentMethod::all();
-        foreach (Reseller::where('level', 3)->get() as $reseller) {
-            foreach ($methods as $method) {
-                $bank = Bank::where('payment_method_id', $method->id)->inRandomOrder()->first();
+        foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
+            foreach (PaymentChannel::where('currency', $reseller->currency)->get() as $ch) {
                 $card = ResellerBankCard::factory()->make([
-                    'bank_id' => $bank->id,
+                    'bank_id' => \Illuminate\Support\Arr::random($ch->banks),
                     'reseller_id' => $reseller->id,
+                    'payment_channel_id' => $ch->id
                 ]);
-                if ($reseller->name == 'Test Reseller') {
-                    $card->status = true;
-                } else {
-                    $card->status = false;
-                }
-                switch ($method->name) {
-                    case 'online_bank':
-                        break;
-                    case 'upi':
+                $card->status = $reseller->name == 'Test Reseller' ? 1 : 0;
+                switch ($ch->name) {
+                    case 'UPI':
                         $card->account_name = '';
                         $card->account_no = Str::random(40) . '@upi';
                         break;
-                    case 'wallet':
+                    case 'WALLET':
                         $card->account_name = '';
                         $card->account_no = 'bc' . Str::random(40);
                         break;

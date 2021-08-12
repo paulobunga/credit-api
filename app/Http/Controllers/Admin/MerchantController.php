@@ -96,22 +96,12 @@ class MerchantController extends Controller
             'ip' => 'array',
             'ip.*' => 'distinct|ipv4',
         ]);
-        \App\Models\MerchantWhiteList::where('merchant_id', $merchant->id)->delete();
-        \App\Models\MerchantWhiteList::insert(
-            collect($request->get('ip'))->map(
-                function ($v) use ($merchant) {
-                    return [
-                        'merchant_id' => $merchant->id,
-                        'ip' => $v,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ];
-                }
-            )->toArray()
+        $merchant_white_lists = \App\Models\MerchantWhiteList::updateOrCreate(
+            ['merchant_id' => $merchant->id],
+            ['ip' => $request->ip],
         );
-        $merchant_white_lists = \App\Models\MerchantWhiteList::where('merchant_id', $merchant->id)->get();
 
-        return $this->response->collection(
+        return $this->response->item(
             $merchant_white_lists,
             \App\Transformers\Admin\MerchantWhiteListTransformer::class
         );

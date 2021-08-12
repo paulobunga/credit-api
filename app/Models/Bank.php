@@ -10,7 +10,6 @@ class Bank extends Model
     use HasFactory;
 
     protected $fillable = [
-        'payment_method_id',
         'ident',
         'name',
         'status'
@@ -20,8 +19,8 @@ class Bank extends Model
         'status' => 'boolean',
     ];
 
-    public function paymentMethod()
+    public function paymentChannels()
     {
-        return $this->belongsTo(PaymentMethod::class);
+        return $this->hasMany(PaymentChannel::class);
     }
 }
