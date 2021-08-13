@@ -14,7 +14,6 @@ class BankExport extends BaseExport
         'id' => 'Bank id',
         'ident' => 'Bank ident',
         'name' => 'Bank name',
-        'type' => 'Type',
         'status' => 'status',
 
     ];
@@ -24,9 +23,7 @@ class BankExport extends BaseExport
         return collect(array_keys($this->fields))->map(function ($v) use ($bank) {
             switch ($v) {
                 case 'status':
-                    return $bank->$v ? 'Y' : 'N';
-                case 'type':
-                    return $bank->paymentMethod->name;
+                    return $bank->$v ? 'Active' : 'Inactive';
                 default:
                     return $bank->$v;
             }

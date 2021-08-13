@@ -16,8 +16,8 @@ class CreateTableAdmins extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('username')->unique();
+            $table->string('name')->unique()->index();
+            $table->string('username')->unique()->index();
             $table->string('password', 60);
             $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
             $table->timestamps();

@@ -18,8 +18,8 @@ class CreateTableResellers extends Migration
             $table->id();
             $table->unsignedBigInteger('upline_id')->default(0);
             $table->tinyInteger('level')->comment('0:referrer,1:master agent,2:agent,3:reseller');
-            $table->string('name');
-            $table->string('username')->unique();
+            $table->string('name')->unique()->index();
+            $table->string('username')->unique()->index();
             $table->string('phone', 20);
             $table->string('currency', 10);
             $table->decimal('credit', 14, 4)->default(0);

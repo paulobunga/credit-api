@@ -20,21 +20,32 @@ $api->group([
         $api->post('/auth/me', ['as' => 'auth.me', 'uses' => 'AuthController@me']);
 
         $api->resource('permissions', 'PermissionController', ['except' => ['show']]);
+
         $api->resource('roles', 'RoleController', ['except' => ['show']]);
+
         $api->resource('banks', 'BankController', ['except' => ['show']]);
         $api->get('/export/banks', ['as' => 'banks.export', 'uses' => 'BankController@export']);
+
         $api->resource('admins', 'AdminController', ['except' => ['show']]);
+
         $api->resource('settings', 'SettingController', ['except' => ['show']]);
+
         $api->resource('merchant_white_lists', 'MerchantWhiteListController', ['except' => ['show']]);
 
         $api->resource('merchants', 'MerchantController', ['except' => ['show']]);
-        $api->put("/merchants/renew/{merchant}", ['as' => 'merchants.renew', 'uses' => 'MerchantController@renew']);
+        $api->put("/merchants/renew/{merchant}", [
+            'as' => 'merchants.renew', 'uses' => 'MerchantController@renew']);
         $api->put("/merchants/whitelist/{merchant}", [
             'as' => 'merchants.whitelist', 'uses' => 'MerchantController@whitelist'
         ]);
+        $api->put("/merchants/fee/{merchant}", [
+            'as' => 'merchants.fee', 'uses' => 'MerchantController@fee'
+        ]);
 
         $api->resource('merchant_deposits', 'MerchantDepositController', ['only' => ['index', 'update']]);
+
         $api->resource('merchant_withdrawals', 'MerchantWithdrawalController', ['only' => ['index']]);
+
         $api->resource('payment_channels', 'PaymentChannelController', ['except' => ['show']]);
 
         $api->resource('resellers', 'ResellerController', ['except' => ['show']]);

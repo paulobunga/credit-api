@@ -59,10 +59,10 @@ trait MerchantDepositObserver
                 'type' => Transaction::TYPE['TRANSACTION_FEE'],
                 'amount' => - ($m->amount * $m->merchant->transaction_fee)
             ]);
-            $m->merchant->increment(
-                'credit',
-                $m->amount * (1 - $m->merchant->transaction_fee)
-            );
+            // $m->merchant->increment(
+            //     'credit',
+            //     $m->amount * (1 - $m->merchant->transaction_fee)
+            // );
             // reseller
             $m->transactions()->create([
                 'user_id' => $m->reseller->id,

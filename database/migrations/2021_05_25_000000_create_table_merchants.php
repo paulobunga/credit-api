@@ -17,12 +17,10 @@ class CreateTableMerchants extends Migration
         Schema::create('merchants', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->string('name');
-            $table->string('username')->unique();
+            $table->string('name')->unique()->index();
+            $table->string('username')->unique()->index();
             $table->string('phone', 20);
             $table->string('api_key', 30);
-            $table->decimal('credit', 14, 4)->default(0);
-            $table->decimal('transaction_fee', 5, 4)->default(0);
             $table->string('callback_url');
             $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
             $table->string('password', 60);
@@ -38,6 +36,19 @@ class CreateTableMerchants extends Migration
             $table->json('ip')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamp('created_at')->useCurrent();
         });
+
+        Schema::create('merchant_credits', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('merchant_id')
+                ->constrained()
+                ->onUpdate('cascade')
+                ->onDelete('cascade');
+            $table->string('currency', 12);
+            $table->decimal('credit', 14, 4)->default(0);
+            $table->decimal('transaction_fee', 5, 4)->default(0);
+            $table->timestamp('created_at')->useCurrent();
+            $table->unique(['merchant_id', 'currency']);
+        });
     }
 
     /**
@@ -48,6 +59,7 @@ class CreateTableMerchants extends Migration
     public function down()
     {
         Schema::dropIfExists('merchant_white_lists');
+        Schema::dropIfExists('merchant_credits');
         Schema::dropIfExists('merchants');
     }
 }

@@ -80,7 +80,6 @@ class BankController extends Controller
     {
         return new BankExport(
             QueryBuilder::for($this->model)
-                ->with('paymentMethod')
                 ->allowedFilters([
                     AllowedFilter::partial('name', 'banks.name'),
                     AllowedFilter::partial('ident'),

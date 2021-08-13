@@ -24,7 +24,6 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
         'name',
         'username',
         'phone',
-        'transaction_fee',
         'password',
         'callback_url',
         'status',
@@ -44,6 +43,11 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
     public function whiteList()
     {
         return $this->hasOne(MerchantWhiteList::class);
+    }
+
+    public function credits()
+    {
+        return $this->hasMany(MerchantCredit::class);
     }
 
     public function setPasswordAttribute($value)
