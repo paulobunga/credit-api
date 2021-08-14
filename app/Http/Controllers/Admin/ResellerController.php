@@ -12,8 +12,14 @@ use App\Models\Reseller;
 class ResellerController extends Controller
 {
     protected $model = \App\Models\Reseller::class;
+
     protected $transformer = \App\Transformers\Admin\ResellerTransformer::class;
 
+    /**
+     * Get reseller lists
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         $resellers = QueryBuilder::for($this->model)
@@ -41,6 +47,11 @@ class ResellerController extends Controller
         return $this->response->withPaginator($resellers, $this->transformer);
     }
 
+    /**
+     * Create a reseller
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -49,11 +60,13 @@ class ResellerController extends Controller
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
             'phone' => 'required',
+            'currency' => 'required',
             'password' => 'required|confirmed',
         ]);
         $commission_setting = app(\App\Settings\CommissionSetting::class);
         $reseller_setting = app(\App\Settings\ResellerSetting::class);
         $agent_setting = app(\App\Settings\AgentSetting::class);
+        $currency_setting = app(\App\Settings\CurrencySetting::class);
 
         $reseller = $this->model::create([
             'level' => $request->level,
@@ -61,6 +74,7 @@ class ResellerController extends Controller
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
+            'currency' => $request->currency,
             'password' => $request->password,
             'commission_percentage' => $commission_setting->getDefaultPercentage($request->level),
             'pending_limit' => $reseller_setting->getDefaultPendingLimit($request->level),
@@ -73,9 +87,14 @@ class ResellerController extends Controller
         return $this->response->item($reseller, $this->transformer);
     }
 
+    /**
+     * Update a reseller via id
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function update(Request $request)
     {
-        $reseller = $this->model::where('name', $this->parameters('reseller'))->firstOrFail();
+        $reseller = $this->model::findOrFail($this->parameters('reseller'));
         $this->validate($request, [
             'level' => 'required',
             'name' => "required|unique:resellers,name,{$reseller->id}",
@@ -99,9 +118,14 @@ class ResellerController extends Controller
         return $this->response->item($reseller, $this->transformer);
     }
 
+    /**
+     * Delete a reseller via id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy(Request $request)
     {
-        $reseller = $this->model::where('name', $this->parameters('reseller'))->firstOrFail();
+        $reseller = $this->model::findOrFail($this->parameters('reseller'));
         if ($reseller->id == 1) {
             throw new \Exception('Default referrer cannot be removed!', 405);
         }
@@ -110,6 +134,11 @@ class ResellerController extends Controller
         return $this->success();
     }
 
+    /**
+     * Top up or Deduct reseller create or coin via id
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function deposit(Request $request)
     {
         $reseller = $this->model::findOrFail($this->parameters('reseller'));
@@ -119,5 +148,22 @@ class ResellerController extends Controller
         $reseller->increment('credit', $request->credit);
 
         return $this->response->item($reseller, $this->transformer);
+    }
+
+    /**
+     * Reset reseller password via id
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
+    public function reset(Request $request)
+    {
+        $merchant = $this->model::findOrFail($this->parameters('reseller'));
+        $this->validate($request, [
+            'password' => 'required|confirmed',
+        ]);
+        $merchant->password = $request->password;
+        $merchant->save();
+
+        return $this->response->item($merchant, $this->transformer);
     }
 }
