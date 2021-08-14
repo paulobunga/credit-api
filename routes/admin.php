@@ -41,6 +41,9 @@ $api->group([
         $api->put("/merchants/fee/{merchant}", [
             'as' => 'merchants.fee', 'uses' => 'MerchantController@fee'
         ]);
+        $api->put("/merchants/reset_password/{merchant}", [
+            'as' => 'merchants.reset_password', 'uses' => 'MerchantController@reset'
+        ]);
 
         $api->resource('merchant_deposits', 'MerchantDepositController', ['only' => ['index', 'update']]);
 

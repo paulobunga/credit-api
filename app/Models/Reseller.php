@@ -39,7 +39,9 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     ];
 
     protected $casts = [
-        'commission_percentage' => 'float'
+        'commission_percentage' => 'float',
+        'created_at'  => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     public const LEVEL = [

@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Queue;
 use App\Models\ResellerWithdrawal;
 use App\Models\Transaction;
 

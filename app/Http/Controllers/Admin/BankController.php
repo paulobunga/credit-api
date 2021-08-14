@@ -12,8 +12,14 @@ use App\Exports\BankExport;
 class BankController extends Controller
 {
     protected $model = \App\Models\Bank::class;
+
     protected $transformer = \App\Transformers\Admin\BankTransformer::class;
 
+    /**
+     * Get bank lists
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         $banks = QueryBuilder::for($this->model)
@@ -34,6 +40,11 @@ class BankController extends Controller
         return $this->response->withPaginator($banks, $this->transformer);
     }
 
+    /**
+     * Create a bank
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -50,6 +61,11 @@ class BankController extends Controller
         return $this->response->item($bank, $this->transformer);
     }
 
+    /**
+     * Update given bank via bank id
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function update(Request $request)
     {
         $bank = $this->model::findOrFail($this->parameters('bank'));

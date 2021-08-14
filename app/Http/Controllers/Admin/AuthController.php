@@ -12,7 +12,7 @@ class AuthController extends Controller
     /**
      * Get a JWT via given credentials.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Dingo\Api\Http\JsonResponse
      */
     public function login(Request $request)
     {
@@ -37,7 +37,7 @@ class AuthController extends Controller
     /**
      * Get the authenticated User.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Dingo\Api\Http\JsonResponse
      */
     public function me(Request $request)
     {
@@ -59,7 +59,7 @@ class AuthController extends Controller
     /**
      * Refresh a token.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Dingo\Api\Http\JsonResponse
      */
     public function refresh()
     {

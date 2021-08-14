@@ -10,17 +10,28 @@ use Dingo\Api\Http\Request;
 class AdminController extends Controller
 {
     protected $model = \App\Models\Admin::class;
+
     protected $transformer = \App\Transformers\Admin\AdminTransformer::class;
 
+    /**
+     * Get admininstrator lists
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         $admins = QueryBuilder::for($this->model)
             ->with([
                 'roles'
             ])
-            ->join('roles', 'roles.id', '=', 'admins.id')
+            ->join('model_has_roles', function ($join) {
+                $join->on('admins.id', '=', 'model_has_roles.model_id')
+                 ->where('model_has_roles.model_type', '=', 'admin');
+            })
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
             ->select('admins.*', 'roles.name AS role')
             ->allowedFilters([
+                'id',
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('role', 'roles.name'),
             ])
@@ -36,6 +47,11 @@ class AdminController extends Controller
         return $this->response->withPaginator($admins, $this->transformer);
     }
 
+    /**
+     * Create an administrator
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -59,9 +75,14 @@ class AdminController extends Controller
         return $this->response->item($admin, $this->transformer);
     }
 
+    /**
+     * Update an administrator via name
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function update(Request $request)
     {
-        $admin = $this->model::where('name', $this->parameters('admin'))->firstOrFail();
+        $admin = $this->model::findOrFail($this->parameters('admin'));
         if ($admin->id == 1) {
             throw new \Exception('Default Administrator cannot be edited!', 405);
         }
@@ -82,11 +103,16 @@ class AdminController extends Controller
         return $this->response->item($admin, $this->transformer);
     }
 
+    /**
+     * Delete an administrator via id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy(Request $request)
     {
-        $admin = $this->model::where('name', $this->parameters('admin'))->firstOrFail();
+        $admin = $this->model::findOrFail($this->parameters('admin'));
         if ($admin->id == 1) {
-            throw new \Exception('Default Administrator cannot be removed!', 405);
+            throw new \Exception('Default Administrator cannot be deleted!', 405);
         }
         $admin->delete();
 

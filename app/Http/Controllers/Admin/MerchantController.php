@@ -12,12 +12,19 @@ use App\Models\MerchantCredit;
 class MerchantController extends Controller
 {
     protected $model = \App\Models\Merchant::class;
+
     protected $transformer = \App\Transformers\Admin\MerchantTransformer::class;
 
+    /**
+     * Get merchant lists
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         $merchants = QueryBuilder::for($this->model)
             ->allowedFilters([
+                'id',
                 AllowedFilter::partial('name'),
             ])
             ->allowedSorts([
@@ -33,6 +40,11 @@ class MerchantController extends Controller
         return $this->response->withPaginator($merchants, $this->transformer);
     }
 
+    /**
+     * Create a merchant
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -81,9 +93,14 @@ class MerchantController extends Controller
         return $this->response->item($merchant, $this->transformer);
     }
 
+    /**
+     * Update a merchant via id
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function update(Request $request)
     {
-        $merchant = $this->model::where('id', urldecode($this->parameters('merchant')))->firstOrFail();
+        $merchant = $this->model::findOrFail($this->parameters('merchant'));
         $this->validate($request, [
             'name' => "required|unique:merchants,name,{$merchant->id}",
             'username' => "required|unique:merchants,username,{$merchant->id}",
@@ -102,26 +119,41 @@ class MerchantController extends Controller
         return $this->response->item($merchant, $this->transformer);
     }
 
+    /**
+     * Delete a merchant via id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy(Request $request)
     {
-        $merchant = $this->model::where('id', urldecode($this->parameters('merchant')))->firstOrFail();
+        $merchant = $this->model::findOrFail($this->parameters('merchant'));
         $merchant->delete();
 
         return $this->success();
     }
 
+    /**
+     * Renew merchant api key via id
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function renew()
     {
-        $merchant = $this->model::where('id', urldecode($this->parameters('merchant')))->firstOrFail();
+        $merchant = $this->model::findOrFail($this->parameters('merchant'));
         $merchant->api_key = Str::random(30);
         $merchant->save();
 
         return $this->response->item($merchant, $this->transformer);
     }
 
+    /**
+     * Update merchant white lists of ip address via id
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function whitelist(Request $request)
     {
-        $merchant = $this->model::where('id', $this->parameters('merchant'))->firstOrFail();
+        $merchant = $this->model::findOrFail($this->parameters('merchant'));
         $this->validate($request, [
             'ip' => 'array',
             'ip.*' => 'distinct|ipv4',
@@ -137,9 +169,14 @@ class MerchantController extends Controller
         );
     }
 
+    /**
+     * Update merchant multi currency transaction fee via id
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function fee(Request $request)
     {
-        $merchant = $this->model::where('id', $this->parameters('merchant'))->firstOrFail();
+        $merchant = $this->model::findOrFail($this->parameters('merchant'));
         $this->validate($request, [
             'currency' => 'required|array',
             'currency.*.currency' => 'required|distinct',
@@ -150,6 +187,23 @@ class MerchantController extends Controller
                 ->where('merchant_id', $merchant->id)
                 ->update(['transaction_fee' => $c['transaction_fee']]);
         }
+
+        return $this->response->item($merchant, $this->transformer);
+    }
+
+    /**
+     * Reset merchant password via id
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
+    public function reset(Request $request)
+    {
+        $merchant = $this->model::findOrFail($this->parameters('merchant'));
+        $this->validate($request, [
+            'password' => 'required|confirmed',
+        ]);
+        $merchant->password = $request->password;
+        $merchant->save();
 
         return $this->response->item($merchant, $this->transformer);
     }
