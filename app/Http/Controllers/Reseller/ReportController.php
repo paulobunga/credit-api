@@ -12,13 +12,13 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $reports = QueryBuilder::for(
-            \App\Models\ReportDailyReseller::class::where('reseller_id', Auth::id())
-        )
+        $reports = QueryBuilder::for(\App\Models\ReportDailyReseller::class)
             ->allowedFilters([
                 AllowedFilter::partial('name'),
             ])
+            ->where('reseller_id', Auth::id())
             ->paginate($this->perPage);
+
         return $this->response->withPaginator(
             $reports,
             \App\Transformers\Reseller\ReportTransformer::class
@@ -27,12 +27,12 @@ class ReportController extends Controller
 
     public function month(Request $request)
     {
-        $reports = QueryBuilder::for(
-            \App\Models\ReportMonthlyReseller::class::where('reseller_id', Auth::id())
-                ->limit(6)
-        )
+        $reports = QueryBuilder::for(\App\Models\ReportMonthlyReseller::class)
             ->allowedFilters([])
+            ->where('reseller_id', Auth::id())
+            ->limit(6)
             ->paginate($this->perPage);
+
         return $this->response->withPaginator(
             $reports,
             \App\Transformers\Reseller\ReportMonthlyTransformer::class

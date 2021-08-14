@@ -24,10 +24,17 @@ $api->group([
         $api->put("/auth/activate", ['as' => 'auth.activate', 'uses' => 'AuthController@activate']);
 
         $api->resource('activate_codes', 'ActivateCodeController', ['only' => ['index', 'store']]);
+
         $api->resource('banks', 'BankController', ['only' => ['index']]);
+        
         $api->resource('bankcards', 'BankCardController');
+        
         $api->resource('deposits', 'DepositController', ['only' => ['index', 'update']]);
+
+        $api->resource('payment_channels', 'PaymentChannelController', ['only' => ['index']]);
+        
         $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'store']]);
+        
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
         $api->get("/reports/month", ['as' => 'reports.month', 'uses' => 'ReportController@month']);
     });

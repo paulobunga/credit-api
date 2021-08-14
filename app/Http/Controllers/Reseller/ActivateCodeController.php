@@ -18,9 +18,7 @@ class ActivateCodeController extends Controller
 
     public function index(Request $request)
     {
-        $codes = QueryBuilder::for(
-            $this->model::where('reseller_id', Auth::id())
-        )
+        $codes = QueryBuilder::for($this->model)
             ->allowedFilters([
                 AllowedFilter::partial('name', 'banks.name'),
                 AllowedFilter::partial('ident'),
@@ -32,6 +30,7 @@ class ActivateCodeController extends Controller
                 'ident',
                 'status'
             ])
+            ->where('reseller_id', Auth::id())
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($codes, $this->transformer);

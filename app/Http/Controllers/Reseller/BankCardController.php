@@ -6,30 +6,27 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Bank;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class BankCardController extends Controller
 {
     protected $model = \App\Models\ResellerBankCard::class;
+
     protected $transformer = \App\Transformers\Reseller\BankCardTransformer::class;
 
     public function index(Request $request)
     {
-        $banks = Bank::select('banks.*', 'payment_methods.name as type')
-            ->leftjoin('payment_methods', 'banks.payment_method_id', '=', 'payment_methods.id');
-        $bankcards = QueryBuilder::for(
-            $this->model::where('reseller_id', Auth::id())
-        )
-            ->joinSub($banks, 'banks', function ($join) {
-                $join->on('reseller_bank_cards.bank_id', '=', 'banks.id');
-            })
-            ->select('reseller_bank_cards.*')
+        $bankcards = QueryBuilder::for($this->model)
+            ->with([
+                'bank',
+                'paymentChannel',
+            ])
             ->allowedFilters([
                 'id',
                 'name',
-                'banks.type',
-                'banks.name'
+                AllowedFilter::exact('channel', 'payment_channel.name'),
             ])
+            ->where('reseller_id', Auth::id())
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($bankcards, $this->transformer);
@@ -39,16 +36,17 @@ class BankCardController extends Controller
     {
         $this->validate($request, [
             'bank_id' => "required|exists:banks,id",
-            'type' => 'required',
+            'channel' => 'required',
             'account_name' => 'required_if:type,online_bank',
             'account_no' => 'required',
             'status' => 'required|boolean',
         ]);
-        $payment_method = \App\Models\PaymentMethod::where('name', $request->type)->firstOrFail();
+        $payment_channel = \App\Models\PaymentChannel::where('name', $request->channel)
+            ->where('currency', Auth::user()->currency)->firstOrFail();
         $bankcard = $this->model::create([
             'reseller_id' => Auth::id(),
             'bank_id' => $request->bank_id,
-            'payment_method_id' => $payment_method->id,
+            'payment_channel_id' => $payment_channel->id,
             'account_name' => $request->get('account_name', ''),
             'account_no' => $request->account_no,
             'status' => $request->status

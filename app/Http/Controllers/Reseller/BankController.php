@@ -15,9 +15,7 @@ class BankController extends Controller
 
     public function index(Request $request)
     {
-        $banks = QueryBuilder::for(
-            $this->model::where('status', true)
-        )
+        $banks = QueryBuilder::for($this->model)
             ->allowedFilters([
                 AllowedFilter::partial('name', 'banks.name'),
                 AllowedFilter::partial('ident'),
@@ -29,6 +27,7 @@ class BankController extends Controller
                 'ident',
                 'status'
             ])
+            ->where('status', true)
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($banks, $this->transformer);

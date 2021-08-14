@@ -34,7 +34,7 @@ class BankSeeder extends Seeder
                 'methods' => [
                     PaymentChannel::METHOD['TRANSFER'],
                 ],
-                'currency' => ['USDT'],
+                'currency' => ['VND', 'USDT'],
             ],
         ];
         foreach ($channels as $name => $ch) {
