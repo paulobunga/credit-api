@@ -23,7 +23,7 @@ class ResellerBankCardFactory extends Factory
         return [
             'account_no' => $this->faker->unique()->bankAccountNumber,
             'account_name' => $this->faker->name,
-            'status' => $this->faker->boolean,
+            'status' => true,
         ];
     }
 }

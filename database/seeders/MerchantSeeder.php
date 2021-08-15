@@ -17,7 +17,7 @@ class MerchantSeeder extends Seeder
      */
     public function run(CurrencySetting $cs)
     {
-        Merchant::factory()->create([
+        $merchant = Merchant::factory()->create([
             'uuid' => '224d4a1f-6fc5-4039-bd81-fcbc7f88c659',
             'name' => 'Test Merchant',
             'username' => 'merchant@gmail.com',
@@ -26,20 +26,37 @@ class MerchantSeeder extends Seeder
             'callback_url' => 'http://google.com.tw',
             'status' => true,
         ]);
-        Merchant::factory()->count(3)->create();
+        $merchant->credits()->create([
+            'currency' => $cs->types[0],
+            'credit' => 0,
+            'transaction_fee' => 0.001
+        ]);
+        $merchant = Merchant::factory()->create([
+            'username' => 'merchant1@gmail.com',
+        ]);
+        $merchant->credits()->create([
+            'currency' => $cs->types[1],
+            'credit' => 0,
+            'transaction_fee' => 0.001
+        ]);
+        $merchant = Merchant::factory()->create([
+            'username' => 'merchant2@gmail.com',
+        ]);
+        $merchant->credits()->create([
+            'currency' => $cs->types[0],
+            'credit' => 0,
+            'transaction_fee' => 0.001
+        ]);
+        $merchant->credits()->create([
+            'currency' => $cs->types[1],
+            'credit' => 0,
+            'transaction_fee' => 0.001
+        ]);
 
         foreach (Merchant::all() as $merchant) {
             MerchantWhiteList::factory()->create([
                 'merchant_id' => $merchant->id
             ]);
-            foreach ($cs->types as $currency) {
-                MerchantCredit::create([
-                    'merchant_id' => $merchant->id,
-                    'currency' => $currency,
-                    'credit' => 100,
-                    'transaction_fee' => 0.001
-                ]);
-            }
         }
     }
 }

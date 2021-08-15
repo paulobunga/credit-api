@@ -3,18 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Observers\ResellerDepositObserver;
+use App\Models\Transaction;
 
 class ResellerDeposit extends Model
 {
-    use HasFactory;
+    use ResellerDepositObserver;
+
+    protected $fillable = [
+        'reseller_id',
+        'audit_admin_id',
+        'order_id',
+        'amount',
+        'status',
+    ];
+
+    public const STATUS = [
+        'PENDING' => 0,
+        'APPROVED' => 1,
+        'REJECTED' => 2,
+    ];
 
     public function reseller()
     {
         return $this->belongsTo(Reseller::class);
     }
 
-    public function admin()
+    public function auditAdmin()
     {
         return $this->belongsTo(Admin::class);
     }

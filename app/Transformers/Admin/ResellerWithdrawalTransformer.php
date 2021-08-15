@@ -18,6 +18,7 @@ class ResellerWithdrawalTransformer extends TransformerAbstract
             'name' => $reseller_withdrawal->reseller->name,
             'order_id' => $reseller_withdrawal->order_id,
             'amount' => $reseller_withdrawal->amount,
+            'currency' => $reseller_withdrawal->reseller->currency,
             'status' => $reseller_withdrawal->status,
             'created_at' => $reseller_withdrawal->created_at->toDateTimeString(),
         ];

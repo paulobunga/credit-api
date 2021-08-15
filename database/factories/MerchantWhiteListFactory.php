@@ -22,7 +22,7 @@ class MerchantWhiteListFactory extends Factory
     {
         return [
             'ip' => [
-                $this->faker->ipv4,
+                '172.19.0.1',
                 $this->faker->ipv4,
             ],
         ];

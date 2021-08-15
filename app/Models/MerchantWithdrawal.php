@@ -3,18 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Observers\MerchantWithdrawalObserver;
 
 class MerchantWithdrawal extends Model
 {
-    use HasFactory;
+    use MerchantWithdrawalObserver;
 
     protected $fillable = [
         'merchant_id',
         'order_id',
         'amount',
+        'currency',
         'status',
         'info'
+    ];
+
+    public const STATUS = [
+        'PENDING' => 0,
+        'APPROVED' => 1,
+        'REJECTED' => 2,
     ];
 
     public function merchant()

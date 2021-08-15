@@ -18,7 +18,8 @@ class MerchantDepositController extends Controller
         $merchant_deposits = QueryBuilder::for($this->model)
             ->with(['merchant', 'reseller'])
             ->join('merchants', 'merchants.id', '=', 'merchant_deposits.merchant_id')
-            ->join('resellers', 'resellers.id', '=', 'merchant_deposits.reseller_id')
+            ->join('reseller_bank_cards', 'reseller_bank_cards.id', '=', 'merchant_deposits.reseller_bank_card_id')
+            ->join('resellers', 'resellers.id', '=', 'reseller_bank_cards.reseller_id')
             ->select('merchant_deposits.*', 'merchants.name')
             ->allowedFilters([
                 AllowedFilter::partial('order_id'),

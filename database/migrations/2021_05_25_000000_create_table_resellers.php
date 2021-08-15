@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-USE App\Models\Reseller;
+use Illuminate\Database\Query\Expression;
+use App\Models\Reseller;
 
 class CreateTableResellers extends Migration
 {
@@ -42,6 +43,33 @@ class CreateTableResellers extends Migration
             'password' => 'P@ssw0rd',
             'status' => Reseller::STATUS['ACTIVE'],
         ]);
+
+        Schema::create('reseller_deposits', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('reseller_id')
+                ->constrained();
+            $table->unsignedBigInteger('audit_admin_id')->default(0);
+            $table->string('order_id', 60)->unique();
+            $table->decimal('amount', 14, 4);
+            $table->unsignedTinyInteger('status')
+                ->comment('0:Pending,1:Approved,2:Rejected');
+            $table->string('reason');
+            $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
+            $table->timestamps();
+        });
+
+        Schema::create('reseller_withdrawals', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('reseller_id')
+                ->constrained();
+            $table->unsignedBigInteger('audit_admin_id')->default(0);
+            $table->string('order_id', 60)->unique();
+            $table->decimal('amount', 14, 4);
+            $table->unsignedTinyInteger('status')
+                ->comment('0:Pending,1::Approved,2:Rejected');
+            $table->string('reason');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -51,6 +79,8 @@ class CreateTableResellers extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('reseller_withdrawals');
+        Schema::dropIfExists('reseller_deposits');
         Schema::dropIfExists('resellers');
     }
 }

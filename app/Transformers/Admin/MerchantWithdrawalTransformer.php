@@ -10,19 +10,20 @@ class MerchantWithdrawalTransformer extends TransformerAbstract
         'transactions',
     ];
 
-    public function transform(Model $merchant_withdrawal)
+    public function transform(Model $m)
     {
         return [
-            'id' => $merchant_withdrawal->id,
-            'name' => $merchant_withdrawal->merchant->name,
-            'order_id' => $merchant_withdrawal->order_id,
-            'amount' => $merchant_withdrawal->amount,
-            'status' => $merchant_withdrawal->status,
+            'id' => $m->id,
+            'name' => $m->merchant->name,
+            'order_id' => $m->order_id,
+            'amount' => $m->amount,
+            'currency' => $m->currency,
+            'status' => $m->status,
         ];
     }
 
-    public function includeTransactions(Model $merchant_withdrawal)
+    public function includeTransactions(Model $m)
     {
-        return $this->collection($merchant_withdrawal->transactions, new TransactionTransformer, false);
+        return $this->collection($m->transactions, new TransactionTransformer, false);
     }
 }

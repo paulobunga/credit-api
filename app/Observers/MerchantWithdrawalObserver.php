@@ -4,10 +4,10 @@ namespace App\Observers;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use App\Models\ResellerWithdrawal;
+use App\Models\MerchantWithdrawal;
 use App\Models\Transaction;
 
-trait ResellerWithdrawalObserver
+trait MerchantWithdrawalObserver
 {
     protected static function boot()
     {
@@ -15,7 +15,7 @@ trait ResellerWithdrawalObserver
 
         // auto-sets values on creation
         static::creating(function ($query) {
-            $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM reseller_withdrawals")[0]->ID ?? 0;
+            $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM merchant_withdrawals")[0]->ID ?? 0;
             $query->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(20);
         });
 
@@ -37,20 +37,21 @@ trait ResellerWithdrawalObserver
      * @param  \App\Models\MerchantDeposit
      * @return void
      */
-    protected static function onStatusChangeEvent($status, ResellerWithdrawal $m)
+    protected static function onStatusChangeEvent($status, MerchantWithdrawal $m)
     {
 
         DB::beginTransaction();
         try {
             // approve
-            if ($status == ResellerWithdrawal::STATUS['APPROVED']) {
+            if ($status == MerchantWithdrawal::STATUS['APPROVED']) {
                 $m->transactions()->create([
-                    'user_id' => $m->reseller_id,
-                    'user_type' => 'reseller',
+                    'user_id' => $m->merchant_id,
+                    'user_type' => 'merchant',
                     'type' => Transaction::TYPE['DEDUCT_COIN'],
                     'amount' => $m->amount
                 ]);
-                $m->reseller->decrement('coin', $m->amount);
+                $m->merchant->credits()->where('currency', $m->currency)
+                    ->decrement('credit', $m->amount);
             }
         } catch (\Exception $e) {
             \Log::error($e->getMessage());

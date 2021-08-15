@@ -22,9 +22,9 @@ class MerchantFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'username' => $this->faker->numerify('merchant##@gmail.com'),
+            'username' => $this->faker->unique()->numerify('merchant#@gmail.com'),
             'phone' => $this->faker->phoneNumber,
-            'password' => $this->faker->password,
+            'password' => 'P@ssw0rd',
             'callback_url' => $this->faker->url,
             'status' => $this->faker->boolean,
         ];

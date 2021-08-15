@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 use App\Observers\MerchantDepositObserver;
 use App\Models\Transaction;
 
@@ -13,19 +12,19 @@ class MerchantDeposit extends Model
 
     protected $fillable = [
         'merchant_id',
-        'reseller_id',
         'reseller_bank_card_id',
         'order_id',
         'merchant_order_id',
         'account_no',
         'account_name',
         'amount',
+        'currency',
         'status',
         'callback_status',
         'attempts',
         'callback_url',
         'reference_no',
-        'info'
+        'extra'
     ];
 
     public const STATUS = [
@@ -49,14 +48,21 @@ class MerchantDeposit extends Model
         return $this->belongsTo(Merchant::class);
     }
 
+    public function reseller()
+    {
+        return $this->hasOneThrough(
+            Reseller::class,
+            ResellerBankCard::class,
+            'id',
+            'id',
+            'reseller_bank_card_id',
+            'reseller_id'
+        );
+    }
+    
     public function resellerBankCard()
     {
         return $this->hasOne(ResellerBankCard::class, 'id', 'reseller_bank_card_id');
-    }
-
-    public function reseller()
-    {
-        return $this->belongsTo(Reseller::class);
     }
 
     public function bank()

@@ -16,10 +16,8 @@ trait MerchantDepositObserver
 
         // auto-sets values on creation
         static::creating(function ($query) {
-            $query->order_id = Str::random(4)
-                . $query->merchant_id
-                . '@'
-                . Str::random(10);
+            $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM merchant_deposits")[0]->ID ?? 0;
+            $query->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(10);
         });
 
         static::created(function ($m) {
@@ -47,6 +45,10 @@ trait MerchantDepositObserver
             MerchantDeposit::STATUS['ENFORCED']
         ])) {
             // merchant add credit and deduct transaction fee
+            $credit = $m->merchant->credits()->where('currency', $m->currency)->first();
+            if (!$credit) {
+                throw new \Exception('Currency type is not supported!');
+            }
             $m->transactions()->create([
                 'user_id' => $m->merchant_id,
                 'user_type' => 'merchant',
@@ -57,12 +59,12 @@ trait MerchantDepositObserver
                 'user_id' => $m->merchant_id,
                 'user_type' => 'merchant',
                 'type' => Transaction::TYPE['TRANSACTION_FEE'],
-                'amount' => - ($m->amount * $m->merchant->transaction_fee)
+                'amount' => - ($m->amount * $credit->transaction_fee)
             ]);
-            // $m->merchant->increment(
-            //     'credit',
-            //     $m->amount * (1 - $m->merchant->transaction_fee)
-            // );
+            $m->merchant->credits()->where('currency', $m->currency)->increment(
+                'credit',
+                $m->amount * (1 - $credit->transaction_fee)
+            );
             // reseller
             $m->transactions()->create([
                 'user_id' => $m->reseller->id,
@@ -118,13 +120,6 @@ trait MerchantDepositObserver
                     'type' => Transaction::TYPE['COMMISSION'],
                     'amount' => $row->amount
                 ]);
-                if ($row->user_id == $m->reseller->id) {
-                    $m->reseller->update([
-                        'credit' => $m->reseller->credit - $m->amount,
-                        'coin' => $m->reseller->coin + $row->amount
-                    ]);
-                    continue;
-                }
                 DB::table('resellers')->where('id', $row->user_id)->increment('coin', $row->amount);
             }
         }

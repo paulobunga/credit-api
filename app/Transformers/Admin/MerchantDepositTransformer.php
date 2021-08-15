@@ -11,24 +11,25 @@ class MerchantDepositTransformer extends TransformerAbstract
         'transactions',
     ];
 
-    public function transform(Model $merchant_deposit)
+    public function transform(Model $m)
     {
         return [
-            'id' => $merchant_deposit->id,
-            'name' => $merchant_deposit->merchant->name,
-            'order_id' => $merchant_deposit->order_id,
-            'merchant_order_id' => $merchant_deposit->merchant_order_id,
-            'reseller_name' => $merchant_deposit->reseller->name ?? '--',
-            'amount' => $merchant_deposit->amount,
-            'status' => $merchant_deposit->status,
-            'callback_url' => $merchant_deposit->callback_url,
-            'reference_no' => $merchant_deposit->reference_no,
-            'created_at' => $merchant_deposit->created_at->toDateTimeString(),
+            'id' => $m->id,
+            'name' => $m->merchant->name,
+            'order_id' => $m->order_id,
+            'merchant_order_id' => $m->merchant_order_id,
+            'reseller_name' => $m->reseller->name,
+            'amount' => $m->amount,
+            'currency' => $m->currency,
+            'status' => $m->status,
+            'callback_url' => $m->callback_url,
+            'reference_no' => $m->reference_no,
+            'created_at' => $m->created_at->toDateTimeString(),
         ];
     }
 
-    public function includeTransactions(Model $deposit)
+    public function includeTransactions(Model $m)
     {
-        return $this->collection($deposit->transactions, new TransactionTransformer, false);
+        return $this->collection($m->transactions, new TransactionTransformer, false);
     }
 }

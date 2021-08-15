@@ -19,12 +19,9 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             BankSeeder::class,
             ResellerSeeder::class,
-            ResellerDepositSeeder::class,
-            ResellerWithdrawalSeeder::class,
             ResellerBankCardSeeder::class,
             MerchantSeeder::class,
             MerchantDepositSeeder::class,
-            MerchantWithdrawalSeeder::class,
             ReportSeeder::class,
         ]);
     }

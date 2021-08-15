@@ -12,10 +12,10 @@ class ResellerWithdrawal extends Model
 
     protected $fillable = [
         'reseller_id',
+        'audit_admin_id',
         'order_id',
         'amount',
         'status',
-        'info'
     ];
 
     public const STATUS = [
@@ -27,6 +27,11 @@ class ResellerWithdrawal extends Model
     public function reseller()
     {
         return $this->belongsTo(Reseller::class);
+    }
+
+    public function auditAdmin()
+    {
+        return $this->belongsTo(Admin::class);
     }
 
     public function transactions()

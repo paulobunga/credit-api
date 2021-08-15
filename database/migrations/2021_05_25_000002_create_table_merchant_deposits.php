@@ -17,19 +17,15 @@ class CreateTableMerchantDeposits extends Migration
         Schema::create('merchant_deposits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('merchant_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->unsignedBigInteger('reseller_id')->default(0);
+                ->constrained();
             $table->foreignId('reseller_bank_card_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->string('order_id', 40)->unique();
+                ->constrained();
+            $table->string('order_id', 60)->unique();
             $table->string('merchant_order_id', 60);
             $table->string('account_name', 64)->default('');
-            $table->string('account_no', 64);
+            $table->string('account_no', 100);
             $table->decimal('amount', 14, 4);
+            $table->string('currency', 10);
             $table->unsignedTinyInteger('status')
                 ->default(0)
                 ->comment('0:Created,1:Pending,2:Approved,3:Rejected,4:Enforced,5:Canceled');
@@ -39,8 +35,8 @@ class CreateTableMerchantDeposits extends Migration
             $table->unsignedTinyInteger('attempts')
                 ->default(0);
             $table->string('callback_url');
-            $table->string('reference_no');
-            $table->json('info')->default(new Expression('(JSON_OBJECT())'));
+            $table->string('reference_no', 100);
+            $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
             $table->timestamp('notified_at')->nullable();
             $table->unique(['merchant_id', 'merchant_order_id']);

@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Seeder;
 use App\Models\Reseller;
+use App\Models\ResellerDeposit;
+use App\Models\ResellerWithdrawal;
 use App\Settings\AgentSetting;
 use App\Settings\CommissionSetting;
 use App\Settings\CurrencySetting;
@@ -12,6 +14,10 @@ use App\Settings\ResellerSetting;
 
 class ResellerSeeder extends Seeder
 {
+    public function __construct()
+    {
+        $this->faker = \Faker\Factory::create();
+    }
     /**
      * Run the database seeds.
      *
@@ -29,8 +35,9 @@ class ResellerSeeder extends Seeder
             'username' => 'master@gmail.com',
             'password' => 'P@ssw0rd',
             'phone' => '+8865721455',
-            'currency' => 'VND',
+            'currency' => $currency->types[0],
             'credit' => 0,
+            'coin' => 0,
             'pending_limit' => 0,
             'commission_percentage' => $cs->master_agent_percentage,
             'downline_slot' => 1,
@@ -43,8 +50,9 @@ class ResellerSeeder extends Seeder
             'username' => 'reseller@gmail.com',
             'password' => 'P@ssw0rd',
             'phone' => '+8865721455',
-            'currency' => 'VND',
-            'credit' => 20000,
+            'currency' => $currency->types[0],
+            'credit' => 0,
+            'coin' => 0,
             'pending_limit' => $rs->default_pending_limit,
             'commission_percentage' => $cs->reseller_percentage,
             'downline_slot' => 0,
@@ -53,16 +61,23 @@ class ResellerSeeder extends Seeder
         foreach (Reseller::LEVEL as $level) {
             $reseller = Reseller::factory()->create([
                 'username' => "reseller{$level}@gmail.com",
-                'upline_id' => $reseller ? $reseller->id : 0,
+                'upline_id' => $level ? $reseller->id : 0,
                 'level' => $level,
-                'currency' => Arr::random($currency->types),
-                'credit' => $level < Reseller::LEVEL['RESELLER'] ? 0 : 20000,
+                'currency' => $currency->types[1],
+                'credit' => 0,
                 'pending_limit' => $rs->getDefaultPendingLimit($level),
                 'commission_percentage' => $cs->getDefaultPercentage($level),
                 'downline_slot' => $as->getDefaultDownLineSlot($level),
-                'status' => $level ==  Reseller::LEVEL['RESELLER'] ?
-                    Reseller::STATUS['INACTIVE'] :
-                    Reseller::STATUS['ACTIVE']
+                'status' => Reseller::STATUS['ACTIVE']
+            ]);
+        }
+        foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
+            ResellerDeposit::create([
+                'reseller_id' => $reseller->id,
+                'audit_admin_id' => 1,
+                'amount' => 10000,
+                'status' => ResellerDeposit::STATUS['APPROVED'],
+                'reason' => 'Audit Success.'
             ]);
         }
     }
