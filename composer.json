@@ -1,6 +1,6 @@
 {
-    "name": "Credit-API",
-    "description": "Simple API built by laravel lumen framework.",
+    "name": "laravel/lumen",
+    "description": "The Laravel Lumen Framework.",
     "keywords": ["framework", "laravel", "lumen"],
     "license": "MIT",
     "type": "project",
