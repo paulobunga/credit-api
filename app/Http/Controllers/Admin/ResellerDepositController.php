@@ -19,7 +19,7 @@ class ResellerDepositController extends Controller
             ->with([
                 'reseller'
             ])
-            ->join('resellers', 'resellers.id', '=', 'reseller_deposits.id')
+            ->join('resellers', 'resellers.id', '=', 'reseller_deposits.reseller_id')
             ->select('reseller_deposits.*', 'resellers.name')
             ->allowedFilters([
                 AllowedFilter::partial('name', 'resellers.name'),

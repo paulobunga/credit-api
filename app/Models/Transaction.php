@@ -16,6 +16,7 @@ class Transaction extends Model
         'user_type',
         'type',
         'amount',
+        'currency',
     ];
 
     public const TYPE = [

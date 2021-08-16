@@ -51,7 +51,11 @@ trait ResellerWithdrawalObserver
                     'amount' => $m->amount,
                     'currency' => $m->reseller->currency
                 ]);
-                $m->reseller->decrement('coin', $m->amount);
+                if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
+                    $m->reseller->decrement('credit', $m->amount);
+                } elseif ($m->type == ResellerWithdrawal::TYPE['COIN']) {
+                    $m->reseller->decrement('coin', $m->amount);
+                }
             }
         } catch (\Exception $e) {
             \Log::error($e->getMessage());

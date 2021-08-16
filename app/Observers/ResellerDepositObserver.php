@@ -51,7 +51,11 @@ trait ResellerDepositObserver
                     'amount' => $m->amount,
                     'currency' => $m->reseller->currency
                 ]);
-                $m->reseller->increment('credit', $m->amount);
+                if ($m->type == ResellerDeposit::TYPE['CREDIT']) {
+                    $m->reseller->increment('credit', $m->amount);
+                } elseif ($m->type == ResellerDeposit::TYPE['COIN']) {
+                    $m->reseller->increment('coin', $m->amount);
+                }
             }
         } catch (\Exception $e) {
             \Log::error($e->getMessage());

@@ -56,12 +56,17 @@ $api->group([
         $api->put("/resellers/deposit/{reseller}", [
             'as' => 'resellers.deposit', 'uses' => 'ResellerController@deposit'
         ]);
+        $api->put("/resellers/withdrawal/{reseller}", [
+            'as' => 'resellers.withdrawal', 'uses' => 'ResellerController@withdrawal'
+        ]);
         $api->put("/resellers/reset_password/{reseller}", [
-            'as' => 'resellsers.reset_password', 'uses' => 'ResellerController@reset'
+            'as' => 'resellers.reset_password', 'uses' => 'ResellerController@reset'
         ]);
 
         $api->resource('reseller_bank_cards', 'ResellerBankCardController', ['only' => ['index', 'update', 'destroy']]);
+
         $api->resource('reseller_deposits', 'ResellerDepositController', ['only' => ['index']]);
+
         $api->resource('reseller_withdrawals', 'ResellerWithdrawalController', ['only' => ['index', 'update']]);
 
         $api->get("/report/resellers", [

@@ -60,7 +60,9 @@ class MerchantDepositSeeder extends Seeder
                 'transaction_type' => Transaction::TYPE['RESELLER_WITHDRAW_COIN'],
                 'amount' => 1,
                 'status' => ResellerWithdrawal::STATUS['APPROVED'],
-                'reason' => 'Audit Success.'
+                'extra' => [
+                    'reason' => 'Withdraw'
+                ]
             ]);
         }
     }

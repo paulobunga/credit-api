@@ -72,6 +72,16 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         return $this->agent->agent ?? null;
     }
 
+    public function deposits()
+    {
+        return $this->hasMany(ResellerDeposit::class);
+    }
+
+    public function withdrawals()
+    {
+        return $this->hasMany(ResellerWithdrawal::class);
+    }
+
     public function transactions()
     {
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');

@@ -55,7 +55,6 @@ class CreateTableResellers extends Migration
             $table->decimal('amount', 14, 4);
             $table->unsignedTinyInteger('status')
                 ->comment('0:Pending,1:Approved,2:Rejected');
-            $table->string('reason');
             $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
         });
@@ -71,7 +70,7 @@ class CreateTableResellers extends Migration
             $table->decimal('amount', 14, 4);
             $table->unsignedTinyInteger('status')
                 ->comment('0:Pending,1::Approved,2:Rejected');
-            $table->string('reason');
+            $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
         });
     }

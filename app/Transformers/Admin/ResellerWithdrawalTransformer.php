@@ -17,12 +17,14 @@ class ResellerWithdrawalTransformer extends TransformerAbstract
             'id' => $m->id,
             'name' => $m->reseller->name,
             'admin' => $m->auditAdmin->name ?? '--',
+            'type' => $m->type,
+            'transaction_type' => $m->transaction_type,
             'order_id' => $m->order_id,
             'amount' => $m->amount,
             'currency' => $m->reseller->currency,
             'status' => $m->status,
-            'reason' => $m->reason,
-            'created_at' => $m->created_at->toDateTimeString(),
+            'extra' => $m->extra,
+            'created_at' => (string)$m->created_at,
         ];
     }
 

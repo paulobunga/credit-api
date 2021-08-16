@@ -24,7 +24,7 @@ class CreateTableResellerBankCards extends Migration
                 ->constrained();
             $table->string('account_name', 64)->default('');
             $table->string('account_no', 64);
-            $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
+            $table->json('content')->default(new Expression('(JSON_OBJECT())'));
             $table->unsignedTinyInteger('status')->default(1)->comment('0:Disabled,1:Enabled');
             $table->timestamps();
         });

@@ -80,7 +80,9 @@ class ResellerSeeder extends Seeder
                 'transaction_type' => Transaction::TYPE['RESELLER_TOPUP_CREDIT'],
                 'amount' => 10000,
                 'status' => ResellerDeposit::STATUS['APPROVED'],
-                'reason' => 'Audit Success.'
+                'extra' => [
+                    'payment_type' => 'By Cash'
+                ]
             ]);
         }
     }

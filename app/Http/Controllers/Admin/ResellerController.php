@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use App\Models\Reseller;
+use App\Models\ResellerDeposit;
+use App\Models\ResellerWithdrawal;
+use App\Models\Transaction;
 
 class ResellerController extends Controller
 {
@@ -135,7 +139,7 @@ class ResellerController extends Controller
     }
 
     /**
-     * Top up or Deduct reseller create or coin via id
+     * Top up reseller create or coin via id
      *
      * @return \Dingo\Api\Http\JsonResponse
      */
@@ -143,11 +147,92 @@ class ResellerController extends Controller
     {
         $reseller = $this->model::findOrFail($this->parameters('reseller'));
         $this->validate($request, [
-            'credit' => 'required|numeric',
+            'type' => 'required|in:' . implode(',', ResellerDeposit::TYPE),
+            'transaction_type' => 'required|between:0,1',
+            'amount' => 'required|numeric|min:1',
         ]);
-        $reseller->increment('credit', $request->credit);
 
-        return $this->response->item($reseller, $this->transformer);
+        if ($request->type == ResellerDeposit::TYPE['CREDIT'] && $request->transaction_type == 0) {
+            $transaction_type = Transaction::TYPE['RESELLER_TOPUP_CREDIT'];
+        } elseif ($request->type == ResellerDeposit::TYPE['CREDIT'] && $request->transaction_type == 1) {
+            $transaction_type = Transaction::TYPE['ADMIN_TOPUP_CREDIT'];
+        } elseif ($request->type == ResellerDeposit::TYPE['COIN'] && $request->transaction_type == 1) {
+            $transaction_type = Transaction::TYPE['ADMIN_TOPUP_COIN'];
+        } else {
+            throw new \Exception('Unsupported transaction type');
+        }
+
+        if ($request->type == ResellerDeposit::TYPE['CREDIT'] &&  $request->transaction_type == 0) {
+            $this->validate($request, [
+                'payment_type' => 'required',
+            ]);
+            $extra = [
+                'payment_type' => $request->payment_type
+            ];
+        } else {
+            $this->validate($request, [
+                'reason' => 'required',
+            ]);
+            $extra = [
+                'reason' => $request->reason
+            ];
+        }
+        $reseller->deposits()->create([
+            'reseller_id' => $reseller->id,
+            'audit_admin_id' => Auth::id(),
+            'type' => $request->type,
+            'transaction_type' => $transaction_type,
+            'amount' => $request->amount,
+            'extra' => $extra,
+            'status' => ResellerDeposit::STATUS['APPROVED']
+        ]);
+
+        return $this->response->item($reseller->refresh(), $this->transformer);
+    }
+
+    /**
+     * Withdraw reseller create or coin via id
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
+    public function withdrawal(Request $request)
+    {
+        $reseller = $this->model::findOrFail($this->parameters('reseller'));
+        $this->validate($request, [
+            'type' => 'required|in:' . implode(',', ResellerWithdrawal::TYPE),
+            'transaction_type' => 'required|between:0,1',
+            'amount' => 'required',
+            'reason' => 'required',
+        ]);
+        if ($request->type == ResellerWithdrawal::TYPE['CREDIT'] && $request->transaction_type == 0) {
+            $this->validate($request, ['amount' => 'numeric|between:1,' . $reseller->credit]);
+            $transaction_type = Transaction::TYPE['RESELLER_WITHDRAW_CREDIT'];
+        } elseif ($request->type == ResellerWithdrawal::TYPE['CREDIT'] && $request->transaction_type == 1) {
+            $this->validate($request, ['amount' => 'numeric|between:1,' . $reseller->credit]);
+            $transaction_type = Transaction::TYPE['ADMIN_WITHDRAW_CREDIT'];
+        } elseif ($request->type == ResellerWithdrawal::TYPE['COIN'] && $request->transaction_type == 0) {
+            $this->validate($request, ['amount' => 'numeric|between:1,' . $reseller->coin]);
+            $transaction_type = Transaction::TYPE['RESELLER_WITHDRAW_COIN'];
+        } elseif ($request->type == ResellerWithdrawal::TYPE['COIN'] && $request->transaction_type == 1) {
+            $this->validate($request, ['amount' => 'numeric|between:1,' . $reseller->coin]);
+            $transaction_type = Transaction::TYPE['ADMIN_WITHDRAW_COIN'];
+        } else {
+            throw new \Exception('Unsupported transaction type');
+        }
+
+        $reseller->withdrawals()->create([
+            'reseller_id' => $reseller->id,
+            'audit_admin_id' => Auth::id(),
+            'type' => $request->type,
+            'transaction_type' => $transaction_type,
+            'amount' => $request->amount,
+            'extra' => [
+                'reason' => $request->reason
+            ],
+            'status' => ResellerWithdrawal::STATUS['APPROVED']
+        ]);
+
+        return $this->response->item($reseller->refresh(), $this->transformer);
     }
 
     /**

@@ -17,9 +17,13 @@ class ResellerDepositTransformer extends TransformerAbstract
             'id' => $m->id,
             'reseller' => $m->reseller->name,
             'admin' => $m->auditAdmin->name ?? '--',
+            'type' => $m->type,
+            'transaction_type' => $m->transaction_type,
             'amount' => $m->amount,
+            'currency' => $m->reseller->currency,
             'status' => $m->status,
-            'reason' => $m->reason,
+            'extra' => $m->extra,
+            'created_at' => (string)$m->created_at,
         ];
     }
 

@@ -14,8 +14,16 @@ class ResellerDeposit extends Model
         'reseller_id',
         'audit_admin_id',
         'order_id',
+        'transaction_type',
+        'type',
         'amount',
         'status',
+        'extra',
+    ];
+
+    protected $casts = [
+        'extra' => 'array',
+        'created_at'  => 'datetime:Y-m-d H:i:s',
     ];
 
     public const TYPE = [
@@ -42,5 +50,10 @@ class ResellerDeposit extends Model
     public function transactions()
     {
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
+    }
+
+    public function getExtraAttribute()
+    {
+        return json_decode($this->attributes['extra'], true);
     }
 }
