@@ -34,8 +34,8 @@ class DepositTransformer extends TransformerAbstract
         return $this->collection(
             $deposit->transactions()
                 ->whereIn('transactions.type', [
-                    Transaction::TYPE['TOPUP_CREDIT'],
-                    Transaction::TYPE['TRANSACTION_FEE'],
+                    Transaction::TYPE['MERCHANT_TOPUP_CREDIT'],
+                    Transaction::TYPE['SYSTEM_TRANSACTION_FEE'],
                 ])
                 ->where('user_type', 'merchant')
                 ->where('user_id', Auth::id())

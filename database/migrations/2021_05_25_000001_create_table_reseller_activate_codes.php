@@ -16,9 +16,7 @@ class CreateTableResellerActivateCodes extends Migration
         Schema::create('reseller_activate_codes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reseller_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->constrained();
             $table->unsignedBigInteger('active_reseller_id')->default(0);
             $table->string('code', 40)->unique();
             $table->unsignedTinyInteger('status')->default(0)->comment('0:Pending,1:Activated,2:Expired');

@@ -17,20 +17,14 @@ class CreateTableResellerBankCards extends Migration
         Schema::create('reseller_bank_cards', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reseller_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->constrained();
             $table->foreignId('bank_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->constrained();
             $table->foreignId('payment_channel_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->constrained();
             $table->string('account_name', 64)->default('');
             $table->string('account_no', 64);
-            $table->json('info')->default(new Expression('(JSON_ARRAY())'));
+            $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
             $table->unsignedTinyInteger('status')->default(1)->comment('0:Disabled,1:Enabled');
             $table->timestamps();
         });

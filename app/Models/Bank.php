@@ -12,6 +12,7 @@ class Bank extends Model
     protected $fillable = [
         'ident',
         'name',
+        'currency',
         'status'
     ];
 

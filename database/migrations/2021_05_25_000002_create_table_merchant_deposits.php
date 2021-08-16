@@ -25,7 +25,7 @@ class CreateTableMerchantDeposits extends Migration
             $table->string('account_name', 64)->default('');
             $table->string('account_no', 100);
             $table->decimal('amount', 14, 4);
-            $table->string('currency', 10);
+            $table->string('currency', 3);
             $table->unsignedTinyInteger('status')
                 ->default(0)
                 ->comment('0:Created,1:Pending,2:Approved,3:Rejected,4:Enforced,5:Canceled');

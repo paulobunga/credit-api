@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Bank;
 use App\Models\PaymentChannel;
-use App\Settings\CurrencySetting;
 
 class BankSeeder extends Seeder
 {
@@ -14,13 +13,13 @@ class BankSeeder extends Seeder
      *
      * @return void
      */
-    public function run(CurrencySetting $setting)
+    public function run()
     {
         Bank::factory()->count(11)->create();
         $channels = [
             'NETBANK' => [
                 'methods' => [
-                    PaymentChannel::METHOD['TRANSFER'],
+                    PaymentChannel::METHOD['TEXT'],
                 ],
                 'currency' => ['IND', 'VND'],
             ],
@@ -32,7 +31,7 @@ class BankSeeder extends Seeder
             ],
             'WALLET' => [
                 'methods' => [
-                    PaymentChannel::METHOD['TRANSFER'],
+                    PaymentChannel::METHOD['TEXT'],
                 ],
                 'currency' => ['VND', 'USDT'],
             ],

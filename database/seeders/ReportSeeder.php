@@ -20,10 +20,13 @@ class ReportSeeder extends Seeder
     {
         foreach (Merchant::all() as $merchant) {
             foreach (range(6, 1) as $i) {
-                ReportMonthlyMerchant::factory()->create([
-                    'merchant_id' => $merchant->id,
-                    'date' => Carbon::now()->subMonths($i)->startOfMonth()->format('Y-m-d')
-                ]);
+                foreach ($merchant->credits as $credit) {
+                    ReportMonthlyMerchant::factory()->create([
+                        'merchant_id' => $merchant->id,
+                        'date' => Carbon::now()->subMonths($i)->startOfMonth()->format('Y-m-d'),
+                        'currency' => $credit->currency
+                    ]);
+                }
             }
         }
         foreach (Reseller::all() as $reseller) {

@@ -47,8 +47,9 @@ trait MerchantWithdrawalObserver
                 $m->transactions()->create([
                     'user_id' => $m->merchant_id,
                     'user_type' => 'merchant',
-                    'type' => Transaction::TYPE['DEDUCT_COIN'],
-                    'amount' => $m->amount
+                    'type' => Transaction::TYPE['MERCHANT_WITHDRAW_CREDIT'],
+                    'amount' => $m->amount,
+                    'currency' => $m->currency,
                 ]);
                 $m->merchant->credits()->where('currency', $m->currency)
                     ->decrement('credit', $m->amount);

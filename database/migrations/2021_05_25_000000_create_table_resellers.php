@@ -22,9 +22,9 @@ class CreateTableResellers extends Migration
             $table->string('name')->unique()->index();
             $table->string('username')->unique()->index();
             $table->string('phone', 20);
-            $table->string('currency', 10);
             $table->decimal('credit', 14, 4)->default(0);
             $table->decimal('coin', 14, 4)->default(0);
+            $table->string('currency', 3);
             $table->decimal('commission_percentage', 5, 4)->default(0);
             $table->unsignedInteger('pending_limit')->default(0);
             $table->unsignedInteger('downline_slot')->default(0);
@@ -50,6 +50,8 @@ class CreateTableResellers extends Migration
                 ->constrained();
             $table->unsignedBigInteger('audit_admin_id')->default(0);
             $table->string('order_id', 60)->unique();
+            $table->unsignedTinyInteger('transaction_type');
+            $table->unsignedTinyInteger('type')->comment('0:Credit,1:Coin');
             $table->decimal('amount', 14, 4);
             $table->unsignedTinyInteger('status')
                 ->comment('0:Pending,1:Approved,2:Rejected');
@@ -64,6 +66,8 @@ class CreateTableResellers extends Migration
                 ->constrained();
             $table->unsignedBigInteger('audit_admin_id')->default(0);
             $table->string('order_id', 60)->unique();
+            $table->unsignedTinyInteger('transaction_type');
+            $table->unsignedTinyInteger('type')->comment('0:Credit,1:Coin');
             $table->decimal('amount', 14, 4);
             $table->unsignedTinyInteger('status')
                 ->comment('0:Pending,1::Approved,2:Rejected');

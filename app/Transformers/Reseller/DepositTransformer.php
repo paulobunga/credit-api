@@ -32,8 +32,8 @@ class DepositTransformer extends TransformerAbstract
         return $this->collection(
             $deposit->transactions()
                 ->whereIn('transactions.type', [
-                    Transaction::TYPE['DEDUCT_CREDIT'],
-                    Transaction::TYPE['COMMISSION'],
+                    Transaction::TYPE['SYSTEM_DEDUCT_CREDIT'],
+                    Transaction::TYPE['SYSTEM_TOPUP_COMMISSION'],
                 ])
                 ->where('user_type', 'reseller')
                 ->where('user_id', Auth::id())

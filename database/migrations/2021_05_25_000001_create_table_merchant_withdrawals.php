@@ -17,12 +17,10 @@ class CreateTableMerchantWithdrawals extends Migration
         Schema::create('merchant_withdrawals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('merchant_id')
-                ->constrained()
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->constrained();
             $table->string('order_id', 60)->unique();
             $table->decimal('amount', 14, 4);
-            $table->string('currency', 10);
+            $table->string('currency', 3);
             $table->unsignedTinyInteger('status')
                 ->default(0)
                 ->comment('1:Created,2:Waiting to Approve,3:Approved,4:Rejected,5:Enforced,6:Canceled');

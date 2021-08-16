@@ -6,13 +6,14 @@ use League\Fractal\TransformerAbstract;
 
 class BankTransformer extends TransformerAbstract
 {
-    public function transform(Model $bank)
+    public function transform(Model $m)
     {
         return [
-            'id' => $bank->id,
-            'ident' => $bank->ident,
-            'name' => $bank->name,
-            'status' => $bank->status,
+            'id' => $m->id,
+            'ident' => $m->ident,
+            'name' => $m->name,
+            'currency' => $m->currency,
+            'status' => $m->status,
         ];
     }
 }

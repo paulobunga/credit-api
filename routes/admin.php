@@ -34,7 +34,8 @@ $api->group([
 
         $api->resource('merchants', 'MerchantController', ['except' => ['show']]);
         $api->put("/merchants/renew/{merchant}", [
-            'as' => 'merchants.renew', 'uses' => 'MerchantController@renew']);
+            'as' => 'merchants.renew', 'uses' => 'MerchantController@renew'
+        ]);
         $api->put("/merchants/whitelist/{merchant}", [
             'as' => 'merchants.whitelist', 'uses' => 'MerchantController@whitelist'
         ]);
@@ -60,7 +61,7 @@ $api->group([
         ]);
 
         $api->resource('reseller_bank_cards', 'ResellerBankCardController', ['only' => ['index', 'update', 'destroy']]);
-        // $api->resource('reseller_deposits', 'ResellerDepositController');
+        $api->resource('reseller_deposits', 'ResellerDepositController', ['only' => ['index']]);
         $api->resource('reseller_withdrawals', 'ResellerWithdrawalController', ['only' => ['index', 'update']]);
 
         $api->get("/report/resellers", [

@@ -17,6 +17,11 @@ class ResellerWithdrawal extends Model
         'amount',
         'status',
     ];
+    
+    public const TYPE = [
+        'CREDIT' => 0,
+        'COIN' => 1,
+    ];
 
     public const STATUS = [
         'PENDING' => 0,

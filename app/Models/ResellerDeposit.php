@@ -18,6 +18,11 @@ class ResellerDeposit extends Model
         'status',
     ];
 
+    public const TYPE = [
+        'CREDIT' => 0,
+        'COIN' => 1,
+    ];
+
     public const STATUS = [
         'PENDING' => 0,
         'APPROVED' => 1,

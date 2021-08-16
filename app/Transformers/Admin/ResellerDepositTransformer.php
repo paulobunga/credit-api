@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Transformers\Admin;
 
 use Illuminate\Database\Eloquent\Model;
@@ -6,16 +7,24 @@ use League\Fractal\TransformerAbstract;
 
 class ResellerDepositTransformer extends TransformerAbstract
 {
-    public function transform(Model $reseller_deposit)
+    protected $defaultIncludes = [
+        'transactions',
+    ];
+
+    public function transform(Model $m)
     {
         return [
-            'id' => $reseller_deposit->id,
-            'reseller' => $reseller_deposit->reseller->name,
-            'admin' => $reseller_deposit->admin->name,
-            'amount' => $reseller_deposit->amount,
-            'status' => $reseller_deposit->status,
-            'callback_url' => $reseller_deposit->callback_url,
-            'reference_no' => $reseller_deposit->reference_no,
+            'id' => $m->id,
+            'reseller' => $m->reseller->name,
+            'admin' => $m->auditAdmin->name ?? '--',
+            'amount' => $m->amount,
+            'status' => $m->status,
+            'reason' => $m->reason,
         ];
+    }
+
+    public function includeTransactions(Model $m)
+    {
+        return $this->collection($m->transactions, new TransactionTransformer, false);
     }
 }

@@ -15,7 +15,7 @@ class MerchantWithdrawal extends Model
         'amount',
         'currency',
         'status',
-        'info'
+        'extra'
     ];
 
     public const STATUS = [

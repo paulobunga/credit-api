@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Seeder;
 use App\Models\Reseller;
+use App\Models\Transaction;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 use App\Settings\AgentSetting;
@@ -75,6 +76,8 @@ class ResellerSeeder extends Seeder
             ResellerDeposit::create([
                 'reseller_id' => $reseller->id,
                 'audit_admin_id' => 1,
+                'type' => ResellerDeposit::TYPE['CREDIT'],
+                'transaction_type' => Transaction::TYPE['RESELLER_TOPUP_CREDIT'],
                 'amount' => 10000,
                 'status' => ResellerDeposit::STATUS['APPROVED'],
                 'reason' => 'Audit Success.'

@@ -47,8 +47,9 @@ trait ResellerWithdrawalObserver
                 $m->transactions()->create([
                     'user_id' => $m->reseller_id,
                     'user_type' => 'reseller',
-                    'type' => Transaction::TYPE['DEDUCT_COIN'],
-                    'amount' => $m->amount
+                    'type' => $m->transaction_type,
+                    'amount' => $m->amount,
+                    'currency' => $m->reseller->currency
                 ]);
                 $m->reseller->decrement('coin', $m->amount);
             }

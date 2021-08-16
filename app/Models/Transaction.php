@@ -19,11 +19,18 @@ class Transaction extends Model
     ];
 
     public const TYPE = [
-        'DEDUCT_CREDIT' => 0,
-        'TOPUP_CREDIT' => 1,
-        'DEDUCT_COIN' => 2,
-        'COMMISSION' => 3,
-        'TRANSACTION_FEE' => 4,
+        'ADMIN_TOPUP_CREDIT' => 0,
+        'ADMIN_WITHDRAW_CREDIT' => 1,
+        'ADMIN_TOPUP_COIN' => 2,
+        'ADMIN_WITHDRAW_COIN' => 3,
+        'MERCHANT_TOPUP_CREDIT' => 4,
+        'MERCHANT_WITHDRAW_CREDIT' => 5,
+        'RESELLER_TOPUP_CREDIT' => 6,
+        'RESELLER_WITHDRAW_CREDIT' => 7,
+        'RESELLER_WITHDRAW_COIN' => 8,
+        'SYSTEM_TRANSACTION_FEE' => 9,
+        'SYSTEM_DEDUCT_CREDIT'=> 10,
+        'SYSTEM_TOPUP_COMMISSION' => 11,
     ];
 
     public function getTypeAttribute()

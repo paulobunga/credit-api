@@ -10,6 +10,7 @@ use App\Models\MerchantWithdrawal;
 use App\Models\Reseller;
 use App\Models\ResellerWithdrawal;
 use App\Models\PaymentChannel;
+use App\Models\Transaction;
 
 class MerchantDepositSeeder extends Seeder
 {
@@ -55,6 +56,8 @@ class MerchantDepositSeeder extends Seeder
             ResellerWithdrawal::create([
                 'reseller_id' => $reseller->id,
                 'audit_admin_id' => 1,
+                'type' => ResellerWithdrawal::TYPE['COIN'],
+                'transaction_type' => Transaction::TYPE['RESELLER_WITHDRAW_COIN'],
                 'amount' => 1,
                 'status' => ResellerWithdrawal::STATUS['APPROVED'],
                 'reason' => 'Audit Success.'

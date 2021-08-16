@@ -11,21 +11,23 @@ class ResellerWithdrawalTransformer extends TransformerAbstract
         'transactions',
     ];
 
-    public function transform(Model $reseller_withdrawal)
+    public function transform(Model $m)
     {
         return [
-            'id' => $reseller_withdrawal->id,
-            'name' => $reseller_withdrawal->reseller->name,
-            'order_id' => $reseller_withdrawal->order_id,
-            'amount' => $reseller_withdrawal->amount,
-            'currency' => $reseller_withdrawal->reseller->currency,
-            'status' => $reseller_withdrawal->status,
-            'created_at' => $reseller_withdrawal->created_at->toDateTimeString(),
+            'id' => $m->id,
+            'name' => $m->reseller->name,
+            'admin' => $m->auditAdmin->name ?? '--',
+            'order_id' => $m->order_id,
+            'amount' => $m->amount,
+            'currency' => $m->reseller->currency,
+            'status' => $m->status,
+            'reason' => $m->reason,
+            'created_at' => $m->created_at->toDateTimeString(),
         ];
     }
 
-    public function includeTransactions(Model $withdrawal)
+    public function includeTransactions(Model $m)
     {
-        return $this->collection($withdrawal->transactions, new TransactionTransformer, false);
+        return $this->collection($m->transactions, new TransactionTransformer, false);
     }
 }

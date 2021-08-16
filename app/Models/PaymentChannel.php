@@ -15,7 +15,7 @@ class PaymentChannel extends Model
     ];
 
     public const METHOD = [
-        'TRANSFER' => 0,
+        'TEXT' => 0,
         'QRCODE' => 1,
     ];
 

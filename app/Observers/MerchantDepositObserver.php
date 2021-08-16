@@ -52,14 +52,16 @@ trait MerchantDepositObserver
             $m->transactions()->create([
                 'user_id' => $m->merchant_id,
                 'user_type' => 'merchant',
-                'type' => Transaction::TYPE['TOPUP_CREDIT'],
-                'amount' => $m->amount
+                'type' => Transaction::TYPE['MERCHANT_TOPUP_CREDIT'],
+                'amount' => $m->amount,
+                'currency' => $m->currency,
             ]);
             $m->transactions()->create([
                 'user_id' => $m->merchant_id,
                 'user_type' => 'merchant',
-                'type' => Transaction::TYPE['TRANSACTION_FEE'],
-                'amount' => - ($m->amount * $credit->transaction_fee)
+                'type' => Transaction::TYPE['SYSTEM_TRANSACTION_FEE'],
+                'amount' => - ($m->amount * $credit->transaction_fee),
+                'currency' => $m->currency,
             ]);
             $m->merchant->credits()->where('currency', $m->currency)->increment(
                 'credit',
@@ -69,8 +71,9 @@ trait MerchantDepositObserver
             $m->transactions()->create([
                 'user_id' => $m->reseller->id,
                 'user_type' => 'reseller',
-                'type' => Transaction::TYPE['DEDUCT_CREDIT'],
-                'amount' => - ($m->amount)
+                'type' => Transaction::TYPE['SYSTEM_DEDUCT_CREDIT'],
+                'amount' => - ($m->amount),
+                'currency' => $m->currency,
             ]);
             $m->reseller->decrement(
                 'credit',
@@ -111,14 +114,15 @@ trait MerchantDepositObserver
             ", [
                 'id' => $m->reseller->id,
                 'amount' => $m->amount,
-                'type' => Transaction::TYPE['COMMISSION']
+                'type' => Transaction::TYPE['SYSTEM_TOPUP_COMMISSION']
             ]);
             foreach ($rows as $row) {
                 $m->transactions()->create([
                     'user_id' => $row->user_id,
                     'user_type' => 'reseller',
-                    'type' => Transaction::TYPE['COMMISSION'],
-                    'amount' => $row->amount
+                    'type' => Transaction::TYPE['SYSTEM_TOPUP_COMMISSION'],
+                    'amount' => $row->amount,
+                    'currency' => $m->currency,
                 ]);
                 DB::table('resellers')->where('id', $row->user_id)->increment('coin', $row->amount);
             }
