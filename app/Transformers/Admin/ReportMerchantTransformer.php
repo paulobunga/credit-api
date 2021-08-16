@@ -6,16 +6,17 @@ use League\Fractal\TransformerAbstract;
 
 class ReportMerchantTransformer extends TransformerAbstract
 {
-    public function transform(Model $report)
+    public function transform(Model $m)
     {
         return [
-            'id' => $report->id,
-            'merchant' => $report->merchant->name,
-            'start_at' => $report->start_at,
-            'end_at' => $report->end_at,
-            'turnover' => $report->turnover,
-            'credit' => $report->credit,
-            'transaction_fee' => $report->transaction_fee,
+            'id' => $m->id,
+            'merchant' => $m->merchant->name,
+            'start_at' => $m->start_at,
+            'end_at' => $m->end_at,
+            'turnover' => $m->turnover,
+            'credit' => $m->credit,
+            'transaction_fee' => $m->transaction_fee,
+            'currency' => $m->currency
         ];
     }
 }

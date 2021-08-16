@@ -36,7 +36,8 @@ class ReportController extends Controller
                 'credit',
                 'coin',
                 'amount',
-                AllowedSort::field('name', 'resellers.name'),
+                'currency',
+                'name'
             ])
             ->paginate($this->perPage);
 

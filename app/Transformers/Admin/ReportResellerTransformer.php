@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Transformers\Admin;
 
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,7 @@ class ReportResellerTransformer extends TransformerAbstract
             'turnover' => $report->turnover,
             'credit' => $report->credit,
             'coin' => $report->coin,
+            'currency' => $report->reseller->currency,
         ];
     }
 }

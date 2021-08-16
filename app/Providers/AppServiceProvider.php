@@ -22,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             'admin' => 'App\Models\Admin',
             'merchant.deposit' => 'App\Models\MerchantDeposit',
+            'merchant.withdrawal' => 'App\Models\MerchantWithdrawal',
+            'reseller.deposit' => 'App\Models\ResellerDeposit',
             'reseller.withdrawal' => 'App\Models\ResellerWithdrawal',
         ]);
     }

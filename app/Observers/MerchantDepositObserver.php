@@ -60,7 +60,7 @@ trait MerchantDepositObserver
                 'user_id' => $m->merchant_id,
                 'user_type' => 'merchant',
                 'type' => Transaction::TYPE['SYSTEM_TRANSACTION_FEE'],
-                'amount' => - ($m->amount * $credit->transaction_fee),
+                'amount' => $m->amount * $credit->transaction_fee,
                 'currency' => $m->currency,
             ]);
             $m->merchant->credits()->where('currency', $m->currency)->increment(
@@ -72,7 +72,7 @@ trait MerchantDepositObserver
                 'user_id' => $m->reseller->id,
                 'user_type' => 'reseller',
                 'type' => Transaction::TYPE['SYSTEM_DEDUCT_CREDIT'],
-                'amount' => - ($m->amount),
+                'amount' => $m->amount,
                 'currency' => $m->currency,
             ]);
             $m->reseller->decrement(

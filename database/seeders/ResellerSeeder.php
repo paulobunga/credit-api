@@ -31,6 +31,7 @@ class ResellerSeeder extends Seeder
         CurrencySetting $currency
     ) {
         $reseller = \App\Models\Reseller::create([
+            'upline_id' => 1,
             'level' => Reseller::LEVEL['AGENT_MASTER'],
             'name' => 'Test Master Agent',
             'username' => 'master@gmail.com',

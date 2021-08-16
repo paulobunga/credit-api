@@ -16,7 +16,8 @@ class ReportMonthlyMerchant extends Model
         'date',
         'turnover',
         'payin',
-        'payout'
+        'payout',
+        'currency'
     ];
 
     public function merchant()
