@@ -18,8 +18,7 @@ class CreateTableResellerBankCards extends Migration
             $table->id();
             $table->foreignId('reseller_id')
                 ->constrained();
-            $table->foreignId('bank_id')
-                ->constrained();
+            $table->unsignedBigInteger('bank_id')->default(0);
             $table->foreignId('payment_channel_id')
                 ->constrained();
             $table->string('account_name', 64)->default('');

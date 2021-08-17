@@ -21,27 +21,30 @@ class BankSeeder extends Seeder
                 'methods' => [
                     PaymentChannel::METHOD['TEXT'],
                 ],
-                'currency' => ['IND', 'VND'],
+                'currency' => [
+                    'IND' => Bank::where('currency', 'IND')->limit(3)->pluck('id')->toArray(),
+                    'VND' => Bank::where('currency', 'VND')->limit(3)->pluck('id')->toArray(),
+                ],
             ],
             'UPI' => [
                 'methods' => [
                     PaymentChannel::METHOD['QRCODE'],
                 ],
-                'currency' => ['IND'],
+                'currency' => ['IND' => []],
             ],
             'WALLET' => [
                 'methods' => [
-                    PaymentChannel::METHOD['TEXT'],
+                    PaymentChannel::METHOD['QRCODE'],
                 ],
-                'currency' => ['VND', 'USDT'],
+                'currency' => ['USDT' => []],
             ],
         ];
         foreach ($channels as $name => $ch) {
-            foreach ($ch['currency'] as $currency) {
+            foreach ($ch['currency'] as $currency => $banks) {
                 PaymentChannel::create([
                     'name' => $name,
                     'payment_methods' => implode(',', $ch['methods']),
-                    'banks' => implode(',', Bank::inRandomOrder()->limit(5)->pluck('id')->toArray()),
+                    'banks' => implode(',', $banks),
                     'currency' => $currency,
                     'status' => true,
                 ]);

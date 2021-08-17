@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
+use App\Models\PaymentChannel;
 
 class PaymentChannelController extends Controller
 {
@@ -17,13 +18,14 @@ class PaymentChannelController extends Controller
     {
         $admins = QueryBuilder::for($this->model)
             ->allowedFilters([
-                'id',
+                AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('currency'),
             ])
             ->allowedSorts([
                 'id',
                 'name',
+                'currency',
                 'status',
             ])
             ->paginate($this->perPage);
@@ -34,56 +36,51 @@ class PaymentChannelController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|unique:admins,name',
-            'username' => 'required|unique:admins,username',
-            'role' => 'required',
-            'password' => 'required|confirmed',
+            'name' => 'required|unique:payment_channels,name',
+            'payment_methods' => 'required|array|in:' . implode(',', PaymentChannel::METHOD),
+            'currency' => 'required|in:' . implode(',', app(\App\Settings\CurrencySetting::class)->types),
+            'banks' => 'array',
+            'banks.*' => 'exists:banks,id',
             'status' => 'boolean'
         ]);
 
-        $role = \App\Models\Role::findOrFail($request->role);
-
-        $admin = $this->model::create([
+        $model = $this->model::create([
             'name' => $request->name,
-            'username' => $request->username,
-            'password' => $request->password,
+            'payment_methods' => implode(',', $request->payment_methods),
+            'currency' => $request->currency,
+            'banks' => implode(',', $request->banks),
             'status' => $request->status,
         ]);
-        $admin->syncRoles($role);
 
-        return $this->response->item($admin, $this->transformer);
+        return $this->response->item($model, $this->transformer);
     }
 
     public function update(Request $request)
     {
-        $admin = $this->model::where('name', $this->parameters('admin'))->firstOrFail();
-        if ($admin->id == 1) {
-            throw new \Exception('Default Administrator cannot be edited!', 405);
-        }
+        $model = $this->model::findOrFail($this->parameters('payment_channel'));
         $this->validate($request, [
-            'name' => "required|unique:admins,name,{$admin->id}",
-            'username' => "required|unique:admins,username,{$admin->id}",
-            'role' => 'required',
+            'name' => "required|unique:payment_channels,name,{$model->id}",
+            'payment_methods' => 'required|array|in:' . implode(',', PaymentChannel::METHOD),
+            'currency' => 'required|in:' . implode(',', app(\App\Settings\CurrencySetting::class)->types),
+            'banks' => 'array',
+            'banks.*' => 'exists:banks,id',
             'status' => 'boolean'
         ]);
-        $role = \App\Models\Role::findOrFail($request->role);
-        $admin->update([
+        $model->update([
             'name' => $request->name,
-            'username' => $request->username,
+            'payment_methods' => implode(',', $request->payment_methods),
+            'currency' => $request->currency,
+            'banks' => implode(',', $request->banks),
             'status' => $request->status,
         ]);
-        $admin->syncRoles($role);
 
-        return $this->response->item($admin, $this->transformer);
+        return $this->response->item($model, $this->transformer);
     }
 
     public function destroy(Request $request)
     {
-        $admin = $this->model::where('name', $this->parameters('admin'))->firstOrFail();
-        if ($admin->id == 1) {
-            throw new \Exception('Default Administrator cannot be removed!', 405);
-        }
-        $admin->delete();
+        $model = $this->model::findOrFail($this->parameters('payment_channel'));
+        $model->delete();
 
         return $this->success();
     }

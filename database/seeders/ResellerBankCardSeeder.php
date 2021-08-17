@@ -25,7 +25,8 @@ class ResellerBankCardSeeder extends Seeder
         foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
             foreach (PaymentChannel::where('currency', $reseller->currency)->get() as $ch) {
                 $card = ResellerBankCard::factory()->make([
-                    'bank_id' => Arr::random($ch->banks->pluck('id')->toArray()),
+                    'bank_id' => $ch->banks->isEmpty() ?
+                        0 : Arr::random($ch->banks->pluck('id')->toArray()),
                     'reseller_id' => $reseller->id,
                     'payment_channel_id' => $ch->id
                 ]);
