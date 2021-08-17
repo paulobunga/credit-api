@@ -17,14 +17,14 @@ class CreateTableBanks extends Migration
             $table->id();
             $table->string('ident', 30)->unique()->index();
             $table->string('name', 100);
-            $table->string('currency', 3);
+            $table->string('currency', 6);
             $table->unsignedTinyInteger('status');
             $table->timestamps();
         });
         Schema::create('payment_channels', function (Blueprint $table) {
             $table->id();
             $table->string('name', 40);
-            $table->string('currency', 4);
+            $table->string('currency', 6);
             $table->text('payment_methods');
             $table->text('banks');
             $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');

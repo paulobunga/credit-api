@@ -20,7 +20,7 @@ class CreateTableMerchantWithdrawals extends Migration
                 ->constrained();
             $table->string('order_id', 60)->unique();
             $table->decimal('amount', 14, 4);
-            $table->string('currency', 3);
+            $table->string('currency', 6);
             $table->unsignedTinyInteger('status')
                 ->default(0)
                 ->comment('1:Created,2:Waiting to Approve,3:Approved,4:Rejected,5:Enforced,6:Canceled');

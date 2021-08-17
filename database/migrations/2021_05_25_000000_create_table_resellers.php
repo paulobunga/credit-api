@@ -24,7 +24,7 @@ class CreateTableResellers extends Migration
             $table->string('phone', 20);
             $table->decimal('credit', 14, 4)->default(0);
             $table->decimal('coin', 14, 4)->default(0);
-            $table->string('currency', 3);
+            $table->string('currency', 6);
             $table->decimal('commission_percentage', 5, 4)->default(0);
             $table->unsignedInteger('pending_limit')->default(0);
             $table->unsignedInteger('downline_slot')->default(0);

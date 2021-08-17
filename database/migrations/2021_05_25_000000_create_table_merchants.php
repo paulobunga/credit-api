@@ -43,7 +43,7 @@ class CreateTableMerchants extends Migration
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->string('currency', 3);
+            $table->string('currency', 6);
             $table->decimal('credit', 14, 4)->default(0);
             $table->decimal('transaction_fee', 5, 4)->default(0);
             $table->timestamp('created_at')->useCurrent();

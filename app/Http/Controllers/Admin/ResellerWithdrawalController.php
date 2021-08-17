@@ -18,7 +18,7 @@ class ResellerWithdrawalController extends Controller
             ->with([
                 'reseller'
             ])
-            ->join('resellers', 'resellers.id', '=', 'reseller_withdrawals.id')
+            ->join('resellers', 'resellers.id', '=', 'reseller_withdrawals.reseller_id')
             ->select('reseller_withdrawals.*', 'resellers.name')
             ->allowedFilters([
                 AllowedFilter::partial('name', 'resellers.name'),

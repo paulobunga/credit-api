@@ -22,7 +22,7 @@ class CreateTableReport extends Migration
             $table->unsignedInteger('turnover');
             $table->decimal('credit', 14, 4);
             $table->decimal('transaction_fee', 14, 4);
-            $table->string('currency', 3);
+            $table->string('currency', 6);
             $table->timestamp('created_at')->useCurrent();
         });
 
@@ -34,7 +34,7 @@ class CreateTableReport extends Migration
             $table->unsignedInteger('turnover');
             $table->decimal('payin', 14, 4);
             $table->decimal('payout', 14, 4);
-            $table->string('currency', 3);
+            $table->string('currency', 6);
             $table->timestamp('created_at')->useCurrent();
         });
 

@@ -27,11 +27,13 @@ class BankController extends Controller
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name', 'banks.name'),
                 AllowedFilter::partial('ident'),
+                AllowedFilter::exact('currency'),
                 AllowedFilter::exact('status')
             ])
             ->allowedSorts([
-                AllowedSort::field('id', 'banks.id'),
-                AllowedSort::field('name', 'banks.name'),
+                'id',
+                'name',
+                'currency',
                 'ident',
                 'status'
             ])

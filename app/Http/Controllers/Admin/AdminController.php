@@ -31,9 +31,10 @@ class AdminController extends Controller
             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
             ->select('admins.*', 'roles.name AS role')
             ->allowedFilters([
-                'id',
+                AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),
                 AllowedFilter::partial('role', 'roles.name'),
+                AllowedFilter::exact('status'),
             ])
             ->allowedSorts([
                 'id',

@@ -31,7 +31,7 @@ class CreateTableTransactions extends Migration
             $table->string('user_type', 20);
             $table->unsignedTinyInteger('type');
             $table->decimal('amount', 14, 4);
-            $table->string('currency', 3);
+            $table->string('currency', 6);
             $table->timestamp('created_at')->useCurrent();
         });
     }

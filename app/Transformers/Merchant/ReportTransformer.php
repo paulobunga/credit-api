@@ -15,6 +15,7 @@ class ReportTransformer extends TransformerAbstract
             'turnover' => $report->turnover,
             'credit' => $report->credit,
             'transaction_fee' => $report->transaction_fee,
+            'currency' => $report->currency,
         ];
     }
 }

@@ -23,9 +23,14 @@ class MerchantController extends Controller
     public function index(Request $request)
     {
         $merchants = QueryBuilder::for($this->model)
+            ->with([
+                'credits'
+            ])
             ->allowedFilters([
-                'id',
+                AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),
+                AllowedFilter::exact('currency'),
+                AllowedFilter::exact('status')
             ])
             ->allowedSorts([
                 'id',

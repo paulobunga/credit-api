@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedSort;
 use App\Models\Reseller;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
@@ -31,12 +30,13 @@ class ResellerController extends Controller
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('level'),
+                AllowedFilter::exact('currency'),
                 AllowedFilter::exact('status')
             ])
             ->allowedSorts([
-                AllowedSort::field('id', 'id'),
+                'id',
                 'level',
-                AllowedSort::field('name', 'name'),
+                'name',
                 'username',
                 'phone',
                 'credit',

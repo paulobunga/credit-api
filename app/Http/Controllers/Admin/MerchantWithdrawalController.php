@@ -11,15 +11,35 @@ use Illuminate\Support\Facades\DB;
 class MerchantWithdrawalController extends Controller
 {
     protected $model = \App\Models\MerchantWithdrawal::class;
+
     protected $transformer = \App\Transformers\Admin\MerchantWithdrawalTransformer::class;
 
     public function index(Request $request)
     {
         $merchant_withdrawals = QueryBuilder::for($this->model)
+            ->with([
+                'merchant'
+            ])
+            ->join('merchants', 'merchants.id', '=', 'merchant_withdrawals.merchant_id')
+            ->select('merchant_withdrawals.*', 'merchants.name')
             ->allowedFilters([
-                AllowedFilter::partial('name')
+                AllowedFilter::partial('name', 'merchants.name'),
+                AllowedFilter::exact('status'),
+                AllowedFilter::callback(
+                    'created_at_between',
+                    fn ($query, $v) => $query->whereBetween('merchant_withdrawals.created_at', $v)
+                ),
+            ])
+            ->allowedSorts([
+                'id',
+                'name',
+                'order_id',
+                'amount',
+                'currency',
+                'status'
             ])
             ->paginate($this->perPage);
+
         return $this->response->withPaginator($merchant_withdrawals, $this->transformer);
     }
 

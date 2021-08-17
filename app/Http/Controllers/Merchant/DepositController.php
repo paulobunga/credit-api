@@ -22,6 +22,16 @@ class DepositController extends Controller
                 ->where('merchant_deposits.merchant_id', Auth::id())
         )
             ->allowedFilters('name')
+            ->allowedSorts([
+                'id',
+                'merchant_order_id',
+                'account_name',
+                'account_no',
+                'amount',
+                'status',
+                'callback_url',
+                'attempts'
+            ])
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($deposits, $this->transformer);

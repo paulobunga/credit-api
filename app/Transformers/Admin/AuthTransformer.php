@@ -5,6 +5,7 @@ namespace App\Transformers\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\TransformerAbstract;
+use App\Settings\CurrencySetting;
 
 class AuthTransformer extends TransformerAbstract
 {
@@ -26,7 +27,8 @@ class AuthTransformer extends TransformerAbstract
             'token_type' => 'bearer',
             'expires_in' => Auth::factory()->getTTL() * 60,
             'role' => $admin->roles[0]->name ?? null,
-            'permissions' => $admin->getAllPermissions()->pluck('name')
+            'permissions' => $admin->getAllPermissions()->pluck('name'),
+            'currency' => app(CurrencySetting::class)->toArray(),
         ];
     }
 }

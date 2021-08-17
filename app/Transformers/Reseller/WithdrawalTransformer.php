@@ -11,18 +11,19 @@ class WithdrawalTransformer extends TransformerAbstract
         'transactions',
     ];
 
-    public function transform(Model $withdrawal)
+    public function transform(Model $m)
     {
         return [
-            'id' => $withdrawal->id,
-            'order_id' => $withdrawal->order_id,
-            'amount' => $withdrawal->amount,
-            'status' => $withdrawal->status,
+            'id' => $m->id,
+            'order_id' => $m->order_id,
+            'amount' => $m->amount,
+            'status' => $m->status,
+            'extra' => $m->extra,
         ];
     }
 
-    public function includeTransactions(Model $withdrawal)
+    public function includeTransactions(Model $m)
     {
-        return $this->collection($withdrawal->transactions, new TransactionTransformer, false);
+        return $this->collection($m->transactions, new TransactionTransformer, false);
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 
 class ResellerDepositController extends Controller
 {
@@ -17,10 +18,17 @@ class ResellerDepositController extends Controller
     {
         $reseller_deposits = QueryBuilder::for($this->model)
             ->with([
-                'reseller'
+                'reseller',
+                'auditAdmin'
             ])
             ->join('resellers', 'resellers.id', '=', 'reseller_deposits.reseller_id')
-            ->select('reseller_deposits.*', 'resellers.name')
+            ->join('admins', 'admins.id', '=', 'reseller_deposits.audit_admin_id')
+            ->select(
+                'reseller_deposits.*',
+                'resellers.name AS name',
+                'admins.name AS admin',
+                'resellers.currency AS currency',
+            )
             ->allowedFilters([
                 AllowedFilter::partial('name', 'resellers.name'),
                 AllowedFilter::exact('status'),
@@ -32,9 +40,14 @@ class ResellerDepositController extends Controller
             ->allowedSorts([
                 'id',
                 'name',
+                'transaction_type',
+                'admin',
                 'order_id',
+                'type',
                 'amount',
-                'status'
+                'currency',
+                'status',
+                'created_at'
             ])
             ->paginate($this->perPage);
 
