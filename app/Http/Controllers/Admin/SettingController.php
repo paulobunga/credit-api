@@ -34,7 +34,7 @@ class SettingController extends Controller
         $rules = [
             'admin' => [
                 'white_lists' => 'array',
-                'white_lists.*' => 'distinct|ipv4',
+                'white_lists.*' => 'required|distinct|ipv4',
             ],
             'agent' => [
                 'default_downline_slot' => 'required|numeric|gte:0',

@@ -161,7 +161,7 @@ class MerchantController extends Controller
         $merchant = $this->model::findOrFail($this->parameters('merchant'));
         $this->validate($request, [
             'ip' => 'array',
-            'ip.*' => 'distinct|ipv4',
+            'ip.*' => 'required|distinct|ip',
         ]);
         $merchant_white_lists = \App\Models\MerchantWhiteList::updateOrCreate(
             ['merchant_id' => $merchant->id],

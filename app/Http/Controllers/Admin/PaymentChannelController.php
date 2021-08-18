@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
@@ -21,6 +22,7 @@ class PaymentChannelController extends Controller
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('currency'),
+                AllowedFilter::exact('status'),
             ])
             ->allowedSorts([
                 'id',
@@ -36,17 +38,26 @@ class PaymentChannelController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|unique:payment_channels,name',
-            'payment_methods' => 'required|array|in:' . implode(',', PaymentChannel::METHOD),
+            'name' => [
+                'required',
+                Rule::unique('payment_channels')->where(function ($query) use ($request) {
+                    return $query->where('currency', $request->get('currency', ''));
+                }),
+            ],
+            'payment_methods' => 'required|array',
+            'payment_methods.*' => 'in:' . implode(',', PaymentChannel::METHOD),
             'currency' => 'required|in:' . implode(',', app(\App\Settings\CurrencySetting::class)->types),
             'banks' => 'array',
             'banks.*' => 'exists:banks,id',
+            'attributes' => 'required|array',
+            'attributes.*' => 'required',
             'status' => 'boolean'
         ]);
 
         $model = $this->model::create([
             'name' => $request->name,
             'payment_methods' => implode(',', $request->payment_methods),
+            'attributes' => $request->get('attributes'),
             'currency' => $request->currency,
             'banks' => implode(',', $request->banks),
             'status' => $request->status,
@@ -59,16 +70,25 @@ class PaymentChannelController extends Controller
     {
         $model = $this->model::findOrFail($this->parameters('payment_channel'));
         $this->validate($request, [
-            'name' => "required|unique:payment_channels,name,{$model->id}",
-            'payment_methods' => 'required|array|in:' . implode(',', PaymentChannel::METHOD),
+            'name' => [
+                'required',
+                Rule::unique('payment_channels')->where(function ($query) use ($request) {
+                    return $query->where('currency', $request->get('currency', ''));
+                })->ignore($model->id),
+            ],
+            'payment_methods' => 'required|array',
+            'payment_methods.*' => 'in:' . implode(',', PaymentChannel::METHOD),
             'currency' => 'required|in:' . implode(',', app(\App\Settings\CurrencySetting::class)->types),
             'banks' => 'array',
             'banks.*' => 'exists:banks,id',
+            'attributes' => 'required|array',
+            'attributes.*' => 'required',
             'status' => 'boolean'
         ]);
         $model->update([
             'name' => $request->name,
             'payment_methods' => implode(',', $request->payment_methods),
+            'attributes' => $request->get('attributes'),
             'currency' => $request->currency,
             'banks' => implode(',', $request->banks),
             'status' => $request->status,

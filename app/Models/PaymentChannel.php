@@ -12,6 +12,7 @@ class PaymentChannel extends Model
         'name',
         'banks',
         'currency',
+        'attributes',
         'payment_methods',
         'status',
     ];
@@ -22,6 +23,7 @@ class PaymentChannel extends Model
     ];
 
     protected $casts = [
+        'attributes' => 'array',
         'status' => 'boolean',
         'created_at'  => 'datetime:Y-m-d H:i:s',
     ];

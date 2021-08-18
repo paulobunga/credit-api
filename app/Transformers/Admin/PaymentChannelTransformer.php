@@ -13,6 +13,7 @@ class PaymentChannelTransformer extends TransformerAbstract
             'id' => $m->id,
             'name' => $m->name,
             'banks' => $m->banks,
+            'attributes' => $m->attributes,
             'payment_methods' => $m->payment_methods,
             'currency' => $m->currency,
             'status' => $m->status,

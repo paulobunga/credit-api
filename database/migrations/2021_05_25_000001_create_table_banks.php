@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Query\Expression;
 
 class CreateTableBanks extends Migration
 {
@@ -27,6 +28,7 @@ class CreateTableBanks extends Migration
             $table->string('currency', 6);
             $table->text('payment_methods');
             $table->text('banks');
+            $table->json('attributes')->default(new Expression('(JSON_ARRAY())'));
             $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
             $table->timestamp('created_at')->useCurrent();
             $table->unique(['name', 'currency']);
