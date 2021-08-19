@@ -11,13 +11,10 @@ class ResellerBankCardTransformer extends TransformerAbstract
     {
         return [
             'id' => $m->id,
-            'reseller_name' => $m->reseller->name,
-            'bank_id' => $m->bank->id,
-            'bank_name' => $m->bank->name,
+            'name' => $m->reseller->name,
             'payment_channel_id' => $m->payment_channel_id,
+            'attributes' => $m->attributes,
             'channel' => $m->paymentChannel->name,
-            'account_no' => substr_replace($m->account_no, str_repeat('*', strlen($m->account_no) - 6), 0, -6),
-            'account_name' => $m->account_name,
             'status' => $m->status,
         ];
     }

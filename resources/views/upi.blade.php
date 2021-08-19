@@ -66,25 +66,21 @@
         <div class="row" id="payment_detail">
             <div class="col-md-12">
                 @if($deposit->status == 0)
-                <form 
-                    id="form"
-                    method="post" 
-                    action="<?= app('Dingo\Api\Routing\UrlGenerator')->version(env('API_VERSION'))
-                        ->route('api.deposits.update',$deposit->merchant_order_id) ?>">
-                        <input type="hidden" name="_method" value="put" />
-                        <input type="hidden" name="merchant_id" value="{{ $deposit->merchant_id }}" />
+                <form id="form" method="post" action="<?= app('Dingo\Api\Routing\UrlGenerator')->version(env('API_VERSION'))->route('api.deposits.update', $deposit->merchant_order_id) ?>">
+                    <input type="hidden" name="_method" value="put" />
+                    <input type="hidden" name="merchant_id" value="{{ $deposit->merchant_id }}" />
                     @endif
                     <div class="card p-3">
                         <div class="mb-3 row">
                             <div class="col-sm-12 mb-3 text-center">
-                            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(250)->generate($deposit->resellerBankCard->account_no) !!}
+                                {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(250)->generate($bankCard['attributes']['upi_id']) !!}
                             </div>
                         </div>
                         <div class="mb-3 row">
                             <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">UPI ID</label>
                             <div class="col-sm-10 mb-3">
                                 <div class="input-group">
-                                    <input id="account_no" type="text" class="form-control readonly" required="required" readonly value="<?= $deposit->resellerBankCard->account_no ?>">
+                                    <input id="account_no" type="text" class="form-control readonly" required="required" readonly value="<?= $bankCard['attributes']['upi_id'] ?>">
                                     <button class="btn btn-primary" data-clipboard-target="#account_no"><i class="fas fa-copy"></i></button>
                                 </div>
                             </div>
@@ -96,8 +92,8 @@
                         <div class="mb-3 row align-items-center">
                             <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">Reference No</label>
                             @if($deposit->status == 0)
-                            <input class="col-sm-10 col-form-label fw-bold fs-5" name="reference_no" value="" placeholder="Please input reference number"/>
-                            @else 
+                            <input class="col-sm-10 col-form-label fw-bold fs-5" name="reference_no" value="" placeholder="Please input reference number" />
+                            @else
                             <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">{{ $deposit->reference_no }}</label>
                             @endif
                         </div>
@@ -105,7 +101,7 @@
                         <button type="submit" class="btn btn-primary">Submit</button>
                         @endif
                     </div>
-                @if($deposit->status == 0)
+                    @if($deposit->status == 0)
                 </form>
                 @endif
             </div>
@@ -124,20 +120,20 @@
 <script>
     $(document).ready(function() {
         @if($deposit->status == 0)
-            $('#clock-c').countdown("<?= $deposit->created_at->addHours(1)->toDateTimeString() ?>", function(event) {
-                var $this = $(this).html(event.strftime('' +
-                    '<span class="h1 font-weight-bold">%M</span> Min' +
-                    '<span class="h1 font-weight-bold">%S</span> Sec'));
-            }).on('finish.countdown', function(e) {
-                $('#expiration').show();
-            });
-            @if($deposit->created_at->addHours(1) <= \Carbon\Carbon::now())
+        $('#clock-c').countdown("<?= $deposit->created_at->addHours(1)->toDateTimeString() ?>", function(event) {
+            var $this = $(this).html(event.strftime('' +
+                '<span class="h1 font-weight-bold">%M</span> Min' +
+                '<span class="h1 font-weight-bold">%S</span> Sec'));
+        }).on('finish.countdown', function(e) {
+            $('#expiration').show();
+        });
+        @if($deposit->created_at->addHours(1) <= \Carbon\Carbon::now())
             $('#expiration').show();
         @endif
         @else
-            $('#expiration').text('Your order is pending, please wait it completed').show();
+        $('#expiration').text('Your order is pending, please wait it completed').show();
         @endif
-        $( "#form").submit(function( event ) {
+        $("#form").submit(function(event) {
             event.preventDefault();
             $.ajax({
                 url: $(this).attr('action'),

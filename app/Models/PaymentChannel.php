@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Observers\PaymentChannelObserver;
 
 class PaymentChannel extends Model
 {
+    use PaymentChannelObserver;
+
     public $timestamps = false;
 
     protected $fillable = [

@@ -3,32 +3,35 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\Rule;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Trait\SignValidator;
 use App\Transformers\Api\DepositTransformer;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Validation\Rule;
 use \App\Models\MerchantDeposit;
-use Carbon\Carbon;
+use App\Models\PaymentChannel;
+use App\Models\ResellerBankCard;
 
 class DepositController extends Controller
 {
     use SignValidator;
 
     protected $model = MerchantDeposit::class;
-    protected $transformer = \App\Transformers\Api\DepositTransformer::class;
+    protected $transformer = DepositTransformer::class;
 
     public function index(Request $request)
     {
-        $merchant = $this->validateSign(request());
-        $merchant_deposits = QueryBuilder::for($this->model::where('merchant_id', $merchant->id))
+        $merchant = $this->validateSign($request);
+        $merchant_deposits = QueryBuilder::for($this->model)
             ->allowedFilters([
                 'merchant_order_id',
                 'order_id'
             ])
+            ->where('merchant_id', $merchant->id)
             ->paginate($this->perPage);
+
         return $this->response->withPaginator($merchant_deposits, new DepositTransformer);
     }
 
@@ -46,57 +49,84 @@ class DepositController extends Controller
     public function store(Request $request)
     {
         $merchant = $this->validateSign($request);
+        $cs = app(\App\Settings\CurrencySetting::class);
         $this->validate($request, [
             'merchant_order_id' => [
                 'required',
-                Rule::unique('merchant_deposits')->where(function ($query) use ($request, $merchant) {
-                    return $query->where([
-                        'merchant_id' => $merchant->id,
-                        'merchant_order_id' => $request->merchant_order_id
-                    ]);
+                Rule::unique('merchant_deposits')->where(function ($query) use ($merchant) {
+                    return $query->where('merchant_id', $merchant->id);
                 }),
             ],
-            'account_no' => 'required',
-            'account_name' => 'required_if:type,online_bank',
-            'type' => 'required',
-            'amount' => 'numeric|min:10',
+            'currency' => 'required|in:' . implode(',', $cs->types),
+            'channel' => 'required',
+            'amount' => 'required|numeric|min:1',
         ]);
+        $channel = PaymentChannel::where([
+            'status' => true,
+            'currency' => $request->currency,
+            'name' => $request->channel
+        ])->firstOrFail();
 
-        $reseller_bank_card = \App\Models\ResellerBankCard::whereHas(
-            'paymentMethod',
-            function (Builder $query) use ($request) {
-                $query->where('payment_methods.name', strtolower($request->type));
+        // $attributes = $channel->validate($request->all());
+
+        $sql = "SELECT 
+                    rbc.id,
+                    pc.name AS channel,
+                    pc.currency AS currency,
+                    rbc.reseller_id,
+                    rbc.attributes,
+                    r.pending_limit,
+                    SUM(
+                        CASE
+                            WHEN md.amount = :amount THEN r.pending_limit
+                            WHEN md.amount > 0 THEN 1
+                            ELSE 0
+                        END
+                    ) AS pending
+                FROM payment_channels AS pc
+                INNER JOIN reseller_bank_cards AS rbc ON pc.id = rbc.payment_channel_id
+                LEFT JOIN resellers AS r ON rbc.reseller_id = r.id
+                LEFT JOIN merchant_deposits AS md ON rbc.id = md.reseller_bank_card_id 
+                    AND md.status <= :merchant_deposit_status
+                WHERE pc.currency = :currency 
+                    AND pc.name = :channel 
+                    AND pc.status = :channel_status
+                    AND rbc.status = :card_status
+                GROUP BY rbc.id
+                ORDER BY pending ASC
+                ";
+
+        $rows = DB::select($sql, [
+            'currency' => $request->currency,
+            'amount' => $request->amount,
+            'channel' => $request->channel,
+            'channel_status' => 1,
+            'merchant_deposit_status' => MerchantDeposit::STATUS['PENDING'],
+            'card_status' => ResellerBankCard::STATUS['ACTIVE'],
+        ]);
+        // dd($rows);
+        foreach ($rows as $row) {
+            if ($row->pending >= $row->pending_limit) {
+                continue;
+            } else {
+                $reseller_bank_card = $row;
+                break;
             }
-        )
-            ->whereHas(
-                'merchantDeposits',
-                function (Builder $query) {
-                    $query->where('merchant_deposits.status', '<', 2);
-                },
-                '<',
-                5
-            )
-            ->whereDoesntHave(
-                'merchantDeposits',
-                function (Builder $query) use ($request) {
-                    $query->where('merchant_deposits.status', '<', 2)
-                        ->where('merchant_deposits.amount', '=', $request->amount);
-                }
-            )
-            ->where('status', true)->inRandomOrder()->firstOrFail();
+        }
+        if (!isset($reseller_bank_card)) {
+            throw new \Exception('BankCard are unavailable!', 404);
+        }
         DB::beginTransaction();
         try {
-            $last_order_id = $this->model::lockForUpdate()->latest()->first()->id ?? 0;
-            $last_order_id += 1;
             $merchant_deposit = $this->model::create([
                 'merchant_id' => $merchant->id,
                 'reseller_id' => $reseller_bank_card->reseller_id,
                 'reseller_bank_card_id' => $reseller_bank_card->id,
-                'order_id' => '#' . str_pad($last_order_id, 8, "0", STR_PAD_LEFT) . time(),
                 'merchant_order_id' => $request->merchant_order_id,
-                'account_no' => $request->account_no,
-                'account_name' => $request->get('account_name', ''),
+                'account_no' => '',
+                'account_name' => '',
                 'amount' => $request->amount,
+                'currency' => $request->currency,
                 'status' => MerchantDeposit::STATUS['PENDING'],
                 'callback_url' => $merchant->callback_url,
                 'reference_no' => ''
@@ -129,7 +159,7 @@ class DepositController extends Controller
             'merchant_id' => $request->merchant_id,
             'merchant_order_id' => $this->parameters('deposit')
         ])->firstOrFail();
-        if ($deposit->status != 0) {
+        if ($deposit->status != MerchantDeposit::STATUS['CREATED']) {
             throw new \Exception('deposit is already pending', 510);
         }
         $deposit->update([
@@ -146,11 +176,14 @@ class DepositController extends Controller
         $this->validate($request, [
             'time' => 'required|numeric',
         ]);
-        $deposit = $this->model::with(['merchant', 'resellerBankCard', 'bank'])->where([
+        $deposit = $this->model::with(['merchant', 'resellerBankCard'])->where([
             'merchant_id' => $merchant->id,
             'merchant_order_id' => $request->merchant_order_id,
         ])->firstOrFail();
 
-        return view($deposit->paymentMethod->name, compact('deposit'));
+        return view($deposit->paymentChannel->name, [
+            'deposit' => $deposit,
+            'bankCard' => $deposit->resellerBankCard->toArray()
+        ]);
     }
 }

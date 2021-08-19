@@ -43,11 +43,11 @@ class BankCardController extends Controller
             ->where('status', true)
             ->where('currency', Auth::user()->currency)
             ->firstOrFail();
-        // $payment_channel->validate($request);
+        $attributes = $payment_channel->validate($request->get('attributes'));
         $bankcard = $this->model::create([
             'reseller_id' => Auth::id(),
             'payment_channel_id' => $payment_channel->id,
-            'attributes' => $request->get('attributes'),
+            'attributes' => $attributes,
             'status' => ResellerBankCard::STATUS['INACTIVE']
         ]);
 
@@ -56,7 +56,7 @@ class BankCardController extends Controller
 
     public function update(Request $request)
     {
-        $bankcard = $this->model::where([
+        $bankcard = $this->model::with('paymentChannel')->where([
             'id' => $this->parameters('bankcard'),
             'reseller_id' => Auth::id()
         ])->firstOrFail();
@@ -64,9 +64,9 @@ class BankCardController extends Controller
         $this->validate($request, [
             'attributes' => 'required|array'
         ]);
-
+        $attributes = $bankcard->paymentChannel->validate($request->get('attributes'));
         $bankcard->update([
-            'attributes' => $request->get('attributes'),
+            'attributes' => $attributes,
         ]);
 
         return $this->response->item($bankcard, $this->transformer);

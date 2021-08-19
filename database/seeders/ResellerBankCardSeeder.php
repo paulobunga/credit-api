@@ -28,8 +28,7 @@ class ResellerBankCardSeeder extends Seeder
                     'reseller_id' => $reseller->id,
                     'payment_channel_id' => $ch->id
                 ]);
-                $card->status = $reseller->name == 'Test Reseller' ?
-                    ResellerBankCard::STATUS['ACTIVE']  : ResellerBankCard::STATUS['INACTIVE'];
+                $card->status = ResellerBankCard::STATUS['ACTIVE'];
                 switch ($ch->name) {
                     case 'NETBANK':
                         $attributes = [

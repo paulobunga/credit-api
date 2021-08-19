@@ -59,7 +59,7 @@ class MerchantDeposit extends Model
             'reseller_id'
         );
     }
-    
+
     public function resellerBankCard()
     {
         return $this->hasOne(ResellerBankCard::class, 'id', 'reseller_bank_card_id');
@@ -77,9 +77,16 @@ class MerchantDeposit extends Model
         );
     }
 
-    public function paymentMethod()
+    public function paymentChannel()
     {
-        return $this->resellerBankCard->paymentMethod();
+        return $this->hasOneThrough(
+            PaymentChannel::class,
+            ResellerBankCard::class,
+            'id',
+            'id',
+            'reseller_bank_card_id',
+            'payment_channel_id'
+        );
     }
 
     public function transactions()

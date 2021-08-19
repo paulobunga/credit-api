@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use App\Models\ResellerBankCard;
 
 class ResellerBankCardController extends Controller
 {
-    protected $model = \App\Models\ResellerBankCard::class;
+    protected $model = ResellerBankCard::class;
 
     protected $transformer = \App\Transformers\Admin\ResellerBankCardTransformer::class;
 
@@ -18,32 +19,24 @@ class ResellerBankCardController extends Controller
         $reseller_bank_card = QueryBuilder::for($this->model)
             ->with([
                 'reseller',
-                'bank',
                 'paymentChannel',
             ])
-            ->join('banks', 'banks.id', '=', 'reseller_bank_cards.bank_id')
             ->join('resellers', 'resellers.id', '=', 'reseller_bank_cards.reseller_id')
             ->join('payment_channels', 'payment_channels.id', '=', 'reseller_bank_cards.payment_channel_id')
             ->select(
                 'reseller_bank_cards.*',
-                'banks.name AS bank_name',
-                'resellers.name AS reseller_name',
+                'resellers.name AS name',
                 'payment_channels.name AS channel'
             )
             ->allowedFilters([
-                'id',
-                'name',
-                AllowedFilter::partial('channel'),
-                AllowedFilter::partial('bank_name'),
-                AllowedFilter::partial('reseller_name'),
+                AllowedFilter::exact('id'),
+                AllowedFilter::partial('name', 'resellers.name'),
+                AllowedFilter::partial('channel', 'payment_channels.name'),
             ])
             ->allowedSorts([
                 'id',
-                'reseller_name',
-                'bank_name',
+                'name',
                 'channel',
-                'account_no',
-                'account_name',
                 'status'
             ])
             ->paginate($this->perPage);
@@ -55,18 +48,16 @@ class ResellerBankCardController extends Controller
     {
         $reseller_bank_card = $this->model::findOrFail($this->parameters('reseller_bank_card'));
         $this->validate($request, [
-            'bank_id' => "required",
-            'account_name' => 'required_if:type,online_bank',
-            'account_no' => 'required',
+            'attributes' => "required",
+            'status' => 'required|in:' . implode(',', ResellerBankCard::STATUS),
         ]);
-        if (!in_array($request->bank_id, $reseller_bank_card->paymentChannel->banks->pluck('id')->toArray())) {
-            throw new \Exception('Bank is not supported for current payment channel', 405);
-        }
+        // if (!in_array($request->bank_id, $reseller_bank_card->paymentChannel->banks->pluck('id')->toArray())) {
+        //     throw new \Exception('Bank is not supported for current payment channel', 405);
+        // }
 
         $reseller_bank_card->update([
-            'bank_id' => $request->bank_id,
-            'account_no' => $request->account_no,
-            'account_name' => $request->account_name ?? '',
+            'status' => $request->status,
+            'attributes' => $request->get('attributes')
         ]);
 
         return $this->response->item($reseller_bank_card, $this->transformer);

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Dingo\Api\Routing\Helpers;
+
 use Laravel\Lumen\Routing\Controller as BaseController;
-use App\Exceptions\RouteNotFoundException;
-use Dingo\Api\Http\Request;
 use Illuminate\Support\Arr;
+use Dingo\Api\Http\Request;
+use Dingo\Api\Routing\Helpers;
+use App\Exceptions\RouteNotFoundException;
 use App\Exceptions\ValidationHttpException;
 
 abstract class Controller extends BaseController
