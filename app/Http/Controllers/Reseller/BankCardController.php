@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Reseller;
 
 use App\Http\Controllers\Controller;
+use App\Models\ResellerBankCard;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,6 @@ class BankCardController extends Controller
     {
         $bankcards = QueryBuilder::for($this->model)
             ->with([
-                'bank',
                 'paymentChannel',
             ])
             ->allowedFilters([
@@ -35,21 +35,20 @@ class BankCardController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'bank_id' => "required|exists:banks,id",
             'channel' => 'required',
-            'account_name' => 'required_if:type,online_bank',
-            'account_no' => 'required',
-            'status' => 'required|boolean',
+            'attributes' => 'required|array'
         ]);
+
         $payment_channel = \App\Models\PaymentChannel::where('name', $request->channel)
-            ->where('currency', Auth::user()->currency)->firstOrFail();
+            ->where('status', true)
+            ->where('currency', Auth::user()->currency)
+            ->firstOrFail();
+        // $payment_channel->validate($request);
         $bankcard = $this->model::create([
             'reseller_id' => Auth::id(),
-            'bank_id' => $request->bank_id,
             'payment_channel_id' => $payment_channel->id,
-            'account_name' => $request->get('account_name', ''),
-            'account_no' => $request->account_no,
-            'status' => $request->status
+            'attributes' => $request->get('attributes'),
+            'status' => ResellerBankCard::STATUS['INACTIVE']
         ]);
 
         return $this->response->item($bankcard, $this->transformer);
@@ -61,16 +60,13 @@ class BankCardController extends Controller
             'id' => $this->parameters('bankcard'),
             'reseller_id' => Auth::id()
         ])->firstOrFail();
+
         $this->validate($request, [
-            'account_name' => 'required_if:type,online_bank',
-            'account_no' => 'required',
-            'status' => 'required|boolean',
+            'attributes' => 'required|array'
         ]);
 
         $bankcard->update([
-            'account_no' => $request->account_no,
-            'account_name' => $request->account_name,
-            'status' => $request->status
+            'attributes' => $request->get('attributes'),
         ]);
 
         return $this->response->item($bankcard, $this->transformer);

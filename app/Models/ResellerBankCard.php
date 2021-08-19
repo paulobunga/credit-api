@@ -3,33 +3,31 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ResellerBankCard extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'reseller_id',
-        'bank_id',
         'payment_channel_id',
-        'account_no',
-        'account_name',
+        'attributes',
         'status',
     ];
 
     protected $casts = [
-        'status' => 'boolean',
+        'attributes' => 'array',
+        'created_at'  => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
+
+    public const STATUS = [
+        'INACTIVE' => 0,
+        'ACTIVE' => 1,
+        'DISABLED' => 2,
     ];
 
     public function reseller()
     {
         return $this->belongsTo(Reseller::class);
-    }
-
-    public function bank()
-    {
-        return $this->belongsTo(Bank::class);
     }
 
     public function paymentChannel()

@@ -18,33 +18,62 @@ class BankSeeder extends Seeder
         Bank::factory()->count(11)->create();
         $channels = [
             'NETBANK' => [
-                'methods' => [
-                    PaymentChannel::METHOD['TEXT'],
+                'INR' => [
+                    'banks' => Bank::where('currency', 'INR')->limit(3)->pluck('id')->toArray(),
+                    'methods' => [
+                        PaymentChannel::METHOD['TEXT'],
+                    ],
+                    'attributes' => ['account_number', 'account_name', 'ifsc_code']
                 ],
-                'currency' => [
-                    'IND' => Bank::where('currency', 'IND')->limit(3)->pluck('id')->toArray(),
-                    'VND' => Bank::where('currency', 'VND')->limit(3)->pluck('id')->toArray(),
-                ],
+                'VND' => [
+                    'banks' => Bank::where('currency', 'VND')->limit(3)->pluck('id')->toArray(),
+                    'methods' => [
+                        PaymentChannel::METHOD['TEXT'],
+                    ],
+                    'attributes' => ['account_number', 'account_name', 'bank_name']
+                ]
             ],
             'UPI' => [
-                'methods' => [
-                    PaymentChannel::METHOD['QRCODE'],
+                'INR' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['TEXT'],
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['upi_id']
                 ],
-                'currency' => ['IND' => []],
             ],
-            'WALLET' => [
-                'methods' => [
-                    PaymentChannel::METHOD['QRCODE'],
-                ],
-                'currency' => ['USDT' => []],
+            'MOMOPAY' => [
+                'VND' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['qrcode']
+                ]
+            ],
+            'ZALOPAY' => [
+                'VND' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['qrcode']
+                ]
+            ],
+            'VIETTELPAY' => [
+                'VND' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['qrcode']
+                ]
             ],
         ];
         foreach ($channels as $name => $ch) {
-            foreach ($ch['currency'] as $currency => $banks) {
+            foreach ($ch as $currency => $s) {
                 PaymentChannel::create([
                     'name' => $name,
-                    'payment_methods' => implode(',', $ch['methods']),
-                    'banks' => implode(',', $banks),
+                    'payment_methods' => implode(',', $s['methods']),
+                    'attributes' => $s['attributes'],
+                    'banks' => implode(',', $s['banks'] ?? []),
                     'currency' => $currency,
                     'status' => true,
                 ]);

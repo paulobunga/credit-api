@@ -6,6 +6,6 @@ class CreateCurrencySettings extends SettingsMigration
 {
     public function up(): void
     {
-        $this->migrator->add('currency.types', ['VND', 'IND']);
+        $this->migrator->add('currency.types', ['VND', 'INR']);
     }
 }

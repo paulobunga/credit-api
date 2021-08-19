@@ -24,23 +24,40 @@ class ResellerBankCardSeeder extends Seeder
     {
         foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
             foreach (PaymentChannel::where('currency', $reseller->currency)->get() as $ch) {
-                $card = ResellerBankCard::factory()->make([
-                    'bank_id' => $ch->banks->isEmpty() ?
-                        0 : Arr::random($ch->banks->pluck('id')->toArray()),
+                $card = new ResellerBankCard([
                     'reseller_id' => $reseller->id,
                     'payment_channel_id' => $ch->id
                 ]);
-                $card->status = $reseller->name == 'Test Reseller' ? 1 : 0;
+                $card->status = $reseller->name == 'Test Reseller' ?
+                    ResellerBankCard::STATUS['ACTIVE']  : ResellerBankCard::STATUS['INACTIVE'];
                 switch ($ch->name) {
+                    case 'NETBANK':
+                        $attributes = [
+                            'account_number' => $this->faker->unique()->bankAccountNumber,
+                            'account_name' => $this->faker->name,
+                        ];
+                        if ($card->reseller->currency == 'VND') {
+                            $attributes['bank_name'] = $this->faker->name . ' bank';
+                        } elseif ($card->reseller->currency == 'INR') {
+                            $attributes['ifsc_code'] = $this->faker->unique()->numerify('###########');
+                        }
+                        break;
                     case 'UPI':
-                        $card->account_name = '';
-                        $card->account_no = Str::random(40) . '@upi';
+                        $attributes = [
+                            'upi_id' =>  Str::random(40) . '@upi'
+                        ];
                         break;
-                    case 'WALLET':
-                        $card->account_name = '';
-                        $card->account_no = 'bc' . Str::random(40);
+                    case 'VIETTELPAY':
+                    case 'ZALOPAY':
+                    case 'MOMOPAY':
+                        $attributes = [
+                            'qrcode' =>  'https://google.com.tw'
+                        ];
                         break;
+                    default:
+                        $attributes = [];
                 }
+                $card->attributes = $attributes;
                 $card->save();
             }
         }
