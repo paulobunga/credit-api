@@ -26,17 +26,20 @@ class ResellerBankCardController extends Controller
             ->select(
                 'reseller_bank_cards.*',
                 'resellers.name AS name',
-                'payment_channels.name AS channel'
+                'payment_channels.name AS channel',
+                'payment_channels.currency AS currency'
             )
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name', 'resellers.name'),
                 AllowedFilter::partial('channel', 'payment_channels.name'),
+                AllowedFilter::exact('currency', 'payment_channels.currency'),
             ])
             ->allowedSorts([
                 'id',
                 'name',
                 'channel',
+                'currency',
                 'status'
             ])
             ->paginate($this->perPage);

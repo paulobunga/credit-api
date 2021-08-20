@@ -15,14 +15,15 @@ class MerchantDeposit extends Model
         'reseller_bank_card_id',
         'order_id',
         'merchant_order_id',
-        'account_no',
-        'account_name',
+        'method',
         'amount',
         'currency',
         'status',
         'callback_status',
         'attempts',
         'callback_url',
+        'account_no',
+        'account_name',
         'reference_no',
         'extra'
     ];

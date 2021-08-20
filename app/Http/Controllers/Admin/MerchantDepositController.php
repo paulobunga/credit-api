@@ -11,6 +11,7 @@ use Spatie\QueryBuilder\AllowedSort;
 class MerchantDepositController extends Controller
 {
     protected $model = \App\Models\MerchantDeposit::class;
+    
     protected $transformer = \App\Transformers\Admin\MerchantDepositTransformer::class;
 
     public function index(Request $request)

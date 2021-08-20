@@ -19,6 +19,7 @@ class MerchantDepositTransformer extends TransformerAbstract
             'order_id' => $m->order_id,
             'merchant_order_id' => $m->merchant_order_id,
             'reseller_name' => $m->reseller->name,
+            'method' => $m->method,
             'amount' => $m->amount,
             'currency' => $m->currency,
             'status' => $m->status,

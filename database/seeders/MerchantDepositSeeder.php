@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 use App\Models\Merchant;
 use App\Models\ResellerBankCard;
 use App\Models\MerchantDeposit;
@@ -34,12 +35,13 @@ class MerchantDepositSeeder extends Seeder
                 })->inRandomOrder()->first();
                 MerchantDeposit::create([
                     'merchant_order_id' => $this->faker->isbn13,
-                    'account_no' => $this->faker->bankAccountNumber,
-                    'account_name' => $this->faker->name,
+                    'method' => Arr::random($reseller_bank_card->PaymentChannel->payment_methods),
+                    'account_no' => '',
+                    'account_name' => '',
                     'amount' => 1000,
                     'currency' => $credit->currency,
                     'callback_url' => $this->faker->domainName . '/' . $this->faker->word,
-                    'reference_no' => $this->faker->numerify('N-########'),
+                    'reference_no' => '',
                     'merchant_id' => $merchant->id,
                     'reseller_bank_card_id' => $reseller_bank_card->id,
                     'status' => MerchantDeposit::STATUS['APPROVED'],

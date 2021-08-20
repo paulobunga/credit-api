@@ -15,6 +15,7 @@ class ResellerBankCardTransformer extends TransformerAbstract
             'payment_channel_id' => $m->payment_channel_id,
             'attributes' => $m->attributes,
             'channel' => $m->paymentChannel->name,
+            'currency' => $m->paymentChannel->currency,
             'status' => $m->status,
         ];
     }

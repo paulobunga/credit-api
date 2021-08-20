@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Illuminate\Support\Arr;
 use Dingo\Api\Http\Request;

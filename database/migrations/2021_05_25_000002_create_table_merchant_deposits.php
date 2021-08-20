@@ -20,6 +20,7 @@ class CreateTableMerchantDeposits extends Migration
                 ->constrained();
             $table->foreignId('reseller_bank_card_id')
                 ->constrained();
+            $table->string('method', 10);
             $table->string('order_id', 60)->unique();
             $table->string('merchant_order_id', 60);
             $table->string('account_name', 64)->default('');
