@@ -59,7 +59,9 @@ class DepositController extends Controller
             ],
             'currency' => 'required|in:' . implode(',', $cs->types),
             'channel' => 'required',
+            'method' => 'required',
             'amount' => 'required|numeric|min:1',
+            'callback_url' => 'nullable|url'
         ]);
         $channel = PaymentChannel::where([
             'status' => true,
@@ -67,6 +69,9 @@ class DepositController extends Controller
             'name' => $request->channel
         ])->firstOrFail();
 
+        if (!in_array($request->method, $channel->paymentMethods)) {
+            throw new \Exception('Method is not supported!', 405);
+        }
         // $attributes = $channel->validate($request->all());
 
         $sql = "SELECT 
@@ -92,12 +97,14 @@ class DepositController extends Controller
                     AND pc.name = :channel 
                     AND pc.status = :channel_status
                     AND rbc.status = :card_status
+                    AND r.credit >= :credit
                 GROUP BY rbc.id
                 ORDER BY pending ASC
                 ";
 
         $rows = DB::select($sql, [
             'currency' => $request->currency,
+            'credit' => $request->amount,
             'amount' => $request->amount,
             'channel' => $request->channel,
             'channel_status' => 1,
@@ -123,12 +130,13 @@ class DepositController extends Controller
                 'reseller_id' => $reseller_bank_card->reseller_id,
                 'reseller_bank_card_id' => $reseller_bank_card->id,
                 'merchant_order_id' => $request->merchant_order_id,
-                'account_no' => '',
-                'account_name' => '',
+                'method' => $request->method,
                 'amount' => $request->amount,
                 'currency' => $request->currency,
                 'status' => MerchantDeposit::STATUS['PENDING'],
-                'callback_url' => $merchant->callback_url,
+                'callback_url' => $request->get('callback_url', $merchant->callback_url),
+                'account_no' => '',
+                'account_name' => '',
                 'reference_no' => ''
             ]);
         } catch (\Exception $e) {
@@ -176,14 +184,17 @@ class DepositController extends Controller
         $this->validate($request, [
             'time' => 'required|numeric',
         ]);
-        $deposit = $this->model::with(['merchant', 'resellerBankCard'])->where([
+        $deposit = $this->model::with(['merchant', 'resellerBankCard', 'paymentChannel'])->where([
             'merchant_id' => $merchant->id,
             'merchant_order_id' => $request->merchant_order_id,
         ])->firstOrFail();
+        $channel = $deposit->paymentChannel;
 
-        return view($deposit->paymentChannel->name, [
+        return view(strtolower($deposit->method), [
             'deposit' => $deposit,
-            'bankCard' => $deposit->resellerBankCard->toArray()
+            'channel' => $channel,
+            'subview' => strtolower("{$deposit->method}s.{$channel->name}.{$channel->currency}"),
+            'attributes' => $deposit->resellerBankCard->attributes
         ]);
     }
 }
