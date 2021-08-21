@@ -9,9 +9,8 @@ return [
     'settings' => [
         \App\Settings\AdminSetting::class,
         \App\Settings\AgentSetting::class,
-        \App\Settings\CommissionSetting::class,
+        \App\Settings\CurrencySetting::class,
         \App\Settings\ResellerSetting::class,
-        \App\Settings\CurrencySetting::class
     ],
 
     /*

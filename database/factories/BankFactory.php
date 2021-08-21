@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BankFactory extends Factory
@@ -26,7 +25,7 @@ class BankFactory extends Factory
         return [
             'name' => $this->faker->word . ' bank',
             'ident' => substr($this->faker->unique()->swiftBicNumber, 0, 6),
-            'currency' => Arr::random($setting->types),
+            'currency' => array_rand($setting->currency),
             'status' => true,
         ];
     }

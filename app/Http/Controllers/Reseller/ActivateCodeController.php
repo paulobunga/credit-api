@@ -53,7 +53,7 @@ class ActivateCodeController extends Controller
         $code = $this->model::create([
             'reseller_id' => Auth::id(),
             'status' => ResellerActivateCode::STATUS['PENDING'],
-            'expired_at' => Carbon::now()->addMinutes(1)
+            'expired_at' => Carbon::now()->addMinutes(600)
         ]);
 
         return $this->response->item($code, $this->transformer);

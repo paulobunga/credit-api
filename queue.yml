@@ -3,7 +3,7 @@ apps:
     script: artisan
     watch: false
     interpreter: php
-    args: "queue:listen redis --queue=default"
+    args: "queue:listen redis --queue=default --timeout 30"
     restart_delay: 3000
     error_file: ./storage/logs/http/error.log
     out_file: ./storage/logs/http/out.log
@@ -12,7 +12,7 @@ apps:
     script: artisan
     watch: false
     interpreter: php
-    args: "queue:listen redis --queue=echo"
+    args: "queue:listen redis --queue=echo --timeout 30"
     restart_delay: 3000
     error_file: ./storage/logs/laravel-echo/error.log
     out_file: ./storage/logs/laravel-echo/out.log

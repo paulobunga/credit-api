@@ -15,8 +15,9 @@ class MerchantSeeder extends Seeder
      *
      * @return void
      */
-    public function run(CurrencySetting $cs)
+    public function run(CurrencySetting $c)
     {
+        // create VND test merchant
         $merchant = Merchant::factory()->create([
             'uuid' => '224d4a1f-6fc5-4039-bd81-fcbc7f88c659',
             'name' => 'Test Merchant',
@@ -27,31 +28,27 @@ class MerchantSeeder extends Seeder
             'status' => true,
         ]);
         $merchant->credits()->create([
-            'currency' => $cs->types[0],
+            'currency' => 'VND',
             'credit' => 0,
             'transaction_fee' => 0.001
         ]);
-        $merchant = Merchant::factory()->create([
-            'username' => 'merchant1@gmail.com',
-        ]);
-        $merchant->credits()->create([
-            'currency' => $cs->types[1],
-            'credit' => 0,
-            'transaction_fee' => 0.001
-        ]);
-        $merchant = Merchant::factory()->create([
-            'username' => 'merchant2@gmail.com',
-        ]);
-        $merchant->credits()->create([
-            'currency' => $cs->types[0],
-            'credit' => 0,
-            'transaction_fee' => 0.001
-        ]);
-        $merchant->credits()->create([
-            'currency' => $cs->types[1],
-            'credit' => 0,
-            'transaction_fee' => 0.001
-        ]);
+        foreach (range(1, 2) as $i) {
+            $merchant = Merchant::factory()->create([
+                'username' => "merchant{$i}@gmail.com",
+            ]);
+            $count = 0;
+            foreach ($c->currency as $currency => $v) {
+                if ($count == $i) {
+                    break;
+                }
+                $merchant->credits()->create([
+                    'currency' => $currency,
+                    'credit' => 0,
+                    'transaction_fee' => $v['transaction_fee_percentage']
+                ]);
+                ++$count;
+            }
+        }
 
         foreach (Merchant::all() as $merchant) {
             MerchantWhiteList::factory()->create([

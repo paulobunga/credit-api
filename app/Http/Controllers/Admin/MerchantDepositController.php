@@ -17,14 +17,22 @@ class MerchantDepositController extends Controller
     public function index(Request $request)
     {
         $merchant_deposits = QueryBuilder::for($this->model)
-            ->with(['merchant', 'reseller'])
+            ->with(['merchant', 'reseller', 'paymentChannel'])
             ->join('merchants', 'merchants.id', '=', 'merchant_deposits.merchant_id')
             ->join('reseller_bank_cards', 'reseller_bank_cards.id', '=', 'merchant_deposits.reseller_bank_card_id')
             ->join('resellers', 'resellers.id', '=', 'reseller_bank_cards.reseller_id')
-            ->select('merchant_deposits.*', 'merchants.name')
+            ->join('payment_channels', 'payment_channels.id', '=', 'reseller_bank_cards.payment_channel_id')
+            ->select(
+                'merchant_deposits.*',
+                'merchants.name AS merchant_name',
+                'resellers.name AS reseller_name',
+                'payment_channels.name AS channel'
+            )
             ->allowedFilters([
+                AllowedFilter::exact('id'),
                 AllowedFilter::partial('order_id'),
                 AllowedFilter::partial('merchant_order_id'),
+                AllowedFilter::partial('channel', 'payment_channels.name'),
                 AllowedFilter::partial('merchant_name', 'merchants.name'),
                 AllowedFilter::partial('reseller_name', 'resellers.name'),
                 AllowedFilter::partial('status', 'merchant_deposits.status'),
@@ -36,6 +44,10 @@ class MerchantDepositController extends Controller
             ->allowedSorts([
                 AllowedSort::field('id', 'merchant_deposits.id'),
                 AllowedSort::field('name', 'merchants.name'),
+                'method',
+                'currency',
+                'callback_url',
+                AllowedSort::field('channel', 'payment_channels.name'),
                 AllowedSort::field('order_id'),
                 AllowedSort::field('merchant_order_id'),
                 AllowedSort::field('reseller_name', 'resellers.name'),

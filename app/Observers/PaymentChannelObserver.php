@@ -22,7 +22,7 @@ trait PaymentChannelObserver
         if (empty($attributes)) {
             throw new \Exception('Payment Channel attributes is empty', 405);
         }
-        
+
         $request = Arr::only($request, $attributes);
 
         $name = strtoupper($this->name) . '_' . strtoupper($this->currency);
@@ -45,22 +45,14 @@ trait PaymentChannelObserver
                     'account_number' => 'required',
                     'bank_name' => [
                         'required',
-                        Rule::exists('banks', 'name')->where(function ($query) use ($request) {
+                        Rule::exists('banks', 'name')->where(function ($query) {
                             return $query->where('currency', 'VND');
                         }),
                     ]
                 ];
                 break;
             case 'MOMOPAY_VND':
-                $rules = [
-                    'qrcode' => 'required',
-                ];
-                break;
             case 'ZALOPAY_VND':
-                $rules = [
-                    'qrcode' => 'required',
-                ];
-                break;
             case 'VIETTELPAY_VND':
                 $rules = [
                     'qrcode' => 'required',

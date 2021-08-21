@@ -67,7 +67,6 @@ class ResellerController extends Controller
             'currency' => 'required',
             'password' => 'required|confirmed',
         ]);
-        $commission_setting = app(\App\Settings\CommissionSetting::class);
         $reseller_setting = app(\App\Settings\ResellerSetting::class);
         $agent_setting = app(\App\Settings\AgentSetting::class);
         $currency_setting = app(\App\Settings\CurrencySetting::class);
@@ -80,7 +79,10 @@ class ResellerController extends Controller
             'phone' => $request->phone,
             'currency' => $request->currency,
             'password' => $request->password,
-            'commission_percentage' => $commission_setting->getDefaultPercentage($request->level),
+            'commission_percentage' => $currency_setting->getCommissionPercentage(
+                $request->currency,
+                $request->level
+            ),
             'pending_limit' => $reseller_setting->getDefaultPendingLimit($request->level),
             'downline_slot' => $agent_setting->getDefaultDownLineSlot($request->level),
             'status' => ($request->level == Reseller::LEVEL['RESELLER']) ?

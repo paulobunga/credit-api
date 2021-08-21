@@ -60,7 +60,7 @@ class AuthController extends Controller
             'currency' => 'required|in:' . implode(',', $cs->types),
             'password' => 'required|confirmed',
         ]);
-        $commission_setting = app(\App\Settings\CommissionSetting::class);
+        $currency_setting = app(\App\Settings\CurrencySetting::class);
         $reseller_setting = app(\App\Settings\ResellerSetting::class);
         $agent_setting = app(\App\Settings\AgentSetting::class);
 
@@ -72,7 +72,10 @@ class AuthController extends Controller
             'phone' => $request->phone,
             'currency' => $request->currency,
             'password' => $request->password,
-            'commission_percentage' => $commission_setting->getDefaultPercentage(Reseller::LEVEL['RESELLER']),
+            'commission_percentage' => $currency_setting->getCommissionPercentage(
+                $request->currency,
+                Reseller::LEVEL['RESELLER']
+            ),
             'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
             'downline_slot' => $agent_setting->getDefaultDownLineSlot(Reseller::LEVEL['RESELLER']),
             'status' =>  Reseller::STATUS['INACTIVE']
@@ -154,6 +157,9 @@ class AuthController extends Controller
             'status' => ResellerActivateCode::STATUS['PENDING']
         ])->where('expired_at', '>', \Carbon\Carbon::now())
             ->firstOrFail();
+        if ($code->reseller->currency != Auth::user()->currency) {
+            throw new \Exception('Activated Code Currency is not match your currency');
+        }
 
         $code->update([
             'active_reseller_id' => Auth::id(),

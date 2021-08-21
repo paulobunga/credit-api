@@ -52,8 +52,12 @@ class SettingController extends Controller
                     + $request->get('reseller_percentage', 0)
             ],
             'currency' => [
-                'types' => 'array',
-                'types.*' => 'required',
+                'currency' => 'array',
+                'currency.*.agent_percentage' => 'required|numeric',
+                'currency.*.master_agent_percentage' => 'required|numeric',
+                'currency.*.referrer_percentage' => 'required|numeric',
+                'currency.*.reseller_percentage' => 'required|numeric',
+                'currency.*.transaction_fee_percentage' => 'required|numeric',
             ],
             'reseller' => [
                 'default_pending_limit' => 'required|numeric|gte:0',

@@ -2,14 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Support\Arr;
 use Illuminate\Database\Seeder;
 use App\Models\Reseller;
 use App\Models\Transaction;
 use App\Models\ResellerDeposit;
-use App\Models\ResellerWithdrawal;
 use App\Settings\AgentSetting;
-use App\Settings\CommissionSetting;
 use App\Settings\CurrencySetting;
 use App\Settings\ResellerSetting;
 
@@ -26,9 +23,8 @@ class ResellerSeeder extends Seeder
      */
     public function run(
         ResellerSetting $rs,
-        CommissionSetting $cs,
         AgentSetting $as,
-        CurrencySetting $currency
+        CurrencySetting $c
     ) {
         $reseller = \App\Models\Reseller::create([
             'upline_id' => 1,
@@ -37,11 +33,11 @@ class ResellerSeeder extends Seeder
             'username' => 'master@gmail.com',
             'password' => 'P@ssw0rd',
             'phone' => '+8865721455',
-            'currency' => $currency->types[0],
+            'currency' => 'VND',
             'credit' => 0,
             'coin' => 0,
             'pending_limit' => 0,
-            'commission_percentage' => $cs->master_agent_percentage,
+            'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['AGENT_MASTER']),
             'downline_slot' => 1,
             'status' => true,
         ]);
@@ -52,27 +48,29 @@ class ResellerSeeder extends Seeder
             'username' => 'reseller@gmail.com',
             'password' => 'P@ssw0rd',
             'phone' => '+8865721455',
-            'currency' => $currency->types[0],
+            'currency' => 'VND',
             'credit' => 0,
             'coin' => 0,
             'pending_limit' => $rs->default_pending_limit,
-            'commission_percentage' => $cs->reseller_percentage,
+            'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['RESELLER']),
             'downline_slot' => 0,
             'status' => true,
         ]);
+        // create INR 4 level agent
         foreach (Reseller::LEVEL as $level) {
             $reseller = Reseller::factory()->create([
                 'username' => "reseller{$level}@gmail.com",
                 'upline_id' => $level ? $reseller->id : 0,
                 'level' => $level,
-                'currency' => $currency->types[1],
+                'currency' => 'INR',
                 'credit' => 0,
                 'pending_limit' => $rs->getDefaultPendingLimit($level),
-                'commission_percentage' => $cs->getDefaultPercentage($level),
+                'commission_percentage' => $c->getCommissionPercentage('INR', $level),
                 'downline_slot' => $as->getDefaultDownLineSlot($level),
                 'status' => Reseller::STATUS['ACTIVE']
             ]);
         }
+        // create reseller deposit
         foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
             ResellerDeposit::create([
                 'reseller_id' => $reseller->id,
