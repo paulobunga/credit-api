@@ -59,7 +59,7 @@ class MerchantController extends Controller
             'phone' => 'required',
             'callback_url' => 'required',
             'currency' => 'required|array',
-            'currency.*.name' => 'required|distinct',
+            'currency.*.label' => 'required|distinct',
             'currency.*.value' => 'required|boolean',
             'currency.*.transaction_fee' => 'required|numeric',
             'status' => 'required|boolean'
@@ -70,7 +70,7 @@ class MerchantController extends Controller
             if (!$c['value']) {
                 continue;
             }
-            if (!in_array($c['label'], $setting->types)) {
+            if (!in_array($c['label'], array_keys($setting->currency))) {
                 throw new \Exception('Unsuported currency type ' . $c['label'], 500);
             }
             $currency[] = $c;

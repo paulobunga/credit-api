@@ -46,7 +46,8 @@ class PaymentChannelController extends Controller
             ],
             'payment_methods' => 'required|array',
             'payment_methods.*' => 'in:' . implode(',', PaymentChannel::METHOD),
-            'currency' => 'required|in:' . implode(',', app(\App\Settings\CurrencySetting::class)->types),
+            'currency' => 'required|in:' .
+                implode(',', array_keys(app(\App\Settings\CurrencySetting::class)->currency)),
             'banks' => 'array',
             'banks.*' => 'exists:banks,id',
             'attributes' => 'required|array',
@@ -78,7 +79,8 @@ class PaymentChannelController extends Controller
             ],
             'payment_methods' => 'required|array',
             'payment_methods.*' => 'in:' . implode(',', PaymentChannel::METHOD),
-            'currency' => 'required|in:' . implode(',', app(\App\Settings\CurrencySetting::class)->types),
+            'currency' => 'required|in:' .
+                implode(',', array_keys(app(\App\Settings\CurrencySetting::class)->currency)),
             'banks' => 'array',
             'banks.*' => 'exists:banks,id',
             'attributes' => 'required|array',

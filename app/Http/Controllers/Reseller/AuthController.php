@@ -40,7 +40,7 @@ class AuthController extends Controller
         return [
             'message' => 'success',
             'data' => [
-                'currency' => $cs->types
+                'currency' => $cs->currency
             ]
         ];
     }
@@ -57,7 +57,7 @@ class AuthController extends Controller
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
             'phone' => 'required|unique:resellers,phone',
-            'currency' => 'required|in:' . implode(',', $cs->types),
+            'currency' => 'required|in:' . implode(',', array_keys($cs->currency)),
             'password' => 'required|confirmed',
         ]);
         $currency_setting = app(\App\Settings\CurrencySetting::class);

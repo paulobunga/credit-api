@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Trait\SignValidator;
-use App\Transformers\Api\DepositTransformer;
-use \App\Models\MerchantDeposit;
+use App\Models\Reseller;
+use App\Models\MerchantDeposit;
 use App\Models\PaymentChannel;
 use App\Models\ResellerBankCard;
+use App\Transformers\Api\DepositTransformer;
 
 class DepositController extends Controller
 {
@@ -57,7 +58,7 @@ class DepositController extends Controller
                     return $query->where('merchant_id', $merchant->id);
                 }),
             ],
-            'currency' => 'required|in:' . implode(',', $cs->types),
+            'currency' => 'required|in:' . implode(',', array_keys($cs->currency)),
             'channel' => 'required',
             'method' => 'required',
             'amount' => 'required|numeric|min:1',
@@ -74,61 +75,76 @@ class DepositController extends Controller
         }
         // $attributes = $channel->validate($request->all());
 
-        $sql = "SELECT 
-                    rbc.id,
-                    pc.name AS channel,
-                    pc.currency AS currency,
-                    rbc.reseller_id,
-                    rbc.attributes,
-                    r.pending_limit,
-                    SUM(
-                        CASE
-                            WHEN md.amount = :amount THEN r.pending_limit
-                            WHEN md.amount > 0 THEN 1
-                            ELSE 0
-                        END
-                    ) AS pending
-                FROM payment_channels AS pc
-                INNER JOIN reseller_bank_cards AS rbc ON pc.id = rbc.payment_channel_id
+        $sql = "WITH reseller_channels AS (
+            SELECT
+                r.id AS reseller_id,
+                rbc.id AS reseller_bank_card_id,
+                pc.NAME AS channel,
+                r.currency AS currency,
+                SUM(
+                    CASE
+                        WHEN md.status <= :md_status THEN 1
+                        ELSE 0 
+                    END 
+                ) AS pending,
+                SUM(
+                    CASE
+                        WHEN md.status <= :same_md_status AND md.amount = {$request->amount} THEN 1
+                        ELSE 0 
+                    END 
+                ) AS same_amount,
+                r.pending_limit AS pending_limit 
+            FROM
+                reseller_bank_cards AS rbc
                 LEFT JOIN resellers AS r ON rbc.reseller_id = r.id
-                LEFT JOIN merchant_deposits AS md ON rbc.id = md.reseller_bank_card_id 
-                    AND md.status <= :merchant_deposit_status
-                WHERE pc.currency = :currency 
-                    AND pc.name = :channel 
-                    AND pc.status = :channel_status
-                    AND rbc.status = :card_status
-                    AND r.credit >= :credit
+                LEFT JOIN merchant_deposits AS md ON md.reseller_bank_card_id = rbc.id
+                LEFT JOIN payment_channels AS pc ON rbc.payment_channel_id = pc.id 
+            WHERE
+                r.currency = '{$request->currency}'
+                AND r.credit >= {$request->amount}
+                AND r.STATUS = :r_status
+                AND rbc.STATUS = :rbc_status
+                AND pc.STATUS = :pc_status
+                AND pc.currency = '{$request->currency}'
                 GROUP BY rbc.id
-                ORDER BY pending ASC
-                ";
+            ),
+            reseller_pending AS (
+            SELECT
+                reseller_id,
+                SUM(pending) AS total_pending 
+                FROM
+                    reseller_channels
+                GROUP BY
+                    reseller_id 
+                ) 
+            SELECT
+                * 
+            FROM
+                reseller_channels
+                JOIN reseller_pending USING ( reseller_id ) 
+            WHERE total_pending < pending_limit 
+                AND channel = '{$request->channel}'
+                AND same_amount = 0";
 
-        $rows = DB::select($sql, [
-            'currency' => $request->currency,
-            'credit' => $request->amount,
-            'amount' => $request->amount,
-            'channel' => $request->channel,
-            'channel_status' => 1,
-            'merchant_deposit_status' => MerchantDeposit::STATUS['PENDING'],
-            'card_status' => ResellerBankCard::STATUS['ACTIVE'],
+        $reseller_bank_cards = DB::select($sql, [
+            'r_status' => Reseller::STATUS['ACTIVE'],
+            'pc_status' => PaymentChannel::STATUS['ACTIVE'],
+            'md_status' => MerchantDeposit::STATUS['PENDING'],
+            'same_md_status' => MerchantDeposit::STATUS['PENDING'],
+            'rbc_status' => ResellerBankCard::STATUS['ACTIVE'],
         ]);
-        // dd($rows);
-        foreach ($rows as $row) {
-            if ($row->pending >= $row->pending_limit) {
-                continue;
-            } else {
-                $reseller_bank_card = $row;
-                break;
-            }
-        }
-        if (!isset($reseller_bank_card)) {
+        // dd($reseller_bank_cards);
+        if (empty($reseller_bank_cards)) {
             throw new \Exception('BankCard are unavailable!', 404);
         }
+        $reseller_bank_card = Arr::random($reseller_bank_cards);
+        // dd($reseller_bank_card);
         DB::beginTransaction();
         try {
             $merchant_deposit = $this->model::create([
                 'merchant_id' => $merchant->id,
                 'reseller_id' => $reseller_bank_card->reseller_id,
-                'reseller_bank_card_id' => $reseller_bank_card->id,
+                'reseller_bank_card_id' => $reseller_bank_card->reseller_bank_card_id,
                 'merchant_order_id' => $request->merchant_order_id,
                 'method' => $request->method,
                 'amount' => $request->amount,

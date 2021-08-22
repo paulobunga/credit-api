@@ -20,15 +20,20 @@ class PaymentChannel extends Model
         'status',
     ];
 
+    protected $casts = [
+        'attributes' => 'array',
+        'status' => 'boolean',
+        'created_at'  => 'datetime:Y-m-d H:i:s',
+    ];
+
     public const METHOD = [
         'TEXT' => 0,
         'QRCODE' => 1,
     ];
 
-    protected $casts = [
-        'attributes' => 'array',
-        'status' => 'boolean',
-        'created_at'  => 'datetime:Y-m-d H:i:s',
+    public const STATUS = [
+        'INACTIVE' => 0,
+        'ACTIVE' => 1,
     ];
 
     public function getBanksAttribute()
