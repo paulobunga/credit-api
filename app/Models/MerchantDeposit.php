@@ -22,10 +22,13 @@ class MerchantDeposit extends Model
         'callback_status',
         'attempts',
         'callback_url',
-        'account_no',
-        'account_name',
-        'reference_no',
         'extra'
+    ];
+
+    protected $casts = [
+        'extra' => 'array',
+        'created_at'  => 'datetime:Y-m-d H:i:s',
+        'updated_at'  => 'datetime:Y-m-d H:i:s',
     ];
 
     public const STATUS = [

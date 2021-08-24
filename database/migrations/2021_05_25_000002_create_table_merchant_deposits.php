@@ -23,8 +23,6 @@ class CreateTableMerchantDeposits extends Migration
             $table->string('method', 10);
             $table->string('order_id', 60)->unique();
             $table->string('merchant_order_id', 60);
-            $table->string('account_name', 64)->default('');
-            $table->string('account_no', 100);
             $table->decimal('amount', 14, 4);
             $table->string('currency', 6);
             $table->unsignedTinyInteger('status')
@@ -36,7 +34,6 @@ class CreateTableMerchantDeposits extends Migration
             $table->unsignedTinyInteger('attempts')
                 ->default(0);
             $table->string('callback_url');
-            $table->string('reference_no', 100);
             $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
             $table->timestamp('notified_at')->nullable();

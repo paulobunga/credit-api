@@ -4,15 +4,22 @@ namespace App\Http\Controllers\Reseller;
 
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class DepositController extends Controller
 {
     protected $model = \App\Models\MerchantDeposit::class;
+
     protected $transformer = \App\Transformers\Reseller\DepositTransformer::class;
 
+    /**
+     * Get Merchant Deposit lists
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         $deposits = QueryBuilder::for($this->model)
@@ -29,7 +36,20 @@ class DepositController extends Controller
                 'merchant_deposits.*',
             )
             ->allowedFilters([
-                'name'
+                AllowedFilter::partial('merchant_order_id'),
+                AllowedFilter::partial('amount'),
+                AllowedFilter::exact('status'),
+                AllowedFilter::callback(
+                    'created_at_between',
+                    fn ($query, $v) => $query->whereBetween('merchant_deposits.created_at', $v)
+                ),
+            ])
+            ->allowedSorts([
+                'id',
+                'merchant_order_id',
+                'amount',
+                'status',
+                'created_at',
             ])
             ->paginate($this->perPage);
 

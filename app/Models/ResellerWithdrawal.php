@@ -24,6 +24,7 @@ class ResellerWithdrawal extends Model
     protected $casts = [
         'extra' => 'array',
         'created_at'  => 'datetime:Y-m-d H:i:s',
+        'updated_at'  => 'datetime:Y-m-d H:i:s',
     ];
 
     public const TYPE = [

@@ -151,9 +151,6 @@ class DepositController extends Controller
                 'currency' => $request->currency,
                 'status' => MerchantDeposit::STATUS['PENDING'],
                 'callback_url' => $request->get('callback_url', $merchant->callback_url),
-                'account_no' => '',
-                'account_name' => '',
-                'reference_no' => ''
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -188,7 +185,9 @@ class DepositController extends Controller
         }
         $deposit->update([
             'status' => MerchantDeposit::STATUS['PENDING'],
-            'reference_no' => $request->reference_no
+            'extra' => array_merge($request->extra, [
+                'reference_no' => $request->reference_no
+            ])
         ]);
 
         return $this->success();

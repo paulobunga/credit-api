@@ -27,12 +27,12 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         # Generate daily report
-        $schedule->command('Report:run daily')
+        $schedule->command('report:daily')
             ->name('ReportDaily')
             ->runInBackground()
             ->dailyAt('02:00');
         # Activate code check
-        $schedule->command('Activate:check')
+        $schedule->command('activate:check')
             ->name('ActivateCheck')
             ->runInBackground()
             ->everyMinute();

@@ -14,6 +14,11 @@ class MerchantDepositController extends Controller
     
     protected $transformer = \App\Transformers\Admin\MerchantDepositTransformer::class;
 
+    /**
+     * Get Merchant Deposit lists
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         $merchant_deposits = QueryBuilder::for($this->model)
@@ -35,7 +40,7 @@ class MerchantDepositController extends Controller
                 AllowedFilter::partial('channel', 'payment_channels.name'),
                 AllowedFilter::partial('merchant_name', 'merchants.name'),
                 AllowedFilter::partial('reseller_name', 'resellers.name'),
-                AllowedFilter::partial('status', 'merchant_deposits.status'),
+                AllowedFilter::exact('status', 'merchant_deposits.status'),
                 AllowedFilter::callback(
                     'created_at_between',
                     fn ($query, $v) => $query->whereBetween('merchant_deposits.created_at', $v)
@@ -53,7 +58,6 @@ class MerchantDepositController extends Controller
                 AllowedSort::field('reseller_name', 'resellers.name'),
                 AllowedSort::field('amount'),
                 AllowedSort::field('status', 'merchant_deposits.status'),
-                AllowedSort::field('reference_no'),
                 AllowedSort::field('created_at', 'merchant_deposits.created_at'),
             ])
             ->paginate($this->perPage);

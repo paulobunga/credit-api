@@ -25,7 +25,6 @@ class MerchantDepositTransformer extends TransformerAbstract
             'currency' => $m->currency,
             'status' => $m->status,
             'callback_url' => $m->callback_url,
-            'reference_no' => $m->reference_no,
             'created_at' => $m->created_at->toDateTimeString(),
         ];
     }

@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Reseller;
 
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class WithdrawalController extends Controller
 {
@@ -15,10 +16,22 @@ class WithdrawalController extends Controller
 
     public function index(Request $request)
     {
-        $withdrawals = QueryBuilder::for($this->model::where('reseller_id', Auth::id()))
+        $withdrawals = QueryBuilder::for($this->model)
             ->allowedFilters([
-                'id'
+                AllowedFilter::exact('status'),
+                AllowedFilter::callback(
+                    'created_at_between',
+                    fn ($query, $v) => $query->whereBetween('created_at', $v)
+                ),
             ])
+            ->allowedSorts([
+                'id',
+                'order_id',
+                'amount',
+                'status',
+                'created_at',
+            ])
+            ->where('reseller_id', Auth::id())
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($withdrawals, $this->transformer);

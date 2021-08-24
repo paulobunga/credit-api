@@ -25,7 +25,6 @@ class DepositTransformer extends TransformerAbstract
             'callback_url' => $deposit->callback_url,
             'callback_status' => $deposit->callback_status,
             'attempts' => $deposit->attempts,
-            'reference_no' => $deposit->reference_no,
         ];
     }
 

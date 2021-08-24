@@ -36,12 +36,9 @@ class MerchantDepositSeeder extends Seeder
                 MerchantDeposit::create([
                     'merchant_order_id' => $this->faker->isbn13,
                     'method' => Arr::random($reseller_bank_card->PaymentChannel->payment_methods),
-                    'account_no' => '',
-                    'account_name' => '',
                     'amount' => 1000,
                     'currency' => $credit->currency,
                     'callback_url' => $this->faker->domainName . '/' . $this->faker->word,
-                    'reference_no' => '',
                     'merchant_id' => $merchant->id,
                     'reseller_bank_card_id' => $reseller_bank_card->id,
                     'status' => MerchantDeposit::STATUS['APPROVED'],
