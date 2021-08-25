@@ -8,10 +8,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use App\Models\Transaction;
+use App\Models\ResellerWithdrawal;
 
 class WithdrawalController extends Controller
 {
-    protected $model = \App\Models\ResellerWithdrawal::class;
+    protected $model = ResellerWithdrawal::class;
+
     protected $transformer = \App\Transformers\Reseller\WithdrawalTransformer::class;
 
     public function index(Request $request)
@@ -42,21 +45,13 @@ class WithdrawalController extends Controller
         $this->validate($request, [
             'amount' => 'required|numeric|min:1|max:' . Auth::user()->coin,
         ]);
-        DB::beginTransaction();
-        try {
-            $last_order_id = $this->model::latest()->first()->id?? 0;
-            $last_order_id += 1;
-            $withdrawal = $this->model::create([
-                'order_id' => '#' . str_pad($last_order_id + 1, 8, "0", STR_PAD_LEFT) . time(),
-                'reseller_id' => Auth::id(),
-                'amount' => $request->amount,
-                'status' => 0,
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
+        $withdrawal = $this->model::create([
+            'reseller_id' => Auth::id(),
+            'type' => ResellerWithdrawal::TYPE['COIN'],
+            'transaction_type' => Transaction::TYPE['RESELLER_WITHDRAW_COIN'],
+            'amount' => $request->amount,
+            'status' => ResellerWithdrawal::STATUS['PENDING'],
+        ]);
 
         return $this->response->item($withdrawal, $this->transformer);
     }

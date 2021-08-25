@@ -3,34 +3,47 @@
 namespace App\Http\Controllers\Merchant;
 
 use App\Http\Controllers\Controller;
-use App\Models\MerchantDeposit;
 use Dingo\Api\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Queue;
+use Spatie\QueryBuilder\QueryBuilder;
+use App\Models\MerchantDeposit;
+
+use Spatie\QueryBuilder\AllowedFilter;
 
 class DepositController extends Controller
 {
     protected $model = MerchantDeposit::class;
+
     protected $transformer = \App\Transformers\Merchant\DepositTransformer::class;
 
     public function index(Request $request)
     {
-        $deposits = QueryBuilder::for(
-            $this->model::select('merchant_deposits.*')
-                ->leftjoin('merchants', 'merchant_deposits.merchant_id', '=', 'merchants.id')
-                ->where('merchant_deposits.merchant_id', Auth::id())
-        )
-            ->allowedFilters('name')
+        $deposits = QueryBuilder::for($this->model)
+            ->join('reseller_bank_cards', 'merchant_deposits.reseller_bank_card_id', '=', 'reseller_bank_cards.id')
+            ->join('payment_channels', 'reseller_bank_cards.payment_channel_id', '=', 'payment_channels.id')
+            ->select('merchant_deposits.*', 'payment_channels.name AS channel')
+            ->where('merchant_id', Auth::id())
+            ->allowedFilters([
+                AllowedFilter::exact('id'),
+                AllowedFilter::partial('merchant_order_id'),
+                AllowedFilter::partial('channel', 'payment_channels.name'),
+                AllowedFilter::partial('method'),
+                AllowedFilter::exact('status'),
+                AllowedFilter::callback(
+                    'created_at_between',
+                    fn ($query, $v) => $query->whereBetween('merchant_deposits.created_at', $v)
+                ),
+            ])
             ->allowedSorts([
                 'id',
                 'merchant_order_id',
-                'account_name',
-                'account_no',
                 'amount',
                 'status',
                 'callback_url',
-                'attempts'
+                'attempts',
+                'callback_status',
+                'created_at',
             ])
             ->paginate($this->perPage);
 

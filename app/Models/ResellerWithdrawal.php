@@ -55,6 +55,6 @@ class ResellerWithdrawal extends Model
 
     public function getExtraAttribute()
     {
-        return json_decode($this->attributes['extra'], true);
+        return json_decode($this->attributes['extra'] ?? '', true);
     }
 }

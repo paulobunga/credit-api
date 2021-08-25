@@ -13,25 +13,27 @@ class DepositTransformer extends TransformerAbstract
         'transactions',
     ];
 
-    public function transform(Model $deposit)
+    public function transform(Model $m)
     {
         return [
-            'id' => $deposit->id,
-            'merchant_order_id' => $deposit->merchant_order_id,
-            'account_name' => $deposit->account_name,
-            'account_no' => $deposit->account_no,
-            'amount' => $deposit->amount,
-            'status' => $deposit->status,
-            'callback_url' => $deposit->callback_url,
-            'callback_status' => $deposit->callback_status,
-            'attempts' => $deposit->attempts,
+            'id' => $m->id,
+            'merchant_order_id' => $m->merchant_order_id,
+            'channel' => $m->paymentChannel->name,
+            'method' => $m->method,
+            'extra' => $m->extra,
+            'amount' => $m->amount,
+            'status' => $m->status,
+            'callback_url' => $m->callback_url,
+            'callback_status' => $m->callback_status,
+            'attempts' => $m->attempts,
+            'created_at' => (string)$m->created_at,
         ];
     }
 
-    public function includeTransactions(Model $deposit)
+    public function includeTransactions(Model $m)
     {
         return $this->collection(
-            $deposit->transactions()
+            $m->transactions()
                 ->whereIn('transactions.type', [
                     Transaction::TYPE['MERCHANT_TOPUP_CREDIT'],
                     Transaction::TYPE['SYSTEM_TRANSACTION_FEE'],
