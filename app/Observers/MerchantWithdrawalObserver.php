@@ -44,15 +44,20 @@ trait MerchantWithdrawalObserver
         try {
             // approve
             if ($status == MerchantWithdrawal::STATUS['APPROVED']) {
+                $credit = $m->merchant->credits()->where('currency', $m->currency)->first();
+                if (!$credit) {
+                    throw new \Exception('Currency type is not supported!');
+                }
                 $m->transactions()->create([
                     'user_id' => $m->merchant_id,
                     'user_type' => 'merchant',
                     'type' => Transaction::TYPE['MERCHANT_WITHDRAW_CREDIT'],
                     'amount' => $m->amount,
+                    'before' => $credit->credit,
+                    'after' => $credit->credit - $m->amount,
                     'currency' => $m->currency,
                 ]);
-                $m->merchant->credits()->where('currency', $m->currency)
-                    ->decrement('credit', $m->amount);
+                $credit->decrement('credit', $m->amount);
             }
         } catch (\Exception $e) {
             \Log::error($e->getMessage());

@@ -54,6 +54,8 @@ trait MerchantDepositObserver
                 'user_type' => 'merchant',
                 'type' => Transaction::TYPE['MERCHANT_TOPUP_CREDIT'],
                 'amount' => $m->amount,
+                'before' => $credit->credit,
+                'after' => $credit->credit + $m->amount,
                 'currency' => $m->currency,
             ]);
             $m->transactions()->create([
@@ -61,9 +63,11 @@ trait MerchantDepositObserver
                 'user_type' => 'merchant',
                 'type' => Transaction::TYPE['SYSTEM_TRANSACTION_FEE'],
                 'amount' => $m->amount * $credit->transaction_fee,
+                'before' => $credit->credit + $m->amount,
+                'after' => $credit->credit + $m->amount * (1 - $credit->transaction_fee),
                 'currency' => $m->currency,
             ]);
-            $m->merchant->credits()->where('currency', $m->currency)->increment(
+            $credit->increment(
                 'credit',
                 $m->amount * (1 - $credit->transaction_fee)
             );
@@ -73,6 +77,8 @@ trait MerchantDepositObserver
                 'user_type' => 'reseller',
                 'type' => Transaction::TYPE['SYSTEM_DEDUCT_CREDIT'],
                 'amount' => $m->amount,
+                'before' => $m->reseller->credit,
+                'after' => $m->reseller->credit - $m->amount,
                 'currency' => $m->currency,
             ]);
             $m->reseller->decrement(
@@ -81,13 +87,14 @@ trait MerchantDepositObserver
             );
             // commission
             $rows = DB::select("
-            WITH recursive recuresive_resellers ( id, upline_id, level, name, commission_percentage ) AS (
+            WITH recursive recuresive_resellers ( id, upline_id, level, name, commission_percentage, coin ) AS (
                 SELECT
                     id,
                     upline_id,
                     level,
                     name,
-                    commission_percentage 
+                    commission_percentage,
+                    coin 
                 FROM
                     resellers 
                 WHERE
@@ -98,7 +105,8 @@ trait MerchantDepositObserver
                     r.upline_id,
                     r.level,
                     r.name,
-                    r.commission_percentage 
+                    r.commission_percentage,
+                    r.coin 
                 FROM
                     resellers r
                     INNER JOIN recuresive_resellers ON r.id = recuresive_resellers.upline_id 
@@ -107,7 +115,8 @@ trait MerchantDepositObserver
                 id AS user_id,
                 'reseller' AS user_type,
                 :type AS type,
-                :amount * commission_percentage AS amount 
+                :amount * commission_percentage AS amount,
+                coin AS coin 
             FROM
                 recuresive_resellers
             ORDER BY user_id DESC
@@ -122,6 +131,8 @@ trait MerchantDepositObserver
                     'user_type' => 'reseller',
                     'type' => Transaction::TYPE['SYSTEM_TOPUP_COMMISSION'],
                     'amount' => $row->amount,
+                    'before' => $row->coin,
+                    'after' => $row->coin + $row->amount,
                     'currency' => $m->currency,
                 ]);
                 DB::table('resellers')->where('id', $row->user_id)->increment('coin', $row->amount);

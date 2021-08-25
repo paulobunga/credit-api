@@ -38,6 +38,7 @@ class MerchantDeposit extends Model
         'REJECTED' => 3,
         'ENFORCED' => 4,
         'CANCELED' => 5,
+        'EXPIRED' => 6,
     ];
 
     public const CALLBACK_STATUS = [

@@ -44,17 +44,29 @@ trait ResellerDepositObserver
         try {
             // approve
             if ($status == ResellerDeposit::STATUS['APPROVED']) {
-                $m->transactions()->create([
-                    'user_id' => $m->reseller_id,
-                    'user_type' => 'reseller',
-                    'type' => $m->transaction_type,
-                    'amount' => $m->amount,
-                    'currency' => $m->reseller->currency
-                ]);
+                $reseller = $m->reseller;
                 if ($m->type == ResellerDeposit::TYPE['CREDIT']) {
-                    $m->reseller->increment('credit', $m->amount);
+                    $m->transactions()->create([
+                        'user_id' => $m->reseller_id,
+                        'user_type' => 'reseller',
+                        'type' => $m->transaction_type,
+                        'amount' => $m->amount,
+                        'before' => $reseller ->credit,
+                        'after' => $reseller ->credit + $m->amount,
+                        'currency' => $reseller ->currency
+                    ]);
+                    $reseller ->increment('credit', $m->amount);
                 } elseif ($m->type == ResellerDeposit::TYPE['COIN']) {
-                    $m->reseller->increment('coin', $m->amount);
+                    $m->transactions()->create([
+                        'user_id' => $m->reseller_id,
+                        'user_type' => 'reseller',
+                        'type' => $m->transaction_type,
+                        'amount' => $m->amount,
+                        'before' => $reseller ->coin,
+                        'after' => $reseller ->coin + $m->amount,
+                        'currency' => $reseller->currency
+                    ]);
+                    $reseller->increment('coin', $m->amount);
                 }
             }
         } catch (\Exception $e) {

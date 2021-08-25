@@ -44,17 +44,29 @@ trait ResellerWithdrawalObserver
         try {
             // approve
             if ($status == ResellerWithdrawal::STATUS['APPROVED']) {
-                $m->transactions()->create([
-                    'user_id' => $m->reseller_id,
-                    'user_type' => 'reseller',
-                    'type' => $m->transaction_type,
-                    'amount' => $m->amount,
-                    'currency' => $m->reseller->currency
-                ]);
+                $reseller = $m->reseller;
                 if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
-                    $m->reseller->decrement('credit', $m->amount);
+                    $m->transactions()->create([
+                        'user_id' => $m->reseller_id,
+                        'user_type' => 'reseller',
+                        'type' => $m->transaction_type,
+                        'amount' => $m->amount,
+                        'before' => $reseller->credit,
+                        'after' => $reseller->credit - $m->amount,
+                        'currency' => $reseller->currency
+                    ]);
+                    $reseller->decrement('credit', $m->amount);
                 } elseif ($m->type == ResellerWithdrawal::TYPE['COIN']) {
-                    $m->reseller->decrement('coin', $m->amount);
+                    $m->transactions()->create([
+                        'user_id' => $m->reseller_id,
+                        'user_type' => 'reseller',
+                        'type' => $m->transaction_type,
+                        'amount' => $m->amount,
+                        'before' => $reseller->coin,
+                        'after' => $reseller->coin - $m->amount,
+                        'currency' => $reseller->currency
+                    ]);
+                    $reseller->decrement('coin', $m->amount);
                 }
             }
         } catch (\Exception $e) {

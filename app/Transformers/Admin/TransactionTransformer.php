@@ -7,21 +7,23 @@ use League\Fractal\TransformerAbstract;
 
 class TransactionTransformer extends TransformerAbstract
 {
-    public function transform(Model $transaction)
+    public function transform(Model $m)
     {
-        $user_class = '\\App\\Models\\' . ucwords($transaction->user_type);
-        $user = $user_class::find($transaction->user_id);
+        $user_class = '\\App\\Models\\' . ucwords($m->user_type);
+        $user = $user_class::find($m->user_id);
 
         return [
-            'id' => $transaction->id,
+            'id' => $m->id,
             'user' => [
                 'level' => $user->level,
-                'type' => $transaction->user_type,
+                'type' => $m->user_type,
                 'name' => $user->name,
             ],
-            'type' => $transaction->type,
-            'amount' => $transaction->amount,
-            'created_at' => $transaction->created_at,
+            'type' => $m->type,
+            'amount' => $m->amount,
+            'before' => $m->before,
+            'after' => $m->after,
+            'created_at' => $m->created_at,
         ];
     }
 }

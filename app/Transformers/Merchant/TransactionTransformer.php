@@ -7,13 +7,15 @@ use League\Fractal\TransformerAbstract;
 
 class TransactionTransformer extends TransformerAbstract
 {
-    public function transform(Model $transaction)
+    public function transform(Model $m)
     {
         return [
-            'id' => $transaction->id,
-            'type' => $transaction->type,
-            'amount' => $transaction->amount,
-            'created_at' => $transaction->created_at,
+            'id' => $m->id,
+            'type' => $m->type,
+            'amount' => $m->amount,
+            'before' => $m->before,
+            'after' => $m->after,
+            'created_at' => $m->created_at,
         ];
     }
 }
