@@ -114,6 +114,10 @@ $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\RouteServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+if (class_exists(\Knuckles\Scribe\ScribeServiceProvider::class)) {
+    $app->register(\Knuckles\Scribe\ScribeServiceProvider::class);
+    $app->configure('scribe');
+}
 
 $app->alias('cache', \Illuminate\Cache\CacheManager::class);
 /*

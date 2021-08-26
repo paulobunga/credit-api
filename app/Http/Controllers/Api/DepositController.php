@@ -15,20 +15,57 @@ use App\Models\PaymentChannel;
 use App\Models\ResellerBankCard;
 use App\Transformers\Api\DepositTransformer;
 
+/**
+ * @group Deposit API
+ *
+ * Before using API, make sure you have an merchant acount.
+ *
+ * @transformerCollection  App\Transformers\Api\DepositTransformer
+ * @transformerModel App\Models\MerchantDeposit
+ */
 class DepositController extends Controller
 {
     use SignValidator;
 
     protected $model = MerchantDeposit::class;
+
     protected $transformer = DepositTransformer::class;
 
+    /**
+     * Get deposit list
+     *
+     * This endpoint lets you get deposit list.
+     *
+     * @authenticated
+     * @queryParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
+     * @queryParam sign string required Signature. Example: e38c3a02a3d9757c912d0dc6240a5c88
+     * @transformerCollection App\Transformers\Api\DepositTransformer
+     * @transformerModel App\Models\MerchantDeposit
+     * @transformerPaginator League\Fractal\Pagination\IlluminatePaginatorAdapter 1
+     * @response status=200 scenario="empty record"
+     * {
+     *      "data": [],
+     *      "meta": {
+     *          "pagination": {
+     *              "total": 0,
+     *              "count": 0,
+     *              "per_page": 10,
+     *              "current_page": 1,
+     *              "total_pages": 1,
+     *              "links": {},
+     *              "sortBy": "id",
+     *              "descending": false
+     *          }
+     *      }
+     * }
+     *
+     */
     public function index(Request $request)
     {
         $merchant = $this->validateSign($request);
         $merchant_deposits = QueryBuilder::for($this->model)
             ->allowedFilters([
                 'merchant_order_id',
-                'order_id'
             ])
             ->where('merchant_id', $merchant->id)
             ->paginate($this->perPage);
@@ -36,6 +73,20 @@ class DepositController extends Controller
         return $this->response->withPaginator($merchant_deposits, new DepositTransformer);
     }
 
+    /**
+     * Get a deposit
+     *
+     * This endpoint lets you get a deposit.
+     *
+     * @authenticated
+     * @urlParam id required The Merchant Order ID of the deposit. Example: 9798223690986
+     * @queryParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
+     * @queryParam sign string required Signature. Example: e38c3a02a3d9757c912d0dc6240a5c88
+     * @transformer App\Transformers\Api\DepositTransformer
+     * @transformerModel App\Models\MerchantDeposit
+     * @response status=404 scenario="not found"
+     * {"message": "No query results for model [App\\Models\\MerchantDeposit]."}
+     */
     public function show(Request $request)
     {
         $merchant = $this->validateSign($request);
@@ -47,6 +98,35 @@ class DepositController extends Controller
         return $this->response->item($deposit, new DepositTransformer);
     }
 
+    /**
+     * Create a deposit
+     *
+     * This endpoint lets you create a deposit.
+     *
+     * @authenticated
+     * @bodyParam merchant_order_id string required The order id created by merchant. Example: 9798223690986
+     * @bodyParam currency string required The currency of the deposit. Example: VND
+     * @bodyParam channel string required Payment Channel of the deposit. Example: MOMOPAY
+     * @bodyParam method string required Payment method supported by selected Payment channel.
+     * Example: TEXT
+     * @bodyParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
+     * @bodyParam sign string required Signature. Example: d72b7a2c1fda1b4914354e6c5dbb0038
+     * @bodyParam amount string required Amount of the deposit. Example: 1000
+     * @bodyParam callback_url url Callback URL of the deposit,
+     * if not set, it would be the setting in merchant panel.
+     * Example: http://callback.url/0001
+     * @transformer App\Transformers\Api\DepositTransformer
+     * @transformerModel App\Models\MerchantDeposit
+     * @response status=422 scenario="parameter error"
+     * {
+     *      "message": "The merchant order id has already been taken.",
+     *      "errors": {
+     *          "merchant_order_id": [
+     *              "The merchant order id has already been taken."
+     *          ]
+     *      }
+     * }
+     */
     public function store(Request $request)
     {
         $merchant = $this->validateSign($request);

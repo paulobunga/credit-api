@@ -34,7 +34,7 @@ class MerchantDepositSeeder extends Seeder
                     $q->where('currency', $credit->currency);
                 })->inRandomOrder()->first();
                 MerchantDeposit::create([
-                    'merchant_order_id' => $this->faker->isbn13,
+                    'merchant_order_id' => $merchant->id == 1 ? '9798223690986' : $this->faker->isbn13,
                     'method' => Arr::random($reseller_bank_card->PaymentChannel->payment_methods),
                     'amount' => 1000,
                     'currency' => $credit->currency,

@@ -19,8 +19,6 @@ class DepositTransformer extends TransformerAbstract
         return [
             'name' => $deposit->merchant->name,
             'order_id' => $deposit->order_id,
-            'account_no' => $deposit->resellerBankCard->account_no,
-            'account_name' => $deposit->resellerBankCard->account_name,
             'merchant_order_id' => $deposit->merchant_order_id,
             'amount' => $deposit->amount,
             'status' => $deposit->status,
