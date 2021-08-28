@@ -29,16 +29,32 @@ class DepositController extends Controller
                 '=',
                 'reseller_bank_cards.id'
             )
+            ->join(
+                'payment_channels',
+                'reseller_bank_cards.payment_channel_id',
+                '=',
+                'payment_channels.id'
+            )
             ->whereHas('reseller', function (Builder $query) {
                 $query->where('resellers.id', Auth::id());
             })
             ->select(
                 'merchant_deposits.*',
+                'payment_channels.name AS channel'
             )
             ->allowedFilters([
                 AllowedFilter::partial('merchant_order_id'),
                 AllowedFilter::partial('amount'),
-                AllowedFilter::exact('status'),
+                AllowedFilter::callback(
+                    'status',
+                    function (Builder $query, $v) {
+                        if (is_array($v)) {
+                            $query->whereIn('merchant_deposits.status', $v);
+                        } else {
+                            $query->where('merchant_deposits.status', $v);
+                        }
+                    }
+                ),
                 AllowedFilter::callback(
                     'created_at_between',
                     fn ($query, $v) => $query->whereBetween('merchant_deposits.created_at', $v)
@@ -47,6 +63,7 @@ class DepositController extends Controller
             ->allowedSorts([
                 'id',
                 'merchant_order_id',
+                'channel',
                 'amount',
                 'status',
                 'created_at',

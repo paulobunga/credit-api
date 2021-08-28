@@ -18,6 +18,8 @@ class DepositTransformer extends TransformerAbstract
         return [
             'id' => $m->id,
             'merchant_order_id' => $m->merchant_order_id,
+            'channel' => $m->paymentChannel->name,
+            'method' => $m->method,
             'amount' => $m->amount,
             'status' => $m->status,
             'extra' => $m->extra,
