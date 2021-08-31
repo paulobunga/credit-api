@@ -1,0 +1,4 @@
+*
+!.gitignore
+!append.md
+!endpoints/custom.0.yaml

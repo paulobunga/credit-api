@@ -19,7 +19,7 @@ return [
     /*
      * The base URL displayed in the docs. If this is empty, Scribe will use the value of config('app.url').
      */
-    'base_url' => env('PUBLIC_DOMAIN'),
+    'base_url' => env('DOC_BASE_URL'),
 
     /*
      * Tell Scribe what routes to generate documentation for.
@@ -78,9 +78,9 @@ return [
                  * Additional headers to be added to the example requests
                  */
                 'headers' => [
-                    'Api-Version' => 'v1',
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
+                    // 'Api-Version' => 'v1',
+                    // 'Content-Type' => 'application/json',
+                    // 'Accept' => 'application/json',
                 ],
 
                 /*
@@ -191,7 +191,7 @@ return [
          * The base URL for the API tester to use (for example, you can set this to your staging URL).
          * Leave as null to use the current app URL (config(app.url)).
          */
-        'base_url' => null,
+        'base_url' => env('DOC_BASE_URL'),
     ],
 
     /*
