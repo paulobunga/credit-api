@@ -375,7 +375,7 @@ INTRO,
             Strategies\BodyParameters\GetFromBodyParamTag::class,
         ],
         'responses' => [
-            Strategies\Responses\UseTransformerTags::class,
+            App\Strategies\Responses\UseTransformerTags::class,
             Strategies\Responses\UseResponseTag::class,
             Strategies\Responses\UseResponseFileTag::class,
             Strategies\Responses\UseApiResourceTags::class,

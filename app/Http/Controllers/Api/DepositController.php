@@ -20,8 +20,7 @@ use App\Transformers\Api\DepositTransformer;
  *
  * Before using API, make sure you have an merchant acount.
  *
- * @transformerCollection  App\Transformers\Api\DepositTransformer
- * @transformerModel App\Models\MerchantDeposit
+ *
  */
 class DepositController extends Controller
 {
@@ -35,13 +34,25 @@ class DepositController extends Controller
      * Get deposit list
      *
      * This endpoint lets you get deposit list.
+     * <aside class="notice">
+     * <strong>Deposit Status</strong>
+     * <ol>
+     * <li>'PENDING'</li>
+     * <li>'APPROVED'</li>
+     * <li>'REJECTED'</li>
+     * <li>'ENFORCED'</li>
+     * <li>'CANCELED'</li>
+     * </ol>
+     * </aside>
      *
      * @authenticated
      * @queryParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
-     * @queryParam sign string required Signature. Example: e38c3a02a3d9757c912d0dc6240a5c88
+     * @queryParam per_page number Page count. Default: 10. Example: 1
+     * @queryParam filter[status] number Filter status of deposit. Example: 1
+     * @queryParam sign string required Signature. Example: 44ab5404efb22f3e3b28fec1c29f2eae
      * @transformerCollection App\Transformers\Api\DepositTransformer
      * @transformerModel App\Models\MerchantDeposit
-     * @transformerPaginator League\Fractal\Pagination\IlluminatePaginatorAdapter 1
+     * @transformerPaginator League\Fractal\Pagination\IlluminatePaginatorAdapter 10
      * @response status=200 scenario="empty record"
      * {
      *      "data": [],
@@ -66,6 +77,7 @@ class DepositController extends Controller
         $merchant_deposits = QueryBuilder::for($this->model)
             ->allowedFilters([
                 'merchant_order_id',
+                'status'
             ])
             ->where('merchant_id', $merchant->id)
             ->paginate($this->perPage);
@@ -104,18 +116,19 @@ class DepositController extends Controller
      * This endpoint lets you create a deposit.
      *
      * @authenticated
-     * @bodyParam merchant_order_id string required The order id created by merchant. Example: 9798223690986
+     * @bodyParam merchant_order_id string required The order id created by merchant. Example: 97982236909861
      * @bodyParam currency string required The currency of the deposit. Example: VND
      * @bodyParam channel string required Payment Channel of the deposit. Example: MOMOPAY
      * @bodyParam method string required Payment method supported by selected Payment channel.
-     * Example: TEXT
+     * Example: QRCODE
      * @bodyParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
-     * @bodyParam sign string required Signature. Example: d72b7a2c1fda1b4914354e6c5dbb0038
+     * @bodyParam sign string required Signature. Example: c8104a183967516bbb542d10dcc04f2e
      * @bodyParam amount string required Amount of the deposit. Example: 1000
      * @bodyParam callback_url url Callback URL of the deposit,
      * if not set, it would be the setting in merchant panel.
      * Example: http://callback.url/0001
-     * @transformer App\Transformers\Api\DepositTransformer
+     * @transformer App\Transformers\Api\DepositTransformer 
+     * {"pay_url":":base_url/pay/deposits?uuid=224d4a1f-6fc5-4039-bd81-fcbc7f88c659&merchant_order_id=97982236909861&time=1630476187&sign=57cb165e201dea3a4084e0f97eeda637"}
      * @transformerModel App\Models\MerchantDeposit
      * @response status=422 scenario="parameter error"
      * {
