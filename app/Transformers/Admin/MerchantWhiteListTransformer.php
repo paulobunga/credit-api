@@ -10,16 +10,17 @@ class MerchantWhiteListTransformer extends TransformerAbstract
         'merchant'
     ];
 
-    public function transform(Model $merchant_white_list)
+    public function transform(Model $m)
     {
         return [
-            'id' => $merchant_white_list->id,
-            'ip' => $merchant_white_list->ip,
+            'id' => $m->id,
+            'api' => $m->api,
+            'backend' => $m->backend,
         ];
     }
 
-    public function includeMerchant(Model $merchant_white_list)
+    public function includeMerchant(Model $m)
     {
-        return $this->item($merchant_white_list->merchant, new MerchantTransformer, false);
+        return $this->item($m->merchant, new MerchantTransformer, false);
     }
 }

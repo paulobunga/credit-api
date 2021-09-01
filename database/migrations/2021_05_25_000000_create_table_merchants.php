@@ -33,7 +33,8 @@ class CreateTableMerchants extends Migration
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->json('ip')->default(new Expression('(JSON_ARRAY())'));
+            $table->json('api')->default(new Expression('(JSON_ARRAY())'));
+            $table->json('backend')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamp('created_at')->useCurrent();
         });
 

@@ -37,17 +37,18 @@ class DepositController extends Controller
      * <aside class="notice">
      * <strong>Deposit Status</strong>
      * <ol>
-     * <li>'PENDING'</li>
-     * <li>'APPROVED'</li>
-     * <li>'REJECTED'</li>
-     * <li>'ENFORCED'</li>
-     * <li>'CANCELED'</li>
+     * <li>PENDING</li>
+     * <li>APPROVED</li>
+     * <li>REJECTED</li>
+     * <li>ENFORCED</li>
+     * <li>CANCELED</li>
      * </ol>
      * </aside>
      *
      * @authenticated
      * @queryParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
-     * @queryParam per_page number Page count. Default: 10. Example: 1
+     * @queryParam per_page number Page count. Default: 10, Maximum: 100. Example: 1
+     * @queryParam page number Set Page Number. Default: 1. Example: 1
      * @queryParam filter[status] number Filter status of deposit. Example: 1
      * @queryParam sign string required Signature. Example: 44ab5404efb22f3e3b28fec1c29f2eae
      * @transformerCollection App\Transformers\Api\DepositTransformer

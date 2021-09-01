@@ -12,7 +12,7 @@ $api->group([
     $api->group([
         'middleware' => [
             'api.auth:merchant',
-            'whitelist:merchant'
+            'whitelist:merchant_backend'
         ]
     ], function ($api) {
         # auth

@@ -26,7 +26,7 @@ class AuthController extends Controller
 
         if (!in_array(
             $request->ip(),
-            MerchantWhiteList::where('merchant_id', Auth::guard('merchant')->id())->first()->ip ?? []
+            MerchantWhiteList::where('merchant_id', Auth::guard('merchant')->id())->first()->backend ?? []
         )) {
             \Log::error($request->ip() . " is not in merchant[" . Auth::guard('merchant')->id() . '] white list.');
             Auth::guard('merchant')->logout();
@@ -99,12 +99,13 @@ class AuthController extends Controller
     public function whitelist(Request $request)
     {
         $this->validate($request, [
+            'type' => 'required|in:api,backend',
             'ip' => 'required|array',
             'ip.*' => 'required|distinct|ipv4',
         ]);
         \App\Models\MerchantWhiteList::updateOrCreate(
             ['merchant_id' => Auth::id()],
-            ['ip' => $request->ip],
+            [$request->type => $request->ip],
         );
 
         return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));

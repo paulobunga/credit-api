@@ -3,21 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class MerchantWhiteList extends Model
 {
-    use HasFactory;
-
     public $timestamps = false;
     
     protected $fillable = [
         'merchant_id',
-        'ip',
+        'api',
+        'backend',
     ];
 
     protected $casts = [
-        'ip' => 'array',
+        'api' => 'array',
+        'backend' => 'array',
     ];
 
     public function merchant()

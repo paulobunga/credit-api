@@ -5,6 +5,7 @@ $api->group([
     'as' => 'api',
     'middleware' => [
         'domain:' . env('PUBLIC_DOMAIN'),
+        'whitelist:merchant_api'
     ],
 ], function ($api) {
     $api->resource('deposits', 'DepositController', [

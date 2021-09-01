@@ -4,8 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Merchant;
-use App\Models\MerchantCredit;
-use App\Models\MerchantWhiteList;
 use App\Settings\CurrencySetting;
 
 class MerchantSeeder extends Seeder
@@ -48,12 +46,6 @@ class MerchantSeeder extends Seeder
                 ]);
                 ++$count;
             }
-        }
-
-        foreach (Merchant::all() as $merchant) {
-            MerchantWhiteList::factory()->create([
-                'merchant_id' => $merchant->id
-            ]);
         }
     }
 }

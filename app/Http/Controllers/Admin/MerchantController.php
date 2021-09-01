@@ -160,12 +160,13 @@ class MerchantController extends Controller
     {
         $merchant = $this->model::findOrFail($this->parameters('merchant'));
         $this->validate($request, [
+            'type' => 'required|in:api,backend',
             'ip' => 'array',
             'ip.*' => 'required|distinct|ip',
         ]);
         $merchant_white_lists = \App\Models\MerchantWhiteList::updateOrCreate(
             ['merchant_id' => $merchant->id],
-            ['ip' => $request->ip],
+            [$request->type => $request->ip],
         );
 
         return $this->response->item(

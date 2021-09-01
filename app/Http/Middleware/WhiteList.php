@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use App\Models\MerchantWhiteList;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use App\Models\Merchant;
 
 class WhiteList
 {
@@ -23,22 +23,21 @@ class WhiteList
             return $next($request);
         }
 
-        if ($guard == 'merchant') {
-            $white_lists = MerchantWhiteList::where(
-                'merchant_id',
-                Auth::id()
-            )->first()->ip ?? [];
-        } elseif ($guard == 'admin') {
-            if (Auth::user()->hasRole('Super Admin')) {
-                return $next($request);
-            }
+        if ($guard == 'merchant_api') {
+            $white_lists = Merchant::where(
+                'uuid',
+                $request->uuid
+            )->first()->WhiteList->api ?? [];
+        } elseif ($guard == 'merchant_backend') {
+            $white_lists = Auth::user()->WhiteList->backend ?? [];
+        } elseif ($guard == 'admin' && !Auth::user()->hasRole('Super Admin')) {
             $white_lists = app(\App\Settings\AdminSetting::class)->white_lists;
         } else {
             return $next($request);
         }
 
         if (!in_array($request->ip(), $white_lists)) {
-            \Log::error($request->ip() . " is not in {$guard}[" . Auth::id() . '] white list ' . json_encode($white_lists) . '.');
+            \Log::error($request->ip() . " is not in {$guard} white list" . json_encode($white_lists));
             throw new UnauthorizedHttpException('WhiteList', 'Unauthorized IP Address!');
         }
 
