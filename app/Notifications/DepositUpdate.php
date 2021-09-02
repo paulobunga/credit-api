@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
 
-class DepositUpdateNotification extends Notification implements ShouldBroadcast
+class DepositUpdate extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -49,12 +49,7 @@ class DepositUpdateNotification extends Notification implements ShouldBroadcast
     {
         return [
             'id' => $this->deposit->id,
-            'message' => str_replace(
-                ['\r', '\n'],
-                '',
-                "Your order #{$this->deposit->merchant_order_id} has been {$this->getStatus()}
-                "
-            ),
+            'message' => $this->deposit->merchant_order_id,
             'time' => $this->deposit->updated_at->toDateTimeString(),
         ];
     }

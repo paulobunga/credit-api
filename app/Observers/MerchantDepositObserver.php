@@ -141,11 +141,11 @@ trait MerchantDepositObserver
         // send notification
         switch ($status) {
             case MerchantDeposit::STATUS['PENDING']:
-                $m->reseller->notify(new \App\Notifications\DepositPendingNotification($m));
+                $m->reseller->notify(new \App\Notifications\DepositPending($m));
                 break;
             case MerchantDeposit::STATUS['APPROVED']:
             case MerchantDeposit::STATUS['ENFORCED']:
-                $m->merchant->notify(new \App\Notifications\DepositUpdateNotification($m));
+                $m->merchant->notify(new \App\Notifications\DepositUpdate($m));
                 $m->update([
                     'callback_status' => MerchantDeposit::CALLBACK_STATUS['PENDING']
                 ]);

@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
 
-class DepositPendingNotification extends Notification implements ShouldBroadcast
+class DepositPending extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -49,16 +49,7 @@ class DepositPendingNotification extends Notification implements ShouldBroadcast
     {
         return [
             'id' => $this->deposit->id,
-            'message' => str_replace(
-                ['\r', '\n'],
-                '',
-                "You got a new order {$this->deposit->order_id},
-                please check your account {$this->deposit->resellerBankCard->account_no} with the following info,
-                account number {$this->deposit->account_no},
-                account name {$this->deposit->account_name},
-                amount {$this->deposit->amount},
-                "
-            ),
+            'message' => $this->deposit->merchant_order_id,
             'time' => $this->deposit->updated_at->toDateTimeString(),
         ];
     }
