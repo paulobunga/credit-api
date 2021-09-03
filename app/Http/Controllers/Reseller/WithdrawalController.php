@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Reseller;
 
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\Transaction;
@@ -21,7 +21,16 @@ class WithdrawalController extends Controller
     {
         $withdrawals = QueryBuilder::for($this->model)
             ->allowedFilters([
-                AllowedFilter::exact('status'),
+                AllowedFilter::callback(
+                    'status',
+                    function (Builder $query, $v) {
+                        if (is_array($v)) {
+                            $query->whereIn('status', $v);
+                        } else {
+                            $query->where('status', $v);
+                        }
+                    }
+                ),
                 AllowedFilter::callback(
                     'created_at_between',
                     fn ($query, $v) => $query->whereBetween('created_at', $v)
