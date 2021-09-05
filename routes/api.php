@@ -5,11 +5,19 @@ $api->group([
     'as' => 'api',
     'middleware' => [
         'domain:' . env('PUBLIC_DOMAIN'),
-        'whitelist:merchant_api'
     ],
 ], function ($api) {
-    $api->resource('deposits', 'DepositController', [
-        'only' => ['index', 'store', 'show', 'update']
-    ]);
-    $api->get("/pay/deposits", ['as' => 'deposits.pay', 'uses' => 'DepositController@pay']);
+    $api->get("/demos/payin", ['as' => 'demos.payin.create', 'uses' => 'DemoController@payin']);
+    $api->post("/demos/payin", ['as' => 'demos.payin.store', 'uses' => 'DemoController@payin']);
+
+    $api->group([
+        'middleware' => [
+            'whitelist:merchant_api'
+        ],
+    ], function ($api) {
+        $api->resource('deposits', 'DepositController', [
+            'only' => ['index', 'store', 'show', 'update']
+        ]);
+        $api->get("/pay/deposits", ['as' => 'deposits.pay', 'uses' => 'DepositController@pay']);
+    });
 });

@@ -251,17 +251,10 @@ class DepositController extends Controller
             throw $e;
         }
         DB::commit();
-        $params = [
-            'uuid' => $merchant->uuid,
-            'merchant_order_id' => $merchant_deposit->merchant_order_id,
-            'time' => time()
-        ];
-        $pay_url = app('Dingo\Api\Routing\UrlGenerator')->version(env('API_VERSION'))
-            ->route('api.deposits.pay', $params + [
-                'sign' => $this->createSign($params, $merchant->api_key)
-            ]);
 
-        return $this->response->item($merchant_deposit, new DepositTransformer(compact('pay_url')));
+        return $this->response->item($merchant_deposit, new DepositTransformer([
+            'pay_url' => $merchant_deposit->payUrl
+        ]));
     }
 
     public function update(Request $request)

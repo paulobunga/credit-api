@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Observers\MerchantDepositObserver;
 use App\Models\Transaction;
+use App\Trait\SignValidator;
 
 class MerchantDeposit extends Model
 {
     use MerchantDepositObserver;
+    use SignValidator;
 
     protected $fillable = [
         'merchant_id',
@@ -97,5 +99,19 @@ class MerchantDeposit extends Model
     public function transactions()
     {
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
+    }
+
+    public function getPayUrlAttribute()
+    {
+        $params = [
+            'uuid' => $this->merchant->uuid,
+            'merchant_order_id' => $this->merchant_order_id,
+            'time' => $this->created_at->timestamp,
+        ];
+
+        return app('api.url')->version(env('API_VERSION'))
+            ->route('api.deposits.pay', $params + [
+                'sign' => $this->createSign($params, $this->merchant->api_key)
+            ]);
     }
 }

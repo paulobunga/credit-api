@@ -60,7 +60,7 @@
         <div class="col-md-12">
             @if($deposit->status == 0)
             <form id="form" method="post"
-                action="{{ app('Dingo\Api\Routing\UrlGenerator')->version(env('API_VERSION'))->route('api.deposits.update', $deposit->merchant_order_id) }}">
+                action="{{ app('api.url')->version(env('API_VERSION'))->route('api.deposits.update', $deposit->merchant_order_id) }}">
                 <input type="hidden" name="_method" value="put" />
                 <input type="hidden" name="merchant_id" value="{{ $deposit->merchant_id }}" />
                 @endif

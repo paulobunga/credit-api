@@ -26,7 +26,7 @@ class WhiteList
         if ($guard == 'merchant_api') {
             $white_lists = Merchant::where(
                 'uuid',
-                $request->uuid
+                $request->get('uuid', '')
             )->first()->WhiteList->api ?? [];
         } elseif ($guard == 'merchant_backend') {
             $white_lists = Auth::user()->WhiteList->backend ?? [];
