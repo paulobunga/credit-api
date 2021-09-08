@@ -68,6 +68,7 @@ return [
                 'merchant.*',
                 'api.deposits.pay',
                 'api.deposits.update',
+                'api.demos.*'
             ],
 
             /*
