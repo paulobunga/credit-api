@@ -14,7 +14,7 @@ use App\Models\Transaction;
 
 class ResellerController extends Controller
 {
-    protected $model = \App\Models\Reseller::class;
+    protected $model = Reseller::class;
 
     protected $transformer = \App\Transformers\Admin\ResellerTransformer::class;
 
@@ -110,7 +110,8 @@ class ResellerController extends Controller
             'pending_limit' =>
             'required|numeric|max:' . app(\App\Settings\ResellerSetting::class)->max_pending_limit,
             'downline_slot' =>
-            'required_with:level,1,2|numeric|max:' . app(\App\Settings\AgentSetting::class)->max_downline_slot
+            'required_with:level,1,2|numeric|max:' . app(\App\Settings\AgentSetting::class)->max_downline_slot,
+            'status' => 'required|numeric|in:' . implode(',', Reseller::STATUS),
         ]);
         $reseller->update([
             'name' => $request->name,
@@ -119,6 +120,7 @@ class ResellerController extends Controller
             'commission_percentage' => $request->commission_percentage,
             'pending_limit' => $request->pending_limit,
             'downline_slot' => in_array($request->level, [1, 2]) ? $request->downline_slot : 0,
+            'status' => $request->status
         ]);
 
         return $this->response->item($reseller, $this->transformer);
