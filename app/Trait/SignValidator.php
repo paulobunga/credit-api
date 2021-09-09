@@ -34,8 +34,8 @@ trait SignValidator
         ksort($data);
         $str = '';
 
-        foreach ($data as $key => $val) {
-            if ($key == 'sign') {
+        foreach ($data as $k => $val) {
+            if ($k == 'sign') {
                 continue;
             }
             if (is_null($val) || $val === '') {
@@ -44,7 +44,7 @@ trait SignValidator
             if (is_array($val) || is_object($val)) {
                 $val = json_encode($val);
             }
-            $str .= "{$key}={$val}&";
+            $str .= "{$k}={$val}&";
         }
         $str .= 'api_key=' .  $key;
 
