@@ -31,7 +31,7 @@ trait PaymentChannelObserver
                 $rules = [
                     'account_name' => 'required',
                     'account_number' => 'required',
-                    'ifsc_code' => 'required|digits:11',
+                    'ifsc_code' => 'required',
                 ];
                 break;
             case 'UPI_INR':
