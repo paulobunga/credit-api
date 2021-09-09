@@ -101,6 +101,10 @@ class GuzzleJob extends Job
                 'callback_status' => 2
             ]);
         } catch (\Exception $e) {
+            \Log::error([
+                'payload' => $payload,
+                'exception' => $e->getMessage()
+            ]);
             $this->model->update([
                 'attempts' => $this->model->attempts + 1
             ]);

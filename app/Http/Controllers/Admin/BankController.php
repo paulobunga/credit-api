@@ -8,6 +8,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use App\Exports\BankExport;
+use App\Settings\CurrencySetting;
 
 class BankController extends Controller
 {
@@ -52,12 +53,15 @@ class BankController extends Controller
         $this->validate($request, [
             'ident' => 'required|unique:banks',
             'name' => 'required',
+            'currency' => 'required|in:' .
+                implode(',', array_keys(app(CurrencySetting::class)->currency)),
             'status' => 'boolean',
         ]);
         $bank = $this->model::create([
             'ident' => $request->ident,
             'name' => $request->name,
-            'status' => $request->status
+            'currency' => $request->currency,
+            'status' => $request->status,
         ]);
 
         return $this->response->item($bank, $this->transformer);
@@ -74,12 +78,15 @@ class BankController extends Controller
         $this->validate($request, [
             'ident' => "required|unique:banks,ident,{$bank->id}",
             'name' => 'required',
+            'currency' => 'required|in:' .
+                implode(',', array_keys(app(CurrencySetting::class)->currency)),
             'status' => 'boolean',
         ]);
 
         $bank->update([
             'ident' => $request->ident,
             'name' => $request->name,
+            'currency' => $request->currency,
             'status' => $request->status
         ]);
 

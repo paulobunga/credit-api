@@ -21,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
         // register custom morph type
         Relation::morphMap([
             'admin' => 'App\Models\Admin',
+            'reseller' => 'App\Models\Reseller',
+            'merchant' => 'App\Models\Merchant',
             'merchant.deposit' => 'App\Models\MerchantDeposit',
             'merchant.withdrawal' => 'App\Models\MerchantWithdrawal',
             'reseller.deposit' => 'App\Models\ResellerDeposit',
