@@ -3,10 +3,13 @@
 @endphp
 
 <h2 id="{!! Str::slug($group['name']) !!}-{!! $endpoint->endpointId() !!}">
-    {{ $endpoint->metadata->title ?: ($endpoint->httpMethods[0]." ".$endpoint->uri)}}</h2>
+    {{ $endpoint->metadata->title ?: ($endpoint->httpMethods[0]." ".$endpoint->uri)}}
+</h2>
 
 <p>
-    @component('scribe::components.badges.auth', ['authenticated' => $endpoint->metadata->authenticated])
+    @component('scribe::components.badges.auth', [
+    'authenticated' => $endpoint->metadata->authenticated
+    ])
     @endcomponent
 </p>
 
@@ -14,11 +17,8 @@
 
 <span id="example-requests-{!! $endpoint->endpointId() !!}">
     <blockquote>Example request:</blockquote>
-
     @foreach($metadata['example_languages'] as $language)
-
     @include("scribe::partials.example-requests.$language")
-
     @endforeach
 </span>
 
@@ -26,13 +26,14 @@
     @if($endpoint->isGet() || $endpoint->hasResponses())
     @foreach($endpoint->responses as $response)
     <blockquote>
-        <p>Example response ({{$response->description ?: $response->status}}):</p>
+        <p>{{$response->description ?: "Example Response: ($response->status)"}}</p>
     </blockquote>
     @if(count($response->headers))
     <details class="annotation">
         <summary>
-            <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show
-                headers</small>
+            <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">
+                Show headers
+            </small>
         </summary>
         <pre>
             <code class="language-http">
@@ -40,22 +41,31 @@
                 {{ $header }}: {{ is_array($value) ? implode('; ', $value) : $value }}
                 @endforeach 
             </code>
-    </pre>
+        </pre>
     </details>
     @endif
     <pre>
-@if(is_string($response->content) && Str::startsWith($response->content, "<<binary>>"))
-<code>[Binary data] - {{ htmlentities(str_replace("<<binary>>", "", $response->content)) }}</code>
-@elseif($response->status == 204)
-<code>[Empty response]</code>
-@else
-@php
-    $parsed = json_decode($response->content,true); 
-    $parsed = array_merge($parsed??[], ['code'=> $response->status, 'message'=>$parsed['message']??'success']);
-@endphp
-{{-- If response is a JSON string, prettify it. Otherwise, just print it --}}
-<code class="language-json">{!! htmlentities($parsed != null ? json_encode($parsed, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : $response->content) !!}</code>
-@endif </pre>
+    @if(is_string($response->content) && Str::startsWith($response->content, "<<binary>>"))
+        <code>[Binary data] - {{ htmlentities(str_replace("<<binary>>", "", $response->content)) }}</code>
+    @elseif($response->status == 204)
+        <code>[Empty response]</code>
+    @else
+        @php
+            $parsed = json_decode($response->content,true);
+            if(!Str::contains($response->description, [
+                    'Callback', 
+                    'Callback Response'
+                ])){ 
+                $parsed = array_merge($parsed??[], [
+                    'code'=> $response->status, 
+                    'message'=>$parsed['message']??'success'
+                ]);
+            }
+        @endphp
+        {{-- If response is a JSON string, prettify it. Otherwise, just print it --}}
+        <code class="language-json">{!! htmlentities($parsed != null ? json_encode($parsed, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : $response->content) !!}</code>
+    @endif 
+    </pre>
     @endforeach
     @endif
 </span>

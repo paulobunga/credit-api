@@ -19,7 +19,40 @@ use App\Transformers\Api\DepositTransformer;
  * @group Deposit API
  *
  * Before using API, make sure you have an merchant acount.
- *
+ * <h3>Status</h3>
+ * <table>
+ * <tr>
+ * <td>Created</td>
+ * <td>Pending</td>
+ * <td>Approved</td>
+ * <td>Rejected</td>
+ * <td>Enforced</td>
+ * <td>Canceled</td>
+ * </tr>
+ * <tr>
+ * <td>0</td>
+ * <td>1</td>
+ * <td>2</td>
+ * <td>3</td>
+ * <td>4</td>
+ * <td>5</td>
+ * </tr>
+ * </table>
+ * <h3>Callback Status</h3>
+ * <table>
+ * <tr>
+ * <td>Created</td>
+ * <td>Pending</td>
+ * <td>Finished</td>
+ * <td>Failed</td>
+ * </tr>
+ * <tr>
+ * <td>0</td>
+ * <td>1</td>
+ * <td>2</td>
+ * <td>3</td>
+ * </tr>
+ * </table>
  *
  */
 class DepositController extends Controller
@@ -34,16 +67,6 @@ class DepositController extends Controller
      * Get deposit list
      *
      * This endpoint lets you get deposit list.
-     * <aside class="notice">
-     * <strong>Deposit Status</strong>
-     * <ol>
-     * <li>PENDING</li>
-     * <li>APPROVED</li>
-     * <li>REJECTED</li>
-     * <li>ENFORCED</li>
-     * <li>CANCELED</li>
-     * </ol>
-     * </aside>
      *
      * @authenticated
      * @queryParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
@@ -128,7 +151,7 @@ class DepositController extends Controller
      * @bodyParam callback_url url Callback URL of the deposit,
      * if not set, it would be the setting in merchant panel.
      * Example: http://callback.url/0001
-     * @transformer App\Transformers\Api\DepositTransformer 
+     * @transformer App\Transformers\Api\DepositTransformer
      * {"pay_url":":base_url/pay/deposits?uuid=224d4a1f-6fc5-4039-bd81-fcbc7f88c659&merchant_order_id=97982236909861&time=1630476187&sign=57cb165e201dea3a4084e0f97eeda637"}
      * @transformerModel App\Models\MerchantDeposit
      * @response status=422 scenario="parameter error"
@@ -139,6 +162,26 @@ class DepositController extends Controller
      *              "The merchant order id has already been taken."
      *          ]
      *      }
+     * }
+     * @callback status=200
+     * // Callback request format
+     * // Verify the signature with the request data
+     * {
+     *     "name": "Test Merchant",
+     *     "order_id": "N18t1@5iIxqZ4IXb",
+     *     "merchant_order_id": "9798223690986",
+     *     "amount": "1000.0000",
+     *     "status": 2,
+     *     "callback_url": "rohan.com/provident",
+     *     "sign": "09508cdf7f1d089e108d462d182204e6"
+     * }
+     * @callback_response status=200
+     * // Send the following response format
+     * // Otherwise system will keep sending callback request
+     * // every 30 seconds, until
+     * // reach the failure limitation
+     * {
+     *     "message": "ok",
      * }
      */
     public function store(Request $request)

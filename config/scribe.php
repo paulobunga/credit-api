@@ -238,38 +238,7 @@ return [
          * Any extra authentication-related info for your users. For instance, you can describe how to find or generate their auth credentials.
          * Markdown and HTML are supported.
          */
-        'extra_info' => <<<'EOD'
-                    You can create the sign value by the following Pseudo code.
-                    <pre>
-                        <code>
-                        /**
-                         * @param string $key The API Key of merchant
-                         * @param array  $data The json data of Http request
-                         * 
-                         * /
-                        protected function createSign(array $data, String $key)
-                        {
-                            ksort($data);
-                            $str = "";
-                            foreach ($data as $key => $val) {
-                                if ($key == "sign") {
-                                    continue;
-                                }
-                                if (is_null($val) || $val === "") {
-                                    continue;
-                                }
-                                if (is_array($val) || is_object($val)) {
-                                    $val = json_encode($val);
-                                }
-                                $str .= "{$key}={$val}&";
-                            }
-                            $str .= "api_key=" .  $key;
-
-                            return md5($str);
-                        }
-                        </code>
-                    </pre>
-                    EOD,
+        'extra_info' => '',
     ],
 
     /*
@@ -377,7 +346,7 @@ INTRO,
         ],
         'responses' => [
             App\Strategies\Responses\UseTransformerTags::class,
-            Strategies\Responses\UseResponseTag::class,
+            App\Strategies\Responses\UseResponseTag::class,
             Strategies\Responses\UseResponseFileTag::class,
             Strategies\Responses\UseApiResourceTags::class,
             Strategies\Responses\ResponseCalls::class,
