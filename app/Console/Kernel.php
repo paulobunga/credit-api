@@ -13,9 +13,10 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        \App\Console\Commands\ReportDailyCommand::class,
-        \App\Console\Commands\PermissionListCommand::class,
-        \App\Console\Commands\ActivateCheckCommand::class,
+        \App\Console\Commands\ReportDaily::class,
+        \App\Console\Commands\PermissionList::class,
+        \App\Console\Commands\ActivateCheck::class,
+        \App\Console\Commands\ExecuteSql::class,
     ];
 
     /**

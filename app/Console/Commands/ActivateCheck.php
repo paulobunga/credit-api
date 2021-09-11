@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 use App\Models\ResellerActivateCode;
 
-class ActivateCheckCommand extends Command
+class ActivateCheck extends Command
 {
     /**
      * The name and signature of the console command.

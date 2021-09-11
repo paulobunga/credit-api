@@ -6,13 +6,13 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidArgumentException;
+use App\Models\Transaction;
 use App\Models\ReportDailyMerchant;
 use App\Models\ReportDailyReseller;
 use App\Models\ReportMonthlyReseller;
 use App\Models\ReportMonthlyMerchant;
-use App\Models\Transaction;
 
-class ReportDailyCommand extends Command
+class ReportDaily extends Command
 {
     /**
      * The name and signature of the console command.
