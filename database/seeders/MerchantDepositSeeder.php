@@ -51,9 +51,10 @@ class MerchantDepositSeeder extends Seeder
                 ]);
             }
         }
-        foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
+        foreach (Reseller::with('bankCards')->where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
             ResellerWithdrawal::create([
                 'reseller_id' => $reseller->id,
+                'reseller_bank_card_id' => $reseller->bankCards->random()->id,
                 'audit_admin_id' => 1,
                 'type' => ResellerWithdrawal::TYPE['COIN'],
                 'transaction_type' => Transaction::TYPE['RESELLER_WITHDRAW_COIN'],

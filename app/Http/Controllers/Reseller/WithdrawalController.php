@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\Transaction;
+use App\Models\ResellerBankCard;
 use App\Models\ResellerWithdrawal;
 
 class WithdrawalController extends Controller
@@ -52,10 +53,19 @@ class WithdrawalController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'amount' => 'required|numeric|min:1|max:' . Auth::user()->coin,
+            'card' => 'required|numeric',
+            'amount' => 'required|numeric|min:1',
         ]);
+        ResellerBankCard::where([
+            'id' => $request->card,
+            'reseller_id' => Auth::id()
+        ])->firstOrFail();
+        if ($request->amount > Auth::user()->coin - Auth::user()->withdrawalPendingCoin) {
+            throw new \Exception('Pending amount exceed coin value', 405);
+        }
         $withdrawal = $this->model::create([
             'reseller_id' => Auth::id(),
+            'reseller_bank_card_id' => $request->card,
             'type' => ResellerWithdrawal::TYPE['COIN'],
             'transaction_type' => Transaction::TYPE['RESELLER_WITHDRAW_COIN'],
             'amount' => $request->amount,

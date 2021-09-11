@@ -12,6 +12,7 @@ class BankCardTransformer extends TransformerAbstract
         return [
             'id' => $m->id,
             'channel' => $m->paymentChannel->name,
+            'primary' => $m->primary,
             'attributes' => $m->attributes,
             'status' => $m->status,
         ];

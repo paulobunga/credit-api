@@ -16,8 +16,7 @@ class CreateTableMerchantWithdrawals extends Migration
     {
         Schema::create('merchant_withdrawals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('merchant_id')
-                ->constrained();
+            $table->foreignId('merchant_id')->constrained();
             $table->string('order_id', 60)->unique();
             $table->decimal('amount', 14, 4);
             $table->string('currency', 6);

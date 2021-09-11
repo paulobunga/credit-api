@@ -39,4 +39,11 @@ class ResellerBankCard extends Model
     {
         return $this->hasMany(MerchantDeposit::class);
     }
+
+    public function getPrimaryAttribute()
+    {
+        $reference = $this->paymentChannel->getReference();
+        $attributes = json_decode($this->attributes['attributes'], true);
+        return $attributes[$reference->primary] ?? '--';
+    }
 }

@@ -25,6 +25,7 @@ class BankCardController extends Controller
                 'id',
                 'name',
                 AllowedFilter::exact('channel', 'payment_channel.name'),
+                'status'
             ])
             ->where('reseller_id', Auth::id())
             ->paginate($this->perPage);

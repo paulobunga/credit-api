@@ -3,11 +3,11 @@
 namespace App\Observers;
 
 use Illuminate\Support\Arr;
-use Illuminate\Validation\Rule;
 use App\Exceptions\ValidationHttpException;
 
 trait PaymentChannelObserver
 {
+    protected $reference;
 
     public function validate(array $request)
     {
@@ -18,50 +18,14 @@ trait PaymentChannelObserver
         if (!$this->attributes['currency']) {
             throw new \Exception('Payment Channel currency is null', 405);
         }
-        $attributes = json_decode($this->attributes['attributes'], true);
-        if (empty($attributes)) {
-            throw new \Exception('Payment Channel attributes is empty', 405);
+
+        if (!isset($this->reference)) {
+            $this->reference = $this->getReference();
         }
 
-        $request = Arr::only($request, $attributes);
+        $request = Arr::only($request, $this->reference->attributes);
 
-        $name = strtoupper($this->name) . '_' . strtoupper($this->currency);
-        switch ($name) {
-            case 'NETBANK_INR':
-                $rules = [
-                    'account_name' => 'required',
-                    'account_number' => 'required',
-                    'ifsc_code' => 'required',
-                ];
-                break;
-            case 'UPI_INR':
-                $rules = [
-                    'upi_id' => 'required',
-                ];
-                break;
-            case 'NETBANK_VND':
-                $rules = [
-                    'account_name' => 'required',
-                    'account_number' => 'required',
-                    'bank_name' => [
-                        'required',
-                        Rule::exists('banks', 'name')->where(function ($query) {
-                            return $query->where('currency', 'VND');
-                        }),
-                    ]
-                ];
-                break;
-            case 'MOMOPAY_VND':
-            case 'ZALOPAY_VND':
-            case 'VIETTELPAY_VND':
-                $rules = [
-                    'qrcode' => 'required',
-                ];
-                break;
-            default:
-                throw new \Exception("{$name} is unsupported!");
-        }
-        $validator = app('validator')->make($request, $rules);
+        $validator = app('validator')->make($request, $this->reference->rules());
 
         if ($validator->fails()) {
             throw new ValidationHttpException(
@@ -70,5 +34,17 @@ trait PaymentChannelObserver
         }
 
         return $request;
+    }
+
+    public function getReference()
+    {
+        if ($this->reference) {
+            return $this->reference;
+        }
+        $objName = "\\App\\Payments\\{$this->name}\\{$this->currency}";
+        if (!class_exists($objName)) {
+            throw new \Exception("{$objName} is not unsupported!");
+        }
+        return new $objName();
     }
 }

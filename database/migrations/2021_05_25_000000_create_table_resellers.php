@@ -38,16 +38,24 @@ class CreateTableResellers extends Migration
             'level' => 0,
             'name' => 'company',
             'username' => 'company@gmail.com',
-            'phone' => '0936188590',
+            'phone' => '0978475446',
             'currency' => 'VND',
             'password' => 'P@ssw0rd',
             'status' => Reseller::STATUS['ACTIVE'],
         ]);
 
+        Schema::create('reseller_bank_cards', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('reseller_id')->constrained();
+            $table->foreignId('payment_channel_id')->constrained();
+            $table->json('attributes')->default(new Expression('(JSON_OBJECT())'));
+            $table->unsignedTinyInteger('status')->default(1)->comment('0:Inactive,1:Active,2:Disabled');
+            $table->timestamps();
+        });
+
         Schema::create('reseller_deposits', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('reseller_id')
-                ->constrained();
+            $table->foreignId('reseller_id')->constrained();
             $table->unsignedBigInteger('audit_admin_id')->default(0);
             $table->string('order_id', 60)->unique();
             $table->unsignedTinyInteger('transaction_type');
@@ -61,8 +69,8 @@ class CreateTableResellers extends Migration
 
         Schema::create('reseller_withdrawals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('reseller_id')
-                ->constrained();
+            $table->foreignId('reseller_id')->constrained();
+            $table->foreignId('reseller_bank_card_id')->constrained();
             $table->unsignedBigInteger('audit_admin_id')->default(0);
             $table->string('order_id', 60)->unique();
             $table->unsignedTinyInteger('transaction_type');
@@ -84,6 +92,7 @@ class CreateTableResellers extends Migration
     {
         Schema::dropIfExists('reseller_withdrawals');
         Schema::dropIfExists('reseller_deposits');
+        Schema::dropIfExists('reseller_bank_cards');
         Schema::dropIfExists('resellers');
     }
 }

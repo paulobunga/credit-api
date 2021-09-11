@@ -12,6 +12,7 @@ class ResellerWithdrawal extends Model
 
     protected $fillable = [
         'reseller_id',
+        'reseller_bank_card_id',
         'audit_admin_id',
         'order_id',
         'transaction_type',
