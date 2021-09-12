@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
+use Illuminate\Support\Facades\Queue;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
+use App\Http\Controllers\Controller;
 
 class MerchantDepositController extends Controller
 {
     protected $model = \App\Models\MerchantDeposit::class;
-    
+
     protected $transformer = \App\Transformers\Admin\MerchantDepositTransformer::class;
 
     /**
@@ -66,19 +67,40 @@ class MerchantDepositController extends Controller
 
     public function update(Request $request)
     {
-        $merchant_deposit = $this->model::findOrFail($this->parameters('merchant_deposit'));
+        $m = $this->model::findOrFail($this->parameters('merchant_deposit'));
         $this->validate($request, [
             'admin_id' => 'required|exists:admins,id',
             'status' => 'required|numeric',
         ]);
 
-        $merchant_deposit->update([
+        $m->update([
             'status' => $request->status,
             'info' => [
                 'admin_id' => $request->admin_id
             ]
         ]);
 
-        return $this->response->item($merchant_deposit, $this->transformer);
+        return $this->response->item($m, $this->transformer);
+    }
+
+    public function resend()
+    {
+        $m = $this->model::where([
+            'id' => $this->parameters('merchant_deposit'),
+        ])->firstOrFail();
+
+        $m->update([
+            'attempts' => 0,
+            'callback_status' => $this->model::CALLBACK_STATUS['PENDING'],
+        ]);
+
+        // push deposit information callback to callback url
+        Queue::push((new \App\Jobs\GuzzleJob(
+            $m,
+            new \App\Transformers\Api\DepositTransformer,
+            $m->merchant->api_key
+        )));
+
+        return $this->response->item($m, $this->transformer);
     }
 }

@@ -47,6 +47,9 @@ $api->group([
         ]);
 
         $api->resource('merchant_deposits', 'MerchantDepositController', ['only' => ['index', 'update']]);
+        $api->put("/merchant_deposits/resend/{merchant_deposit}", [
+            'as' => 'merchant_deposit.resend', 'uses' => 'MerchantDepositController@resend'
+        ]);
 
         $api->resource('merchant_withdrawals', 'MerchantWithdrawalController', ['only' => ['index']]);
 

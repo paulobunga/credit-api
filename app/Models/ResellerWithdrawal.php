@@ -44,6 +44,11 @@ class ResellerWithdrawal extends Model
         return $this->belongsTo(Reseller::class);
     }
 
+    public function bankCard()
+    {
+        return $this->belongsTo(ResellerBankCard::class, 'reseller_bank_card_id', 'id');
+    }
+
     public function auditAdmin()
     {
         return $this->belongsTo(Admin::class);
