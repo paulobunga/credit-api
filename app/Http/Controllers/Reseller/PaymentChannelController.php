@@ -20,6 +20,7 @@ class PaymentChannelController extends Controller
                 'id',
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('currency'),
+                AllowedFilter::exact('payin.status', 'payin->status'),
             ])
             ->allowedSorts([
                 'id',

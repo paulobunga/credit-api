@@ -75,7 +75,16 @@ class BankSeeder extends Seeder
                     'attributes' => $s['attributes'],
                     'banks' => implode(',', $s['banks'] ?? []),
                     'currency' => $currency,
-                    'status' => true,
+                    'payin' => [
+                        'status' => true,
+                        'min' => 500,
+                        'max' => 50000
+                    ],
+                    'payout' => [
+                        'status' => true,
+                        'min' => 2000,
+                        'max' => 50000
+                    ]
                 ]);
             }
         }

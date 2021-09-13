@@ -16,7 +16,8 @@ class PaymentChannelTransformer extends TransformerAbstract
             'attributes' => $m->attributes,
             'payment_methods' => $m->payment_methods,
             'currency' => $m->currency,
-            'status' => $m->status,
+            'payin' => $m->payin,
+            'payout' => $m->payout,
         ];
     }
 }

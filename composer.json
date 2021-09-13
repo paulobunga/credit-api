@@ -12,13 +12,17 @@
         "guzzlehttp/guzzle": "^7.0",
         "illuminate/notifications": "^8.49",
         "illuminate/redis": "^8.49",
+        "intervention/image": "^2.6",
         "laravel/lumen-framework": "^8.0",
         "maatwebsite/excel": "^3.1",
         "simplesoftwareio/simple-qrcode": "^4.2",
+        "spatie/data-transfer-object": "^3.7",
         "spatie/laravel-permission": "^4.0",
         "spatie/laravel-query-builder": "^3.4",
         "spatie/laravel-settings": "^2.1",
-        "tymon/jwt-auth": "dev-develop"
+        "thiagoalessio/tesseract_ocr": "^2.12",
+        "tymon/jwt-auth": "dev-develop",
+        "williamcruzme/laravel-fcm": "^1.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

@@ -30,7 +30,8 @@ class CreateTableBanks extends Migration
             $table->text('payment_methods');
             $table->text('banks');
             $table->json('attributes')->default(new Expression('(JSON_ARRAY())'));
-            $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
+            $table->json('payin')->default(new Expression('(JSON_OBJECT())'));
+            $table->json('payout')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamp('created_at')->useCurrent();
             $table->unique(['name', 'currency']);
         });

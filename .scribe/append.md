@@ -2,18 +2,20 @@
 
 ## Currency List
 
-| Currency      |
-| ------------- |
-| VND           |
-| INR           |
+|Currency |
+|:--------|
+|VND      |
+|INR      |
 
 ## Payment Channel List
 
-| Currency      | Channel        | Method          |
-| ------------- | -------------- | --------------- | 
-| VND           | NETBANK        | TEXT            |
-| VND           | ZALOPAY        | QRCODE          |
-| VND           | VIETTELPAY     | QRCODE          |
-| VND           | MOMOPAY        | QRCODE          |
-| INR           | UPI            | QRCODE,TEXT     |
-| INR           | NETBANK        | TEXT            |
+### PayIn
+
+|Currency  |Channel    |Method      |Min   |Max   |
+|----------|-----------|------------|------|------|
+|VND       |NETBANK    |TEXT        |500   |50000 |
+|VND       |ZALOPAY    |QRCODE      |500   |50000 |
+|VND       |VIETTELPAY |QRCODE      |500   |50000 |
+|VND       |MOMOPAY    |QRCODE      |500   |50000 |
+|INR       |UPI        |QRCODE,TEXT |500   |50000 |
+|INR       |NETBANK    |TEXT        |500   |50000 |

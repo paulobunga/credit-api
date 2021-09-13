@@ -21,6 +21,7 @@ use App\Transformers\Api\DepositTransformer;
  * Before using API, make sure you have an merchant acount.
  * <h3>Status</h3>
  * <table>
+ * <thead>
  * <tr>
  * <td>Created</td>
  * <td>Pending</td>
@@ -29,6 +30,7 @@ use App\Transformers\Api\DepositTransformer;
  * <td>Enforced</td>
  * <td>Canceled</td>
  * </tr>
+ * </thead>
  * <tr>
  * <td>0</td>
  * <td>1</td>
@@ -40,12 +42,14 @@ use App\Transformers\Api\DepositTransformer;
  * </table>
  * <h3>Callback Status</h3>
  * <table>
+ * <thead>
  * <tr>
  * <td>Created</td>
  * <td>Pending</td>
  * <td>Finished</td>
  * <td>Failed</td>
  * </tr>
+ * </thead>
  * <tr>
  * <td>0</td>
  * <td>1</td>
@@ -198,17 +202,24 @@ class DepositController extends Controller
             'currency' => 'required|in:' . implode(',', array_keys($cs->currency)),
             'channel' => 'required',
             'method' => 'required',
-            'amount' => 'required|numeric|min:1',
+            'amount' => 'required|numeric',
             'callback_url' => 'nullable|url'
         ]);
         $channel = PaymentChannel::where([
-            'status' => true,
+            'payin->status' => true,
             'currency' => $request->currency,
             'name' => $request->channel
         ])->firstOrFail();
 
         if (!in_array($request->method, $channel->paymentMethods)) {
             throw new \Exception('Method is not supported!', 405);
+        }
+
+        if ($request->amount < $channel->payin->min || $request->amount > $channel->payin->max) {
+            throw new \Exception(
+                "Amount is not in range[{$channel->payin->min}, {$channel->payin->max}]!",
+                405
+            );
         }
         // $attributes = $channel->validate($request->all());
 
@@ -218,15 +229,10 @@ class DepositController extends Controller
                 rbc.id AS reseller_bank_card_id,
                 pc.NAME AS channel,
                 r.currency AS currency,
+                COUNT(md.id) AS pending,
                 SUM(
                     CASE
-                        WHEN md.status <= :md_status THEN 1
-                        ELSE 0 
-                    END 
-                ) AS pending,
-                SUM(
-                    CASE
-                        WHEN md.status <= :same_md_status AND md.amount = {$request->amount} THEN 1
+                        WHEN md.amount = {$request->amount} THEN 1
                         ELSE 0 
                     END 
                 ) AS same_amount,
@@ -241,8 +247,9 @@ class DepositController extends Controller
                 AND r.credit >= {$request->amount}
                 AND r.STATUS = :r_status
                 AND rbc.STATUS = :rbc_status
-                AND pc.STATUS = :pc_status
+                AND pc.payin->>'$.status' = :pc_status
                 AND pc.currency = '{$request->currency}'
+                AND md.status <= :md_status
                 GROUP BY rbc.id
             ),
             reseller_pending AS (
@@ -262,12 +269,11 @@ class DepositController extends Controller
             WHERE total_pending < pending_limit 
                 AND channel = '{$request->channel}'
                 AND same_amount = 0";
-
+// dd($sql);
         $reseller_bank_cards = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
             'pc_status' => PaymentChannel::STATUS['ACTIVE'],
             'md_status' => MerchantDeposit::STATUS['PENDING'],
-            'same_md_status' => MerchantDeposit::STATUS['PENDING'],
             'rbc_status' => ResellerBankCard::STATUS['ACTIVE'],
         ]);
         // dd($reseller_bank_cards);
@@ -275,7 +281,7 @@ class DepositController extends Controller
             throw new \Exception('BankCard are unavailable!', 404);
         }
         $reseller_bank_card = Arr::random($reseller_bank_cards);
-        // dd($reseller_bank_card);
+
         DB::beginTransaction();
         try {
             $merchant_deposit = $this->model::create([

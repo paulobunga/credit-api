@@ -6,7 +6,9 @@ use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use App\Models\PaymentChannel;
 
 class ExecuteSql extends Command
 {
@@ -60,5 +62,38 @@ class ExecuteSql extends Command
         Schema::table('reseller_withdrawals', function (Blueprint $table) {
             $table->foreignId('reseller_bank_card_id')->after('reseller_id')->constrained();
         });
+    }
+
+    protected function paymentChannelAddPayinPayout()
+    {
+        if (!Schema::hasColumn('payment_channels', 'payin')) {
+            Schema::table('payment_channels', function (Blueprint $table) {
+                $table->json('payin')->after('attributes')->default(new Expression('(JSON_OBJECT())'));
+            });
+            PaymentChannel::where('id', '<>', 0)->update([
+                'payin' => [
+                    'status' => true,
+                    'min' => 500,
+                    'max' => 50000
+                ]
+            ]);
+        }
+        if (!Schema::hasColumn('payment_channels', 'payout')) {
+            Schema::table('payment_channels', function (Blueprint $table) {
+                $table->json('payout')->after('payin')->default(new Expression('(JSON_OBJECT())'));
+            });
+            PaymentChannel::where('id', '<>', 0)->update([
+                'payout' => [
+                    'status' => true,
+                    'min' => 2000,
+                    'max' => 50000
+                ]
+            ]);
+        }
+        if (Schema::hasColumn('payment_channels', 'status')) {
+            Schema::table('payment_channels', function (Blueprint $table) {
+                $table->dropColumn(['status']);
+            });
+        }
     }
 }
