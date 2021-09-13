@@ -41,7 +41,6 @@ class BankCardController extends Controller
         ]);
 
         $payment_channel = \App\Models\PaymentChannel::where('name', $request->channel)
-            ->where('status', true)
             ->where('currency', Auth::user()->currency)
             ->firstOrFail();
         $attributes = $payment_channel->validate($request->get('attributes'));
