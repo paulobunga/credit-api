@@ -240,8 +240,8 @@ class DepositController extends Controller
             FROM
                 reseller_bank_cards AS rbc
                 LEFT JOIN resellers AS r ON rbc.reseller_id = r.id
-                LEFT JOIN merchant_deposits AS md ON md.reseller_bank_card_id = rbc.id
-                LEFT JOIN payment_channels AS pc ON rbc.payment_channel_id = pc.id 
+                LEFT JOIN payment_channels AS pc ON rbc.payment_channel_id = pc.id
+                LEFT JOIN merchant_deposits AS md ON md.reseller_bank_card_id = rbc.id AND md.status <= :md_status 
             WHERE
                 r.currency = '{$request->currency}'
                 AND r.credit >= {$request->amount}
@@ -249,7 +249,6 @@ class DepositController extends Controller
                 AND rbc.STATUS = :rbc_status
                 AND pc.payin->>'$.status' = :pc_status
                 AND pc.currency = '{$request->currency}'
-                AND md.status <= :md_status
                 GROUP BY rbc.id
             ),
             reseller_pending AS (
@@ -269,7 +268,7 @@ class DepositController extends Controller
             WHERE total_pending < pending_limit 
                 AND channel = '{$request->channel}'
                 AND same_amount = 0";
-// dd($sql);
+        // dd($sql);
         $reseller_bank_cards = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
             'pc_status' => PaymentChannel::STATUS['ACTIVE'],
