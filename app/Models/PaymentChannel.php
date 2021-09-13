@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\DTO\PayIn;
 use App\Observers\PaymentChannelObserver;
 
 class PaymentChannel extends Model
@@ -16,13 +17,15 @@ class PaymentChannel extends Model
         'banks',
         'currency',
         'attributes',
+        'payin',
+        'payout',
         'payment_methods',
-        'status',
     ];
 
     protected $casts = [
         'attributes' => 'array',
-        'status' => 'boolean',
+        'payin' => PayIn::class,
+        'payout' => 'array',
         'created_at'  => 'datetime:Y-m-d H:i:s',
     ];
 
@@ -32,8 +35,8 @@ class PaymentChannel extends Model
     ];
 
     public const STATUS = [
-        'INACTIVE' => 0,
-        'ACTIVE' => 1,
+        'INACTIVE' => 'false',
+        'ACTIVE' => 'true',
     ];
 
     public function getBanksAttribute()
