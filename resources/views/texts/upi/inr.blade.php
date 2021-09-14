@@ -4,7 +4,7 @@
         <div class="input-group">
             <label id="upi_id" type="text" class="form-control readonly" required="required"
                 readonly>
-                {{ $attributes['upi_id']}}"
+                {{ $attributes['upi_id'] }}
             </label>
             <button class="btn btn-primary" data-clipboard-target="#upi_id">
                 <i class="fas fa-copy"></i>
