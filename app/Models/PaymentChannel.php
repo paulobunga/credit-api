@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\DTO\PayIn;
+use App\DTO\PayOut;
 use App\Observers\PaymentChannelObserver;
 
 class PaymentChannel extends Model
@@ -25,7 +26,7 @@ class PaymentChannel extends Model
     protected $casts = [
         'attributes' => 'array',
         'payin' => PayIn::class,
-        'payout' => 'array',
+        'payout' => PayOut::class,
         'created_at'  => 'datetime:Y-m-d H:i:s',
     ];
 

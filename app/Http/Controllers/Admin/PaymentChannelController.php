@@ -52,6 +52,8 @@ class PaymentChannelController extends Controller
             'banks.*' => 'exists:banks,id',
             'attributes' => 'required|array',
             'attributes.*' => 'required',
+            'payin' => 'required',
+            'payout' => 'required',
         ]);
 
         $model = $this->model::create([
@@ -60,6 +62,8 @@ class PaymentChannelController extends Controller
             'attributes' => $request->get('attributes'),
             'currency' => $request->currency,
             'banks' => implode(',', $request->banks),
+            'payin' => $request->payin,
+            'payout' => $request->payout,
         ]);
 
         return $this->response->item($model, $this->transformer);
@@ -83,6 +87,8 @@ class PaymentChannelController extends Controller
             'banks.*' => 'exists:banks,id',
             'attributes' => 'required|array',
             'attributes.*' => 'required',
+            'payin' => 'required',
+            'payout' => 'required',
         ]);
         $model->update([
             'name' => $request->name,
@@ -90,6 +96,8 @@ class PaymentChannelController extends Controller
             'attributes' => $request->get('attributes'),
             'currency' => $request->currency,
             'banks' => implode(',', $request->banks),
+            'payin' => $request->payin,
+            'payout' => $request->payout,
         ]);
 
         return $this->response->item($model, $this->transformer);
