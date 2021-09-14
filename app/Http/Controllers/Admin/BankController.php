@@ -37,10 +37,9 @@ class BankController extends Controller
                 'currency',
                 'ident',
                 'status'
-            ])
-            ->paginate($this->perPage);
+            ]);
 
-        return $this->response->withPaginator($banks, $this->transformer);
+        return $this->paginate($banks, $this->transformer);
     }
 
     /**

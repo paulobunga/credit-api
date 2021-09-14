@@ -6,12 +6,15 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 use Illuminate\Support\Arr;
 use Dingo\Api\Http\Request;
 use Dingo\Api\Routing\Helpers;
+use Spatie\QueryBuilder\QueryBuilder;
 use App\Exceptions\RouteNotFoundException;
 use App\Exceptions\ValidationHttpException;
 
 abstract class Controller extends BaseController
 {
     use Helpers;
+
+    protected $perPage;
 
     public function __construct()
     {
@@ -50,6 +53,15 @@ abstract class Controller extends BaseController
         return [
             'message' => 'success'
         ];
+    }
+
+    protected function paginate(QueryBuilder $builder, $transformer)
+    {
+        if (!empty($this->perPage)) {
+            return $this->response->withPaginator($builder->paginate($this->perPage), $transformer);
+        } else {
+            return $this->response->collection($builder->get(), $transformer);
+        }
     }
 
     public function index(Request $request)
