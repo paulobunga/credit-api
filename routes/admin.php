@@ -24,7 +24,6 @@ $api->group([
         $api->resource('roles', 'RoleController', ['except' => ['show']]);
 
         $api->resource('banks', 'BankController', ['except' => ['show']]);
-        $api->get('/export/banks', ['as' => 'banks.export', 'uses' => 'BankController@export']);
 
         $api->resource('admins', 'AdminController', ['except' => ['show']]);
 

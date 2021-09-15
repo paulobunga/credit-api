@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedSort;
 use App\Exports\BankExport;
 use App\Settings\CurrencySetting;
 
@@ -26,7 +25,7 @@ class BankController extends Controller
         $banks = QueryBuilder::for($this->model)
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::partial('name', 'banks.name'),
+                AllowedFilter::partial('name'),
                 AllowedFilter::partial('ident'),
                 AllowedFilter::exact('currency'),
                 AllowedFilter::exact('status')
@@ -98,23 +97,5 @@ class BankController extends Controller
         $bank->delete();
 
         return $this->success();
-    }
-
-    public function export()
-    {
-        return new BankExport(
-            QueryBuilder::for($this->model)
-                ->allowedFilters([
-                    AllowedFilter::partial('name', 'banks.name'),
-                    AllowedFilter::partial('ident'),
-                    AllowedFilter::exact('status')
-                ])
-                ->allowedSorts([
-                    AllowedSort::field('id', 'banks.id'),
-                    AllowedSort::field('name', 'banks.name'),
-                    'ident',
-                    'status'
-                ])->get()
-        );
     }
 }

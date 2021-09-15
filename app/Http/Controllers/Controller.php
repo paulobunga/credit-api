@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Laravel\Lumen\Routing\Controller as BaseController;
+use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Dingo\Api\Http\Request;
 use Dingo\Api\Routing\Helpers;
@@ -16,9 +17,12 @@ abstract class Controller extends BaseController
 
     protected $perPage;
 
+    protected $export;
+
     public function __construct()
     {
         $this->perPage = min(request()->get('per_page', 10), 100);
+        $this->export = request()->header('X-Header-Export', false);
     }
 
     public function validate(
@@ -57,6 +61,12 @@ abstract class Controller extends BaseController
 
     protected function paginate(QueryBuilder $builder, $transformer)
     {
+        if ($this->export) {
+            $class = ucfirst(Str::singular(array_slice(explode('.', request()->route()[1]['as']), -2, 1)[0]));
+            $class = "\\App\\Exports\\{$class}Export";
+            return new $class($builder->get());
+        }
+
         if (!empty($this->perPage)) {
             return $this->response->withPaginator($builder->paginate($this->perPage), $transformer);
         } else {

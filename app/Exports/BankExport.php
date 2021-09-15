@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-class BankExport extends BaseExport
+class BankExport extends Base
 {
     /**
      * It's required to define the fileName within

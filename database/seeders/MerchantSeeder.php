@@ -26,6 +26,11 @@ class MerchantSeeder extends Seeder
             'status' => true,
         ]);
         $merchant->credits()->create([
+            'currency' => 'INR',
+            'credit' => 0,
+            'transaction_fee' => 0.001
+        ]);
+        $merchant->credits()->create([
             'currency' => 'VND',
             'credit' => 0,
             'transaction_fee' => 0.001

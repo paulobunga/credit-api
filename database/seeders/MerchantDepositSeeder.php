@@ -10,7 +10,6 @@ use App\Models\MerchantDeposit;
 use App\Models\MerchantWithdrawal;
 use App\Models\Reseller;
 use App\Models\ResellerWithdrawal;
-use App\Models\PaymentChannel;
 use App\Models\Transaction;
 
 class MerchantDepositSeeder extends Seeder

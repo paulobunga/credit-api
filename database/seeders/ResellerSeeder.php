@@ -26,23 +26,8 @@ class ResellerSeeder extends Seeder
         AgentSetting $as,
         CurrencySetting $c
     ) {
-        $reseller = \App\Models\Reseller::create([
-            'upline_id' => 1,
-            'level' => Reseller::LEVEL['AGENT_MASTER'],
-            'name' => 'Test Master Agent',
-            'username' => 'master@gmail.com',
-            'password' => 'P@ssw0rd',
-            'phone' => '+8865721455',
-            'currency' => 'VND',
-            'credit' => 0,
-            'coin' => 0,
-            'pending_limit' => 0,
-            'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['AGENT_MASTER']),
-            'downline_slot' => 1,
-            'status' => true,
-        ]);
         \App\Models\Reseller::create([
-            'upline_id' => $reseller->id,
+            'upline_id' => Reseller::where('currency', 'VND')->first()->id,
             'level' => Reseller::LEVEL['RESELLER'],
             'name' => 'Test Reseller',
             'username' => 'reseller@gmail.com',
@@ -57,15 +42,16 @@ class ResellerSeeder extends Seeder
             'status' => true,
         ]);
         // create INR 4 level agent
-        foreach (Reseller::LEVEL as $level) {
-            $reseller = Reseller::factory()->create([
-                'username' => "reseller{$level}@gmail.com",
-                'upline_id' => $level ? $reseller->id : 0,
-                'level' => $level,
-                'currency' => 'INR',
+        foreach ($c->currency as $currency => $setting) {
+            $level = Reseller::LEVEL['RESELLER'];
+            Reseller::factory()->create([
+                'username' => "{$currency}Reseller@gmail.com",
+                'upline_id' => Reseller::where('currency', $currency)->first()->id,
+                'level' =>  $level,
+                'currency' => $currency,
                 'credit' => 0,
                 'pending_limit' => $rs->getDefaultPendingLimit($level),
-                'commission_percentage' => $c->getCommissionPercentage('INR', $level),
+                'commission_percentage' => $c->getCommissionPercentage($currency, $level),
                 'downline_slot' => $as->getDefaultDownLineSlot($level),
                 'status' => Reseller::STATUS['ACTIVE']
             ]);

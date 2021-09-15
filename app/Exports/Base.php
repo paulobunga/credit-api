@@ -8,9 +8,8 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Excel;
-use Spatie\QueryBuilder\QueryBuilder;
 
-abstract class BaseExport implements FromCollection, Responsable, WithHeadings, WithMapping
+abstract class Base implements FromCollection, Responsable, WithHeadings, WithMapping
 {
     use Exportable;
 

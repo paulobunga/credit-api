@@ -37,7 +37,7 @@ class CreateTableMerchantDeposits extends Migration
             $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
             $table->timestamp('notified_at')->nullable();
-            $table->unique(['merchant_id', 'merchant_order_id']);
+            $table->unique(['merchant_id', 'merchant_order_id', 'currency']);
         });
     }
 

@@ -33,17 +33,6 @@ class CreateTableResellers extends Migration
             $table->timestamps();
         });
 
-        // create default referrer
-        Reseller::create([
-            'level' => 0,
-            'name' => 'company',
-            'username' => 'company@gmail.com',
-            'phone' => '0978475446',
-            'currency' => 'VND',
-            'password' => 'P@ssw0rd',
-            'status' => Reseller::STATUS['ACTIVE'],
-        ]);
-
         Schema::create('reseller_bank_cards', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reseller_id')->constrained();
