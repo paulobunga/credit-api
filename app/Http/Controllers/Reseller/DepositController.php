@@ -8,10 +8,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use App\Models\MerchantDeposit;
 
 class DepositController extends Controller
 {
-    protected $model = \App\Models\MerchantDeposit::class;
+    protected $model = MerchantDeposit::class;
 
     protected $transformer = \App\Transformers\Reseller\DepositTransformer::class;
 
@@ -67,10 +68,9 @@ class DepositController extends Controller
                 'amount',
                 'status',
                 'created_at',
-            ])
-            ->paginate($this->perPage);
+            ]);
 
-        return $this->response->withPaginator($deposits, $this->transformer);
+        return $this->paginate($deposits, $this->transformer);
     }
 
     public function update(Request $request)
@@ -78,6 +78,11 @@ class DepositController extends Controller
         $deposit = $this->model::findOrFail($this->parameters('deposit'));
         if ($deposit->reseller->id != Auth::id()) {
             throw new \Exception('Unauthorize', 401);
+        }
+        if (!in_array($deposit->status, [
+            MerchantDeposit::STATUS['PENDING']
+        ])) {
+            throw new \Exception('Status is not allowed to update', 401);
         }
         $this->validate($request, [
             'status' => 'required|numeric',
