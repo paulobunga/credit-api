@@ -96,4 +96,17 @@ class ExecuteSql extends Command
             });
         }
     }
+
+    protected function addCurrencyExpiredMinute()
+    {
+        $setting = app(\App\Settings\CurrencySetting::class);
+        foreach ($setting->currency as $currency => $s) {
+            if (isset($s['expired_minutes'])) {
+                continue;
+            }
+            $s['expired_minutes'] = 5;
+            $setting->currency[$currency] = $s;
+        }
+        $setting->save();
+    }
 }

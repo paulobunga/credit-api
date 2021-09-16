@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\ActivateCheck::class,
         \App\Console\Commands\ExecuteSql::class,
         \App\Console\Commands\ImportFile::class,
+        \App\Console\Commands\CheckCashIn::class,
     ];
 
     /**
@@ -36,6 +37,11 @@ class Kernel extends ConsoleKernel
         # Activate code check
         $schedule->command('activate:check')
             ->name('ActivateCheck')
+            ->runInBackground()
+            ->everyMinute();
+        # Check cash in orders
+        $schedule->command('check:cashin')
+            ->name('CheckCashIn')
             ->runInBackground()
             ->everyMinute();
     }
