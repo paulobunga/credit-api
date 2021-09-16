@@ -78,16 +78,6 @@
                             {{ $deposit->amount }} {{ $deposit->currency }}
                         </label>
                     </div>
-                    <div class="mb-3 row align-items-center">
-                        <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">Reference No</label>
-                        @if($deposit->status == 0)
-                        <input class="col-sm-10 col-form-label fw-bold fs-5" name="reference_no" value=""
-                            placeholder="Please input reference number" />
-                        @else
-                        <label for="staticEmail"
-                            class="col-sm-2 col-form-label fw-bold fs-6">{{ $deposit->reference_no }}</label>
-                        @endif
-                    </div>
                     @if($deposit->status == 0)
                     <button type="submit" class="btn btn-primary">Submit</button>
                     @endif
