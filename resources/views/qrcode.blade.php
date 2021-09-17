@@ -75,7 +75,7 @@
                     <div class="mb-3 row align-items-center">
                         <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">Amount</label>
                         <label class="col-sm-10 col-form-label fw-bold fs-4 text-warning">
-                            {{ $deposit->amount }} {{ $deposit->currency }}
+                            {{ number_format($deposit->amount, 2) }} {{ $deposit->currency }}
                         </label>
                     </div>
                     @if($deposit->status == 0)

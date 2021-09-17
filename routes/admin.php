@@ -27,7 +27,7 @@ $api->group([
 
         $api->resource('admins', 'AdminController', ['except' => ['show']]);
 
-        $api->resource('settings', 'SettingController', ['except' => ['show']]);
+        $api->resource('settings', 'SettingController', ['only' => ['index', 'update']]);
 
         $api->resource('merchant_white_lists', 'MerchantWhiteListController', ['except' => ['show']]);
 
@@ -47,7 +47,7 @@ $api->group([
 
         $api->resource('merchant_deposits', 'MerchantDepositController', ['only' => ['index', 'update']]);
         $api->put("/merchant_deposits/resend/{merchant_deposit}", [
-            'as' => 'merchant_deposit.resend', 'uses' => 'MerchantDepositController@resend'
+            'as' => 'merchant_deposits.resend', 'uses' => 'MerchantDepositController@resend'
         ]);
 
         $api->resource('merchant_withdrawals', 'MerchantWithdrawalController', ['only' => ['index']]);
