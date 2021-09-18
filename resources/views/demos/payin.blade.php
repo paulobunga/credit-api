@@ -68,11 +68,9 @@
             },
             getMethods(){
                 const $channel = this._channels.find(c => c.name == this.channel);
-                console.log($channel, this.channel);
                 return $channel?.methods || [];
             },
             init(){
-                console.log(this._channels);
                 this.$watch('channel', (value) => {
                     this.method = this.getMethods()[0];
                 })

@@ -51,8 +51,8 @@
         </div>
     </div>
 </div>
-<div class="container mt-5 p-5 rounded bg-gradient-4 shadow">
-    <div class="mb-4">
+<div class="container mt-5 p-md-5 rounded bg-gradient-4 shadow-md">
+    <div class="mb-4 text-end text-md-center">
         <h2>Payment details</h2>
     </div>
     @if($deposit->created_at->addHours(1) > \Carbon\Carbon::now())
@@ -75,7 +75,7 @@
                     <div class="mb-3 row align-items-center">
                         <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">Amount</label>
                         <label for="staticEmail" class="col-sm-10 col-form-label fw-bold fs-4 text-warning">
-                            {{ number_format($deposit->amount, 2) }} {{ $deposit->currency }}
+                            {{ number_format($deposit->amount, 2, '.',  '') }} {{ $deposit->currency }}
                         </label>
                     </div>
                     @if($deposit->status == 0)

@@ -1,41 +1,28 @@
-<div class="mb-3 row">
-    <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">Account Number</label>
-    <div class="col-sm-10 mb-3">
-        <div class="input-group">
-            <label id="account_no" type="text" class="form-control">
-                {{ $attributes['account_number']  }}
-            </label>
-            <button class="btn btn-primary" data-clipboard-target="#account_no">
-                <i class="fas fa-copy"> </i>
-            </button>
-        </div>
+@extends('layout')
+
+@section('head')
+<title>{{ env('APP_NAME') }} - PayIn</title>
+@endsection
+
+@section('style')
+<style>
+</style>
+@endsection
+
+@section('content')
+<div class="py-4 md:py-6">
+    <x-stepper :steps="$steps" />
+</div>
+<div class="w-full py-4 md:py-6 text-center flex justify-center">
+    <x-timer :dateTime='$deposit->expired_at' />
+</div>
+<div class="w-full py-4 flex-1 text-center font-bold text-2xl">
+    <div class="h-6 text-gray-800 text-lg leading-8 uppercase">Amount</div>
+    <div class="text-red-700">
+        {{ number_format($deposit->amount, 2, '.',  '') }} {{ $deposit->currency }}
     </div>
 </div>
-<div class="mb-3 row">
-    <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">
-        Account Holder Name
-    </label>
-    <div class="col-sm-10 mb-3">
-        <div class="input-group">
-            <label id="account_name" type="text" class="form-control">
-                {{ $attributes['account_name']}}
-            </label>
-            <button class="btn btn-primary" data-clipboard-target="#account_name">
-                <i class="fas fa-copy"> </i>
-            </button>
-        </div>
-    </div>
-</div>
-<div class="mb-3 row">
-    <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">Bank Name</label>
-    <div class="col-sm-10 mb-3">
-        <div class="input-group">
-            <label id="bank_name" type="text" class="form-control readonly" required="required" readonly>
-                {{ $attributes['bank_name'] }}
-            </label>
-            <button class="btn btn-primary" data-clipboard-target="#bank_name">
-                <i class="fas fa-copy"></i>
-            </button>
-        </div>
-    </div>
-</div>
+
+@yield('attributes')
+
+@endsection

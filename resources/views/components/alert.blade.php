@@ -1,12 +1,15 @@
-<div class="absolute h-screen w-full flex z-10 items-center justify-center bg-black bg-opacity-25" x-data="$store.$alert" x-init="$watch('open', value => {
-    if(value){
-
-    }
-  })" x-show="open">
-    <div class="w-80 sm:w-50 flex flex-col jusctify-center" x-show="open" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-        x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0">
+<div class="absolute h-screen w-full flex z-10 items-center justify-center bg-black bg-opacity-25"
+    x-data="$store.$alert" x-init="$watch('open', value => {
+        if(value){
+            setTimeout(function () {
+                open = false
+                }, 2000);
+        }
+    })" x-show="open" x-on:click="open = false;">
+    <div class="w-80 sm:w-50 flex flex-col jusctify-center" x-show="open"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
         <div class="flex items-center font-bold py-3 px-4 rounded shadow-md mb-2" :class="{
                     'bg-green-500': type == 'success',
                     'bg-blue-500': type == 'info',

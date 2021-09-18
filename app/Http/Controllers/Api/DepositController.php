@@ -351,7 +351,7 @@ class DepositController extends Controller
                 break;
             case MerchantDeposit::STATUS['APPROVED']:
             case MerchantDeposit::STATUS['ENFORCED']:
-                $steps[] = ['icon' => 'fas fa-user-check', 'label' => 'Confirm', 'status' => 1];
+                $steps[] = ['icon' => 'fas fa-user-check', 'label' => 'Confirm', 'status' => 2];
                 break;
             case MerchantDeposit::STATUS['REJECTED']:
             case MerchantDeposit::STATUS['CANCELED']:
@@ -359,10 +359,9 @@ class DepositController extends Controller
                 break;
         }
 
-        return view(strtolower($deposit->method), [
+        return view(strtolower("{$deposit->method}s.{$channel->name}.{$channel->currency}"), [
             'deposit' => $deposit,
             'channel' => $channel,
-            'subview' => strtolower("{$deposit->method}s.{$channel->name}.{$channel->currency}"),
             'attributes' => $deposit->resellerBankCard->attributes,
             'steps' => $steps
         ]);

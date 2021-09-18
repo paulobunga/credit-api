@@ -5,3 +5,9 @@ Homestead.yaml
 .env
 .phpunit.result.cache
 .DS_Store
+/ocr
+node_modules
+/public/js
+/public/css
+/public/fonts/vendor
+/public/mix-manifest.json
