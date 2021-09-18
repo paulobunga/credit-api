@@ -114,4 +114,10 @@ class MerchantDeposit extends Model
                 'sign' => $this->createSign($params, $this->merchant->api_key)
             ]);
     }
+
+    public function getExpiredAtAttribute()
+    {
+        $min = app(\App\Settings\CurrencySetting::class)->getExpiredMinutes($this->attributes['currency']);
+        return $this->created_at->addMinutes($min);
+    }
 }

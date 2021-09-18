@@ -32,4 +32,10 @@ class CurrencySetting extends Settings
         }
         return 0;
     }
+
+    public function getExpiredMinutes($currency)
+    {
+        $c = $this->currency[$currency] ?? null;
+        return isset($c) ? $c['expired_minutes'] : 0;
+    }
 }

@@ -339,12 +339,32 @@ class DepositController extends Controller
             'merchant_order_id' => $request->merchant_order_id,
         ])->firstOrFail();
         $channel = $deposit->paymentChannel;
+        $steps = [
+            ['icon' => 'fas fa-money-check-alt', 'label' => 'Transfer', 'status' => 1],
+        ];
+        switch ($deposit->status) {
+            case MerchantDeposit::STATUS['PENDING']:
+                $steps[] = ['icon' => 'fas fa-user-check', 'label' => 'Confirm', 'status' => 0];
+                break;
+            case MerchantDeposit::STATUS['EXPIRED']:
+                $steps[] = ['icon' => 'fas fa-stopwatch', 'label' => 'Expired', 'status' => 0];
+                break;
+            case MerchantDeposit::STATUS['APPROVED']:
+            case MerchantDeposit::STATUS['ENFORCED']:
+                $steps[] = ['icon' => 'fas fa-user-check', 'label' => 'Confirm', 'status' => 1];
+                break;
+            case MerchantDeposit::STATUS['REJECTED']:
+            case MerchantDeposit::STATUS['CANCELED']:
+                $steps[] = ['icon' => 'fas fa-user-check', 'label' => 'Reject', 'status' => -1];
+                break;
+        }
 
         return view(strtolower($deposit->method), [
             'deposit' => $deposit,
             'channel' => $channel,
             'subview' => strtolower("{$deposit->method}s.{$channel->name}.{$channel->currency}"),
-            'attributes' => $deposit->resellerBankCard->attributes
+            'attributes' => $deposit->resellerBankCard->attributes,
+            'steps' => $steps
         ]);
     }
 }

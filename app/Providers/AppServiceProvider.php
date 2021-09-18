@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
@@ -18,6 +20,12 @@ class AppServiceProvider extends ServiceProvider
         if ($manager = app('api.transformer')->getFractal()) {
             $manager->setSerializer(new \App\Transformers\Serializer\DataArraySerializer());
         }
+        $this->app->singleton('blade.compiler', function () {
+            return new BladeCompiler(
+                $this->app['files'],
+                config('view.compiled')
+            );
+        });
         // register custom morph type
         Relation::morphMap([
             'admin' => 'App\Models\Admin',
@@ -36,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
             'api.auth' => \App\Http\Middleware\Authenticate::class,
         ]);
         $this->bootBroadCast();
+        $this->bootBladeComponents();
     }
 
     protected function bootBroadCast()
@@ -43,5 +52,13 @@ class AppServiceProvider extends ServiceProvider
         $router = app('router');
         $router->get('/broadcasting/auth', ['uses' => '\App\Http\Controllers\BroadcastController@authenticate']);
         $router->post('/broadcasting/auth', ['uses' => '\App\Http\Controllers\BroadcastController@authenticate']);
+    }
+
+    protected function bootBladeComponents()
+    {
+        Blade::component('x-header', \App\View\Components\Header::class);
+        Blade::component('x-stepper', \App\View\Components\Stepper::class);
+        Blade::component('x-alert', \App\View\Components\Alert::class);
+        Blade::component('x-timer', \App\View\Components\Timer::class);
     }
 }

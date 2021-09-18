@@ -1,134 +1,52 @@
 @extends('layout')
+@section('head')
+<title>{{ env('APP_NAME') }} - PayIn</title>
+@endsection
 @section('style')
 <style>
-    .countdown {
-        text-transform: uppercase;
-        font-weight: bold;
-    }
-
-    .countdown span {
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-        font-size: 3rem;
-        margin-left: 0.8rem;
-    }
-
-    .countdown span:first-of-type {
-        margin-left: 0;
-    }
-
-    .countdown-circles {
-        text-transform: uppercase;
-        font-weight: bold;
-    }
-
-    .countdown-circles span {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .countdown-circles span:first-of-type {
-        margin-left: 0;
-    }
 </style>
 @endsection
 @section('content')
-<!-- Flexbox container for aligning the toasts -->
-<div aria-live="polite" aria-atomic="true"
-    class="d-flex justify-content-center align-items-center w-100 position-fixed top-10 " style="z-index: 11">
-    <!-- Then put toasts within -->
-    <div class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <strong class="me-auto text-center">Alert</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-        </div>
-    </div>
-</div>
-<div class="container mt-5 p-5 rounded bg-gradient-4 shadow">
-    <div class="mb-4">
-        <h2>Payment details</h2>
-    </div>
-    @if($deposit->created_at->addHours(1) > \Carbon\Carbon::now())
-    <div class="row" id="payment_detail">
-        <div class="col-md-12">
-            @if($deposit->status == 0)
-            <form id="form" method="post"
-                action="{{ app('api.url')->version(env('API_VERSION'))->route('api.deposits.update', $deposit->merchant_order_id) }}">
-                <input type="hidden" name="_method" value="put" />
-                <input type="hidden" name="merchant_id" value="{{ $deposit->merchant_id }}" />
-                @endif
-                <div class="card p-3">
-                    <div class="mb-3 row align-items-center">
-                        <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">Order Id</label>
-                        <label class="col-sm-10 col-form-label fw-bold fs-4 text-warning">
-                            {{ $deposit->merchant_order_id }}
-                        </label>
-                    </div>
-                    @includeFirst([$subview, 'qrcodes.default'], ['attributes' => $attributes])
-                    <div class="mb-3 row align-items-center">
-                        <label for="staticEmail" class="col-sm-2 col-form-label fw-bold fs-6">Amount</label>
-                        <label class="col-sm-10 col-form-label fw-bold fs-4 text-warning">
-                            {{ number_format($deposit->amount, 2) }} {{ $deposit->currency }}
-                        </label>
-                    </div>
-                    @if($deposit->status == 0)
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    @endif
-                </div>
-                @if($deposit->status == 0)
-            </form>
-            @endif
-        </div>
-    </div>
-    @endif
-    <div class="row text-center mt-2">
-        <h5 id="expiration" class="display-4 mb-4 text-danger" style="display:none">Deposit has expired</h5>
-        <div id="clock-c" class="countdown py-4"></div>
-    </div>
-</div>
-@endsection
+<x-stepper :steps="$steps" />
 
-@section('js')
-<script>
-    $(document).ready(function() {
-        @if($deposit->status == 0)
-        $('#clock-c').countdown("<?= $deposit->created_at->addHours(1)->toDateTimeString() ?>", function(event) {
-            var $this = $(this).html(event.strftime('' +
-                '<span class="h1 font-weight-bold">%M</span> Min' +
-                '<span class="h1 font-weight-bold">%S</span> Sec'));
-        }).on('finish.countdown', function(e) {
-            $('#expiration').show();
-        });
-        @if($deposit->created_at->addHours(1) <= \Carbon\Carbon::now())
-            $('#expiration').show();
-        @endif
-        @else
-        $('#expiration').text('Your order is pending, please wait it completed').show();
-        @endif
-        $("#form").submit(function(event) {
-            event.preventDefault();
-            $.ajax({
-                url: $(this).attr('action'),
-                type: 'put',
-                dataType: 'json',
-                data: $(this).serialize(),
-                success: function(data) {
-                    location.reload();
-                }
-            });
-        });
-        var clipboard = new ClipboardJS('.btn');
-        clipboard.on('success', function(e) {
-            $('.toast .toast-body').text(e.text + ' is Copied!');
-            $('.toast').toast('show');
-        });
-    });
-</script>
+<div class="w-full mt-3 py-2 md:py-3 text-center flex justify-center">
+    <x-timer :dateTime='$deposit->expired_at' />
+</div>
+<div class="w-full mt-3 flex-1 text-center font-bold text-2xl">
+    <div class="h-6 text-gray-800 text-lg leading-8 uppercase">Amount</div>
+    <div class="text-red-700">
+        {{ number_format($deposit->amount, 2, '.',  '') }} {{ $deposit->currency }}
+    </div>
+</div>
+{{-- @if($deposit->status == 0)
+<form id="form" method="post"
+action="{{ app('api.url')->version(env('API_VERSION'))->route('api.deposits.update', $deposit->merchant_order_id) }}">
+<input type="hidden" name="_method" value="put" />
+<input type="hidden" name="merchant_id" value="{{ $deposit->merchant_id }}" />
+@endif --}}
+@section('attirbutes')
+<div class="w-full grid grid-flow-row sm:gap-4 gap-y-2 text-sm sm:text-lg">
+    <div class="w-full py-2 md:py-3 text-center flex justify-center">
+        {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(250)->generate($attributes['upi_id']) !!}
+    </div>
+    <div
+        class="w-full py-2 md:py-3 grid grid-flow-col gap-x-2 text-center border-b-2 border-gray-400 border-opacity-25">
+        <div class="uppercase font-bold">UPI ID</div>
+        <div class="overflow-x-auto">
+            {{ $attributes['upi_id'] }}
+        </div>
+        <div x-data="{'input': '{{ $attributes['upi_id'] }}' }">
+            <button class="px-3 sm:px-6 bg-yellow-200 text-yellow-800 rounded-full"
+                x-on:click="$clipboard(input); $store.$alert.show('success', 'UPI ID is copied!')">
+                <i class="far fa-copy"></i>
+            </button>
+        </div>
+    </div>
+</div>
+@show
+{{-- @if($deposit->status == 0)
+<button type="submit" class="btn btn-primary">Submit</button>
+</form>
+@endif --}}
+
 @endsection

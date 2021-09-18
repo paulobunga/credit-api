@@ -1,73 +1,86 @@
 @extends('layout')
+@section('head')
+<title>{{ env('APP_NAME') }} - Try PayIn</title>
+@endsection
 @section('content')
-    <div class="container mt-5 p-5 rounded bg-gradient-4 shadow">
-        <div class="mb-4">
-            <h2>Demo Payin</h2>
-        </div>
-        <form method="post" action="{{ app('api.url')->version(env('API_VERSION'))->route('api.demos.payin.create') }}">
-            <div class="form-group mb-4">
-                <label for="currency">Currency</label>
-                <select class="form-control" name="currency" id="currency">
-                    @foreach ($currency as $c)
-                        <option val="{{ $c }}">{{ $c }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group mb-4">
-                <label for="channel">Payment Channel</label>
-                <select class="form-control" name="channel" id="channel">
-                </select>
-            </div>
-            <div class="form-group mb-4">
-                <label for="method">Method</label>
-                <select class="form-control" name="method" id="method">
-                    @foreach ($channels as $c)
-                        @foreach ($c->paymentMethods as $m)
-                            <option val="{{ $m }}" data-channel="{{ $c->name }}">
-                                {{ $m }}
-                            </option>
-                        @endforeach
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group mb-4">
-                <label for="amount">Amount</label>
-                <input type="number" class="form-control" name="amount" placeholder="please input valid amount">
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+<h2 class="font-bold text-lg my-4">Demo Payin</h2>
+<form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" x-data="channels" method="post"
+    action="{{ app('api.url')->version(env('API_VERSION'))->route('api.demos.payin.create') }}">
+    <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="currency">
+            Currency
+        </label>
+        <select name="currency" x-model="currency" x-on:change="getChannels"
+            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            @foreach ($currency as $c)
+            <option val="{{ $c }}">{{ $c }}</option>
+            @endforeach
+        </select>
     </div>
+    <div class="mb-6">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="channel">
+            Payment Channel
+        </label>
+        <select name="channel" x-model="channel"
+            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <template x-for="c in getChannels">
+                <option x-bind:val="c.name" x-text="c.name"></option>
+            </template>
+        </select>
+    </div>
+    <div class="mb-6">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="method">
+            Payment Method
+        </label>
+        <select name="method" x-model="method"
+            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <template x-for="m in getMethods">
+                <option x-bind:val="m" x-text="m"></option>
+            </template>
+        </select>
+    </div>
+    <div class="mb-6">
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grip-amount">
+            Amount
+        </label>
+        <input name="amount"
+            class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            type="number" placeholder="Pleas input amount">
+    </div>
+    <div class="flex items-center justify-between">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded
+            focus:outline-none focus:shadow-outline" type="button">
+            Submit
+        </button>
+    </div>
+</form>
 @endsection
-@section('js')
-    <script>
-        $(document).ready(function() {
-            var channels = 
-            {!! json_encode(                
-                collect($channels)->map(function($c){
-                    return [
-                        'name' => $c->name,
-                        'currency' => $c->currency,
-                        'methods' => $c->payment_methods,
-                    ];
-                }));
-            !!}
-            $('#currency').change(function(){
-                $('#channel').empty();
-                channels.filter(v=>v.currency == $(this).val()).forEach(c => {
-                    $('#channel').append(`<option val="${c.name}">${c.name}</option>`);
-                });
-                $('#channel').trigger('change');
-            });
-            $('#channel').change(function(){
-                $('#method').empty();
-                const channel = channels.find(v=>v.name == $(this).val());
-                if(channel){
-                    channel.methods.forEach(m => {
-                        $('#method').append(`<option val="${m}">${m}</option>`);
-                    });
-                }
-            });
-            $('#currency').trigger('change');
-        });
-    </script>
-@endsection
+@push('js')
+<script>
+    document.addEventListener('alpine:init', ()=>{
+        Alpine.data('channels', ()=>({
+            currency: '{{ $channels[0]["currency"]??'' }}',
+            channel: '{{ $channels[0]["name"]??'' }}',
+            method: '{{ $channels[0]["methods"][0]??'' }}',
+            _channels: @json($channels),
+            getChannels(){
+                return this._channels.filter(channel=>channel.currency == this.currency);
+            },
+            getMethods(){
+                const $channel = this._channels.find(c => c.name == this.channel);
+                console.log($channel, this.channel);
+                return $channel?.methods || [];
+            },
+            init(){
+                console.log(this._channels);
+                this.$watch('channel', (value) => {
+                    this.method = this.getMethods()[0];
+                })
+                this.$watch('currency', (value) => {
+                    this.channel = this.getChannels()[0].name;
+                })
+            }
+        }));
+    });
+</script>
+@endpush

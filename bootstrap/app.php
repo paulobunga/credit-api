@@ -66,6 +66,8 @@ $app->configure('auth');
 $app->configure('excel');
 $app->configure('permission');
 $app->configure('query-builder');
+// $app->configure('fcm');
+$app->configure('view');
 $app->configure('broadcasting');
 $app->configure('settings');
 /*
@@ -110,6 +112,7 @@ $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 $app->register(SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
+// $app->register(App\Channels\Fcm\FcmServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\RouteServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);

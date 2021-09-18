@@ -14,7 +14,7 @@ class CreateCurrencySettings extends SettingsMigration
                 'agent_percentage' => 0.004,
                 'reseller_percentage' => 0.005,
                 'transaction_fee_percentage' => 0.001,
-                'expired_minute' => 5,
+                'expired_minutes' => 5,
             ],
             'INR' => [
                 'referrer_percentage' => 0,
@@ -22,7 +22,7 @@ class CreateCurrencySettings extends SettingsMigration
                 'agent_percentage' => 0.004,
                 'reseller_percentage' => 0.005,
                 'transaction_fee_percentage' => 0.001,
-                'expired_minute' => 5,
+                'expired_minutes' => 5,
             ]
         ];
         $this->migrator->add('currency.currency', $currency);

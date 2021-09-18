@@ -59,27 +59,18 @@ class DemoController extends Controller
                 $channels = PaymentChannel::whereIn(
                     'currency',
                     $currency
-                )->get();
+                )
+                ->get()
+                ->map(function ($c) {
+                    return [
+                        'name' => $c->name,
+                        'currency' => $c->currency,
+                        'methods' => $c->payment_methods,
+                    ];
+                });
                 return view('demos.payin', compact('merchant', 'currency', 'channels'));
             default:
                 throw new \Exception('invalid request', 405);
         }
-        // if($request)
-        // $merchant = $this->validateSign($request);
-        // $this->validate($request, [
-        //     'time' => 'required|numeric',
-        // ]);
-        // $deposit = $this->model::with(['merchant', 'resellerBankCard', 'paymentChannel'])->where([
-        //     'merchant_id' => $merchant->id,
-        //     'merchant_order_id' => $request->merchant_order_id,
-        // ])->firstOrFail();
-        // $channel = $deposit->paymentChannel;
-
-        // return view(strtolower($deposit->method), [
-        //     'deposit' => $deposit,
-        //     'channel' => $channel,
-        //     'subview' => strtolower("{$deposit->method}s.{$channel->name}.{$channel->currency}"),
-        //     'attributes' => $deposit->resellerBankCard->attributes
-        // ]);
     }
 }
