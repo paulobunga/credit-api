@@ -7,6 +7,8 @@ use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
+use App\Transformers\Admin\ReportResellerTransformer;
+use App\Transformers\Admin\ReportMerchantTransformer;
 
 class ReportController extends Controller
 {
@@ -38,13 +40,9 @@ class ReportController extends Controller
                 'amount',
                 'currency',
                 'name'
-            ])
-            ->paginate($this->perPage);
+            ]);
 
-        return $this->response->withPaginator(
-            $reports,
-            \App\Transformers\Admin\ReportResellerTransformer::class
-        );
+        return $this->paginate($reports, ReportResellerTransformer::class);
     }
 
     public function merchant()
@@ -79,12 +77,8 @@ class ReportController extends Controller
                 'credit',
                 'transaction_fee',
                 AllowedSort::field('name', 'merchants.name'),
-            ])
-            ->paginate($this->perPage);
+            ]);
 
-        return $this->response->withPaginator(
-            $reports,
-            \App\Transformers\Admin\ReportMerchantTransformer::class
-        );
+        return $this->paginate($reports, ReportMerchantTransformer::class);
     }
 }

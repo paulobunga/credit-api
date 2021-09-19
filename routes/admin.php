@@ -73,11 +73,11 @@ $api->group([
 
         $api->get("/report/resellers", [
             'uses' => "ReportController@reseller",
-            'as' => "report.resellers.index"
+            'as' => "report_resellers.index"
         ]);
         $api->get("/report/merchants", [
             'uses' => "ReportController@merchant",
-            'as' => "report.merchants.index"
+            'as' => "report_merchants.index"
         ]);
     });
 });

@@ -84,9 +84,9 @@ abstract class Controller extends BaseController
     protected function paginate(QueryBuilder $builder, $transformer)
     {
         if ($this->export) {
-            $class = array_slice(explode('.', request()->route()[1]['as']), -2, 1)[0];
-            $class = ucfirst(Str::camel(Str::singular($class)));
-            $class = "\\App\\Exports\\{$class}Export";
+            $routes = array_slice(explode('.', request()->route()[1]['as']), 0, 2);
+            $routes = array_map(fn ($r) => ucfirst(Str::camel(Str::singular($r))), $routes);
+            $class = '\\App\\Exports\\' . implode('\\', $routes) .'Export';
             return new $class($builder->get());
         }
 

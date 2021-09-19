@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Responsable;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -25,15 +26,24 @@ abstract class Base implements FromCollection, Responsable, WithHeadings, WithMa
         'Content-Type' => 'text/csv',
     ];
 
-    // attributes need to be overwritten
-
+    /**
+     * Definition of heading and corresponding column name
+     * Attributes need to be overwritten
+     */
     protected $fields = [];
 
+    /**
+     * Definition of filename
+     * Attributes need to be overwritten
+     */
     protected $fileName = '';
 
+    /**
+     * @var Illuminate\Support\Collection $data
+     */
     protected $data;
 
-    public function __construct($data)
+    public function __construct(Collection $data)
     {
         $this->data = $data;
     }
@@ -43,18 +53,38 @@ abstract class Base implements FromCollection, Responsable, WithHeadings, WithMa
         return array_values($this->fields);
     }
 
-    public function map($model): array
-    {
-        return collect(array_keys($this->fields))->map(function ($v) use ($model) {
-            return $model->$v;
-        })->toArray();
-    }
-
     /**
-     * @return \lluminate\Database\Eloquent\Collection
+     * @return Illuminate\Support\Collection
      */
     public function collection()
     {
         return $this->data;
+    }
+
+    /**
+     * Convert model to array
+     * @param mixed $model
+     * @return array
+     */
+    public function map(mixed $model): array
+    {
+        $arr = [];
+        foreach ($this->fields as $key => $val) {
+            $arr[] = $this->transform($model, $key, $model->$key);
+        }
+        // dd($model, $arr);
+        return $arr;
+    }
+
+    /**
+     * Transform value by key or other attribute of model
+     * @param mixed $model mixed model
+     * @param string $key attribute key
+     * @param mixed $val attribute value
+     * @return string
+     */
+    protected function transform(mixed $model, String $key, mixed $val): String
+    {
+        return (string) $val;
     }
 }
