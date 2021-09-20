@@ -37,10 +37,9 @@ class MerchantWithdrawalController extends Controller
                 'amount',
                 'currency',
                 'status'
-            ])
-            ->paginate($this->perPage);
+            ]);
 
-        return $this->response->withPaginator($merchant_withdrawals, $this->transformer);
+        return $this->paginate($merchant_withdrawals, $this->transformer);
     }
 
     public function update(Request $request)

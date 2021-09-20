@@ -120,4 +120,14 @@ class MerchantDeposit extends Model
         $min = app(\App\Settings\CurrencySetting::class)->getExpiredMinutes($this->attributes['currency']);
         return $this->created_at->addMinutes($min);
     }
+
+    public function getStatusTextAttribute()
+    {
+        return array_keys(self::STATUS)[$this->attributes['status']];
+    }
+
+    public function getCallbackStatusTextAttribute()
+    {
+        return array_keys(self::CALLBACK_STATUS)[$this->attributes['callback_status']];
+    }
 }

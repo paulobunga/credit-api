@@ -60,9 +60,9 @@ class MerchantDepositController extends Controller
                 AllowedSort::field('amount'),
                 AllowedSort::field('status', 'merchant_deposits.status'),
                 AllowedSort::field('created_at', 'merchant_deposits.created_at'),
-            ])
-            ->paginate($this->perPage);
-        return $this->response->withPaginator($merchant_deposits, $this->transformer);
+            ]);
+
+        return $this->paginate($merchant_deposits, $this->transformer);
     }
 
     public function update(Request $request)

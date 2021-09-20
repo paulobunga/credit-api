@@ -17,13 +17,15 @@ abstract class Base implements FromCollection, Responsable, WithHeadings, WithMa
     /**
      * Optional Writer Type
      */
-    protected $writerType = Excel::XLSX;
+    protected $writerType = Excel::CSV;
 
     /**
      * Optional headers
      */
     protected $headers = [
         'Content-Type' => 'text/csv',
+        'Cache-Control'=> 'no-cache, public, must-revalidate, proxy-revalidate',
+        'Expires' =>  0,
     ];
 
     /**
@@ -66,13 +68,13 @@ abstract class Base implements FromCollection, Responsable, WithHeadings, WithMa
      * @param mixed $model
      * @return array
      */
-    public function map(mixed $model): array
+    public function map($model): array
     {
         $arr = [];
         foreach ($this->fields as $key => $val) {
             $arr[] = $this->transform($model, $key, $model->$key);
         }
-        // dd($model, $arr);
+
         return $arr;
     }
 

@@ -39,4 +39,9 @@ class MerchantWithdrawal extends Model
     {
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
     }
+
+    public function getStatusTextAttribute()
+    {
+        return array_keys(self::STATUS)[$this->attributes['status']];
+    }
 }
