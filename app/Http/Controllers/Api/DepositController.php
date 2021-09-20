@@ -344,18 +344,18 @@ class DepositController extends Controller
         ];
         switch ($deposit->status) {
             case MerchantDeposit::STATUS['PENDING']:
-                $steps[] = ['icon' => 'fas fa-user-check', 'label' => 'Confirm', 'status' => 0];
+                $steps[] = ['label' => 'Confirm', 'status' => 0];
                 break;
             case MerchantDeposit::STATUS['EXPIRED']:
-                $steps[] = ['icon' => 'fas fa-stopwatch', 'label' => 'Expired', 'status' => 0];
+                $steps[] = ['label' => 'Confirm', 'status' => 0];
                 break;
             case MerchantDeposit::STATUS['APPROVED']:
             case MerchantDeposit::STATUS['ENFORCED']:
-                $steps[] = ['icon' => 'fas fa-user-check', 'label' => 'Confirm', 'status' => 2];
+                $steps[] = ['label' => 'Confirm', 'status' => 2];
                 break;
             case MerchantDeposit::STATUS['REJECTED']:
             case MerchantDeposit::STATUS['CANCELED']:
-                $steps[] = ['icon' => 'fas fa-user-check', 'label' => 'Reject', 'status' => -1];
+                $steps[] = ['label' => 'Confirm', 'status' => -1];
                 break;
         }
 
@@ -363,7 +363,8 @@ class DepositController extends Controller
             'deposit' => $deposit,
             'channel' => $channel,
             'attributes' => $deposit->resellerBankCard->attributes,
-            'steps' => $steps
+            'steps' => $steps,
+            'amount' => number_format($deposit->amount, 2, '.', ''),
         ]);
     }
 }

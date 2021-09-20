@@ -4,11 +4,11 @@
         <div class="font-mono leading-none sm:text-2xl md:text-4xl" x-text="hours">00</div>
         <div class="font-mono uppercase text-sm leading-none">Hours</div>
     </div>
-    <div class="mx-1 p-2 bg-blue-500 rounded-lg md:w-24">
+    <div class="mx-1 p-2 bg-blue-600 rounded-lg md:w-24">
         <div class="font-mono leading-none sm:text-2xl md:text-4xl" x-text="minutes">00</div>
         <div class="font-mono uppercase text-sm leading-none">Minutes</div>
     </div>
-    <div class="mx-1 p-2 bg-blue-400 rounded-lg md:w-24">
+    <div class="mx-1 p-2 bg-blue-600 rounded-lg md:w-24">
         <div class="font-mono leading-none sm:text-2xl md:text-4xl" x-text="seconds">00</div>
         <div class="font-mono uppercase text-sm leading-none">Seconds</div>
     </div>

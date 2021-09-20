@@ -1,11 +1,5 @@
 <div class="absolute h-screen w-full flex z-10 items-center justify-center bg-black bg-opacity-25"
-    x-data="$store.$alert" x-init="$watch('open', value => {
-        if(value){
-            setTimeout(function () {
-                open = false
-                }, 2000);
-        }
-    })" x-show="open" x-on:click="open = false;">
+    x-data="$store.$alert" x-init="$watch('open', value => watch(value))" x-show="open" x-on:click="open = false;">
     <div class="w-80 sm:w-50 flex flex-col jusctify-center" x-show="open"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300"
@@ -48,11 +42,27 @@
             open: false,
             message: '',
             type: '',
+            timeout: null,
             show(type, message) {
                 this.type= type;
                 this.message = message;
                 this.open = true;
             },
+            watch(value){
+                if(value){
+                    if(this.timeout == null){
+                        this.timeout = setTimeout(()=> {
+                            this.open = false;
+                            }, 2000);
+                    }
+                }
+                else{
+                    if(this.timeout){
+                        clearTimeout(this.timeout);
+                    }
+                    this.timeout = null;
+                }
+            }
         });
     });
 </script>

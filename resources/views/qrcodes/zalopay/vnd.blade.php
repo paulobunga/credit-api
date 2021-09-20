@@ -1,19 +1,32 @@
 @extends('qrcodes.default')
 @section('attributes')
-<div class="w-full grid grid-flow-row sm:gap-4 gap-y-2 text-sm sm:text-lg">
+<div class="grid grid-flow-row sm:gap-4 gap-y-2 text-sm sm:text-lg">
     <div class="w-full py-4 md:py-6 text-center flex justify-center">
         {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(250)->generate($attributes['qrcode']) !!}
     </div>
     <div
-        class="w-full py-4 md:py-6 grid grid-flow-col gap-x-2 text-center border-b-2 border-gray-400 border-opacity-25">
-        <div class="font-bold">QRCODE</div>
-        <div class="overflow-x-auto">
+        class="py-4 md:py-6 grid grid-flow-col grid-cols-8 gap-x-2 text-center border-b-2 border-gray-400 border-opacity-25 items-center">
+        <div class="font-bold col-span-2">QRCODE</div>
+        <div class="overflow-x-auto col-span-4">
             {{ $attributes['qrcode'] }}
         </div>
-        <div x-data="{'input': '{{ $attributes['qrcode'] }}' }">
-            <button class="px-3 sm:px-6 bg-yellow-200 text-yellow-800 rounded-full"
+        <div class="col-span-2" x-data="{'input': '{{ $attributes['qrcode'] }}' }">
+            <button class="px-3 py-1 bg-blue-600 text-white rounded-full"
                 x-on:click="$clipboard(input); $store.$alert.show('success', 'QRCODE is copied!')">
-                <i class="far fa-copy"></i>
+                Copy
+            </button>
+        </div>
+    </div>
+    <div
+        class="py-4 md:py-6 grid grid-flow-col grid-cols-8 gap-x-2 text-center border-b-2 border-gray-400 border-opacity-25 items-center">
+        <div class="font-bold col-span-2">Amount</div>
+        <div class="font-bold text-red-600 col-span-4">
+            {{ $amount }} {{ $deposit->currency }}
+        </div>
+        <div class="col-span-2" x-data="{'input': '{{ $amount }}' }">
+            <button class="px-3 py-1 bg-blue-600 text-white rounded-full"
+                x-on:click="$clipboard(input); $store.$alert.show('success', 'Amount is copied!')">
+                Copy
             </button>
         </div>
     </div>
