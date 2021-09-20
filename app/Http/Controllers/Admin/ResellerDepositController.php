@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedSort;
 
 class ResellerDepositController extends Controller
 {
@@ -48,9 +47,8 @@ class ResellerDepositController extends Controller
                 'currency',
                 'status',
                 'created_at'
-            ])
-            ->paginate($this->perPage);
+            ]);
 
-        return $this->response->withPaginator($reseller_deposits, $this->transformer);
+        return $this->paginate($reseller_deposits, $this->transformer);
     }
 }

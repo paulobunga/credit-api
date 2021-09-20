@@ -57,4 +57,14 @@ class ResellerDeposit extends Model
     {
         return json_decode($this->attributes['extra'], true);
     }
+
+    public function getTypeTextAttribute()
+    {
+        return array_keys(self::TYPE)[$this->attributes['type']];
+    }
+
+    public function getStatusTextAttribute()
+    {
+        return array_keys(self::STATUS)[$this->attributes['status']];
+    }
 }

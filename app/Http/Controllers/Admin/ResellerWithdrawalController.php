@@ -18,10 +18,16 @@ class ResellerWithdrawalController extends Controller
     {
         $reseller_withdrawals = QueryBuilder::for($this->model)
             ->with([
-                'reseller'
+                'reseller',
+                'auditAdmin',
             ])
             ->join('resellers', 'resellers.id', '=', 'reseller_withdrawals.reseller_id')
-            ->select('reseller_withdrawals.*', 'resellers.name')
+            ->join('admins', 'admins.id', '=', 'reseller_withdrawals.audit_admin_id')
+            ->select(
+                'reseller_withdrawals.*',
+                'resellers.name',
+                'admins.name AS admin'
+            )
             ->allowedFilters([
                 AllowedFilter::partial('name', 'resellers.name'),
                 AllowedFilter::exact('status'),
@@ -36,10 +42,9 @@ class ResellerWithdrawalController extends Controller
                 'order_id',
                 'amount',
                 'status'
-            ])
-            ->paginate($this->perPage);
+            ]);
 
-        return $this->response->withPaginator($reseller_withdrawals, $this->transformer);
+        return $this->paginate($reseller_withdrawals, $this->transformer);
     }
 
     public function update(Request $request)
