@@ -109,4 +109,15 @@ class ExecuteSql extends Command
         }
         $setting->save();
     }
+
+    protected function resellerWithdrawalsAlterCardId()
+    {
+        if (Schema::hasColumn('reseller_withdrawals', 'reseller_bank_card_id')) {
+            Schema::table('reseller_withdrawals', function (Blueprint $table) {
+                $table->dropForeign(['reseller_bank_card_id']);
+                $table->dropIndex('reseller_withdrawals_reseller_bank_card_id_foreign');
+                $table->unsignedBigInteger('reseller_bank_card_id')->default(0)->change();
+            });
+        }
+    }
 }

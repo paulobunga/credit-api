@@ -59,7 +59,7 @@ class CreateTableResellers extends Migration
         Schema::create('reseller_withdrawals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reseller_id')->constrained();
-            $table->foreignId('reseller_bank_card_id')->constrained();
+            $table->unsignedBigInteger('reseller_bank_card_id')->default(0);
             $table->unsignedBigInteger('audit_admin_id')->default(0);
             $table->string('order_id', 60)->unique();
             $table->unsignedTinyInteger('transaction_type');
