@@ -11,7 +11,7 @@
 
 @section('content')
 <x-stepper :steps="$steps" />
-<div class="py-4 md:py-6 text-center flex justify-center">
+<div class="py-4 md:py-6 mb-10 text-center flex justify-center">
     <x-timer :dateTime='$deposit->expired_at' />
 </div>
 
