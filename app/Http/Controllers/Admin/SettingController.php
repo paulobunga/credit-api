@@ -25,7 +25,16 @@ class SettingController extends Controller
         if ($request->get('key', null)) {
             return ['data' => $this->getSetting($request->key)->toArray()];
         } else {
-            return $this->response->collection($this->model::all(), $this->transformer);
+            $settings = $this->model::select('group')->distinct()->pluck('group')->map(function ($s) {
+                return [
+                    'key' => $s,
+                    'value' => $this->getSetting($s)->toArray()
+                ];
+            });
+
+            return [
+                'data' => $settings
+            ];
         }
     }
 
@@ -46,7 +55,7 @@ class SettingController extends Controller
                 'agent_percentage' => 'required|numeric|gte:0',
                 'reseller_percentage' => 'required|numeric|gte:0',
                 'total_percentage' => 'required|numeric|min:' .
-                    $request->get('referrer_percentage', 0) 
+                    $request->get('referrer_percentage', 0)
                     + $request->get('master_agent_percentage', 0)
                     + $request->get('agent_percentage', 0)
                     + $request->get('reseller_percentage', 0)
