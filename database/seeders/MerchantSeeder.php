@@ -18,6 +18,7 @@ class MerchantSeeder extends Seeder
         // create VND test merchant
         $merchant = Merchant::factory()->create([
             'uuid' => '224d4a1f-6fc5-4039-bd81-fcbc7f88c659',
+            'api_key' => 'TCFTW2HtNqOtMmQMjSNh9TUMRxrM8l',
             'name' => 'Test Merchant',
             'username' => 'merchant@gmail.com',
             'password' => 'P@ssw0rd',

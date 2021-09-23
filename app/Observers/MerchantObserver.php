@@ -13,7 +13,7 @@ trait MerchantObserver
         // auto-sets values on creation
         static::creating(function ($query) {
             $query->uuid = $query->uuid ?? Str::uuid();
-            $query->api_key = Str::random(30);
+            $query->api_key = $query->api_key ?? Str::random(30);
         });
     }
 }
