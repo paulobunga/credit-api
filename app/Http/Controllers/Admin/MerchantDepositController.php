@@ -46,6 +46,10 @@ class MerchantDepositController extends Controller
                     'created_at_between',
                     fn ($query, $v) => $query->whereBetween('merchant_deposits.created_at', $v)
                 ),
+                AllowedFilter::callback(
+                    'updated_at_between',
+                    fn ($query, $v) => $query->whereBetween('merchant_deposits.updated_at', $v)
+                ),
             ])
             ->allowedSorts([
                 AllowedSort::field('id', 'merchant_deposits.id'),
@@ -59,7 +63,10 @@ class MerchantDepositController extends Controller
                 AllowedSort::field('reseller_name', 'resellers.name'),
                 AllowedSort::field('amount'),
                 AllowedSort::field('status', 'merchant_deposits.status'),
+                'attempts',
+                'callback_status',
                 AllowedSort::field('created_at', 'merchant_deposits.created_at'),
+                'updated_at'
             ]);
 
         return $this->paginate($merchant_deposits, $this->transformer);
