@@ -7,11 +7,12 @@ use Illuminate\Support\Facades\Queue;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
+use App\Models\MerchantDeposit;
 use App\Http\Controllers\Controller;
 
 class MerchantDepositController extends Controller
 {
-    protected $model = \App\Models\MerchantDeposit::class;
+    protected $model = MerchantDeposit::class;
 
     protected $transformer = \App\Transformers\Admin\MerchantDepositTransformer::class;
 
@@ -75,9 +76,18 @@ class MerchantDepositController extends Controller
     public function update(Request $request)
     {
         $m = $this->model::findOrFail($this->parameters('merchant_deposit'));
+        if (!in_array($m->status, [
+            MerchantDeposit::STATUS['PENDING'],
+            MerchantDeposit::STATUS['EXPIRED'],
+        ])) {
+            throw new \Exception('Status is not allowed to update', 401);
+        }
         $this->validate($request, [
             'admin_id' => 'required|exists:admins,id',
-            'status' => 'required|numeric',
+            'status' => 'required|numeric|in:' . implode(',', [
+                MerchantDeposit::STATUS['ENFORCED'],
+                MerchantDeposit::STATUS['CANCELED'],
+            ]),
         ]);
 
         $m->update([

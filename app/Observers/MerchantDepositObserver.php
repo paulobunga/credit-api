@@ -44,6 +44,9 @@ trait MerchantDepositObserver
             MerchantDeposit::STATUS['APPROVED'],
             MerchantDeposit::STATUS['ENFORCED']
         ])) {
+            if ($m->reseller->credit < $m->amount) {
+                throw new \Exception('exceed agent credit', 405);
+            }
             // merchant add credit and deduct transaction fee
             $credit = $m->merchant->credits()->where('currency', $m->currency)->first();
             if (!$credit) {

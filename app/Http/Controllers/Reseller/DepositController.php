@@ -85,7 +85,10 @@ class DepositController extends Controller
             throw new \Exception('Status is not allowed to update', 401);
         }
         $this->validate($request, [
-            'status' => 'required|numeric',
+            'status' => 'required|numeric|in:' . implode(',', [
+                MerchantDeposit::STATUS['APPROVED'],
+                MerchantDeposit::STATUS['REJECTED'],
+            ]),
         ]);
 
         $deposit->update([
