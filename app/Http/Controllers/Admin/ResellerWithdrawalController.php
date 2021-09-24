@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -49,31 +50,30 @@ class ResellerWithdrawalController extends Controller
 
     public function update(Request $request)
     {
-        $reseller_withdrawal = $this->model::with('reseller')->findOrFail($this->parameters('reseller_withdrawal'));
+        $m = $this->model::with('reseller')->findOrFail($this->parameters('reseller_withdrawal'));
         $this->validate($request, [
-            'admin_id' => 'required|exists:admins,id',
             'status' => 'required|numeric',
+            'audit' => 'required|array'
         ]);
-        $reseller = $reseller_withdrawal->reseller;
         if ($request->status == ResellerWithdrawal::STATUS['APPROVED']) {
-            if ($reseller_withdrawal->type == ResellerWithdrawal::TYPE['CREDIT']) {
-                if ($reseller_withdrawal->amount > $reseller->credit) {
+            if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
+                if ($m->amount > $m->reseller->credit) {
                     throw new \Exception('exceed credit', 405);
                 }
-            } elseif ($reseller_withdrawal->type == ResellerWithdrawal::TYPE['COIN']) {
-                if ($reseller_withdrawal->amount > $reseller->coin) {
+            } elseif ($m->type == ResellerWithdrawal::TYPE['COIN']) {
+                if ($m->amount > $m->reseller->coin) {
                     throw new \Exception('exceed coin', 405);
                 }
             }
         }
-        $reseller_withdrawal->update([
-            'audit_admin_id' => $request->admin_id,
+        $m->update([
+            'audit_admin_id' => Auth::id(),
             'status' => $request->status,
-            'extra' => [
-                'reason' => 'Withdraw'
-            ]
+            'extra' => array_merge($m->extra, [
+                'audit' => $request->audit
+            ])
         ]);
 
-        return $this->response->item($reseller_withdrawal->refresh(), $this->transformer);
+        return $this->response->item($m->refresh(), $this->transformer);
     }
 }

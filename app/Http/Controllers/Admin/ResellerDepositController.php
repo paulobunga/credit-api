@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use App\Models\ResellerDeposit;
 
 class ResellerDepositController extends Controller
 {
-    protected $model = \App\Models\ResellerDeposit::class;
+    protected $model = ResellerDeposit::class;
 
     protected $transformer = \App\Transformers\Admin\ResellerDepositTransformer::class;
 
@@ -50,5 +52,30 @@ class ResellerDepositController extends Controller
             ]);
 
         return $this->paginate($reseller_deposits, $this->transformer);
+    }
+
+    public function update(Request $request)
+    {
+        $m = $this->model::with('reseller')->findOrFail($this->parameters('reseller_deposit'));
+        if ($m->status != ResellerDeposit::STATUS['PENDING']) {
+            throw new \Exception('Status is not allowed to modified', 405);
+        }
+        $this->validate($request, [
+            'status' => 'required|numeric|in:' . implode(',', [
+                ResellerDeposit::STATUS['APPROVED'],
+                ResellerDeposit::STATUS['REJECTED'],
+            ]),
+            'audit' => 'required|array'
+        ]);
+
+        $m->update([
+            'audit_admin_id' => Auth::id(),
+            'status' => $request->status,
+            'extra' => array_merge($m->extra, [
+                'audit' => $request->audit
+            ])
+        ]);
+
+        return $this->response->item($m->refresh(), $this->transformer);
     }
 }
