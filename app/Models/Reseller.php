@@ -92,6 +92,14 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         return $this->morphMany(Device::class, 'user');
     }
 
+    public function getWithdrawalPendingCreditAttribute()
+    {
+        return $this->withdrawals()->where([
+            'type' => ResellerWithdrawal::TYPE['CREDIT'],
+            'status' => ResellerWithdrawal::STATUS['PENDING']
+        ])->sum('amount');
+    }
+
     public function getWithdrawalPendingCoinAttribute()
     {
         return $this->withdrawals()->where([

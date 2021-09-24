@@ -33,6 +33,11 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
         'status' => 'boolean',
     ];
 
+    public function getIsSuperAdminAttribute()
+    {
+        return $this->hasRole('Super Admin');
+    }
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;
