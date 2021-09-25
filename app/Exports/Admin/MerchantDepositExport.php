@@ -21,6 +21,7 @@ class MerchantDepositExport extends Base
         'order_id' => 'Order id',
         'merchant_order_id' => 'Merchant order id',
         'merchant_name' => 'Merchant name',
+        'card' => 'Card',
         'reseller_name' => 'Agent name',
         'channel' => 'Channel',
         'method' => 'Method',
@@ -42,6 +43,8 @@ class MerchantDepositExport extends Base
         switch ($key) {
             case 'status':
                 return $model->statusText;
+            case 'card':
+                return $model->resellerBankCard->primary;
             default:
                 return (string) $val;
         }
