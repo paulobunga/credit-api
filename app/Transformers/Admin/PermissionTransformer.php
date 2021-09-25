@@ -6,11 +6,12 @@ use League\Fractal\TransformerAbstract;
 
 class PermissionTransformer extends TransformerAbstract
 {
-    public function transform(Model $p)
+    public function transform(Model $m)
     {
         return [
-            'name' => $p->name,
-            'group' => $p->group,
+            'id' => $m->id,
+            'name' => $m->name,
+            'group' => $m->group,
         ];
     }
 }

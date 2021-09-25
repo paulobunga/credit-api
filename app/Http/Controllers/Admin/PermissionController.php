@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 class PermissionController extends Controller
 {
     protected $model = \App\Models\Permission::class;
+    
     protected $transformer = \App\Transformers\Admin\PermissionTransformer::class;
 
     public function index(Request $request)
@@ -32,7 +33,7 @@ class PermissionController extends Controller
 
     public function update(Request $request)
     {
-        $permission = $this->model::where('name', $this->parameters('permission'))->firstOrFail();
+        $permission = $this->model::findOrFail($this->parameters('permission'));
         $this->validate($request, [
             'name' => "required|unique:permissions,name,{$permission->id}"
         ]);
@@ -45,7 +46,7 @@ class PermissionController extends Controller
 
     public function destroy(Request $request)
     {
-        $permission = $this->model::where('name', $this->parameters('permission'))->firstOrFail();
+        $permission = $this->model::findOrFail($this->parameters('permission'));
         $permission->delete();
 
         return $this->success();

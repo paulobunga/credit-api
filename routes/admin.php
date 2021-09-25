@@ -33,8 +33,6 @@ $api->group([
 
             $api->resource('settings', 'SettingController', ['only' => ['index', 'update']]);
 
-            $api->resource('merchant_white_lists', 'MerchantWhiteListController', ['except' => ['show']]);
-
             $api->resource('merchants', 'MerchantController', ['except' => ['show']]);
             $api->put("/merchants/renew/{merchant}", [
                 'as' => 'merchants.renew', 'uses' => 'MerchantController@renew'
