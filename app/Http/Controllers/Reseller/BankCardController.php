@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Reseller;
 
 use App\Http\Controllers\Controller;
-use App\Models\ResellerBankCard;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
+use App\Models\ResellerBankCard;
 
 class BankCardController extends Controller
 {
-    protected $model = \App\Models\ResellerBankCard::class;
+    protected $model = ResellerBankCard::class;
 
     protected $transformer = \App\Transformers\Reseller\BankCardTransformer::class;
 
@@ -81,5 +81,32 @@ class BankCardController extends Controller
         $bankcard->delete();
 
         return $this->success();
+    }
+
+    public function status(Request $request)
+    {
+        $bankcard = $this->model::where([
+            'id' => $this->parameters('bankcard'),
+            'reseller_id' => Auth::id()
+        ])->firstOrFail();
+
+        if (!in_array($bankcard->status, [
+            ResellerBankCard::STATUS['ACTIVE'],
+            ResellerBankCard::STATUS['DISABLED'],
+        ])) {
+            throw new \Exception('status is not allowd to modified!', 405);
+        }
+
+        $this->validate($request, [
+            'status' => 'required|numeric|in:' . implode(',', [
+                ResellerBankCard::STATUS['ACTIVE'],
+                ResellerBankCard::STATUS['DISABLED'],
+            ])
+        ]);
+        $bankcard->update([
+            'status' => $request->status,
+        ]);
+
+        return $this->response->item($bankcard, $this->transformer);
     }
 }

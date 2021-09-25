@@ -17,6 +17,7 @@ $api->group([
         ]
     ], function ($api) {
         # auth
+        // $api->resource('devices', 'DeviceController', ['only' => ['store','destroy']]);
         $api->post('/auth/logout', ['as' => 'auth.logout', 'uses' => 'AuthController@logout']);
         $api->post('/auth/refresh', ['as' => 'auth.refresh', 'uses' => 'AuthController@refresh']);
         $api->post('/auth/me', ['as' => 'auth.me', 'uses' => 'AuthController@me']);
@@ -28,6 +29,9 @@ $api->group([
         $api->resource('banks', 'BankController', ['only' => ['index']]);
         
         $api->resource('bankcards', 'BankCardController');
+        $api->put("/bankcards/status/{bankcard}", [
+            'as' => 'bankcards.status', 'uses' => 'BankCardController@status'
+        ]);
         
         $api->resource('deposits', 'DepositController', ['only' => ['index', 'update']]);
 
