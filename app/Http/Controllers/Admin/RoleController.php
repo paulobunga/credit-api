@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class RoleController extends Controller
 {
     protected $model = \App\Models\Role::class;
+    
     protected $transformer = \App\Transformers\Admin\RoleTransformer::class;
 
     public function index(Request $request)
