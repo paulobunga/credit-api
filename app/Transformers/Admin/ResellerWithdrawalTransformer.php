@@ -17,6 +17,7 @@ class ResellerWithdrawalTransformer extends TransformerAbstract
             'id' => $m->id,
             'name' => $m->reseller->name,
             'admin' => $m->auditAdmin->name ?? '--',
+            'card' => $m->bankcard,
             'type' => $m->type,
             'transaction_type' => $m->transaction_type,
             'order_id' => $m->order_id,

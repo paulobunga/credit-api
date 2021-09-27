@@ -60,7 +60,11 @@ class MerchantDepositSeeder extends Seeder
                 'amount' => 1,
                 'status' => ResellerWithdrawal::STATUS['APPROVED'],
                 'extra' => [
-                    'reason' => 'Withdraw'
+                    'payment_type' => 'BY BANK TRANSFER',
+                    'reason' => 'Withdraw',
+                    'remark' => 'OK',
+                    'memo' => 'success',
+                    'creator' => $reseller->id
                 ]
             ]);
         }

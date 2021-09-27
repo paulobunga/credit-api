@@ -23,11 +23,12 @@ class ResellerWithdrawalController extends Controller
                 'auditAdmin',
             ])
             ->join('resellers', 'resellers.id', '=', 'reseller_withdrawals.reseller_id')
-            ->join('admins', 'admins.id', '=', 'reseller_withdrawals.audit_admin_id')
+            ->leftjoin('admins', 'admins.id', '=', 'reseller_withdrawals.audit_admin_id')
             ->select(
                 'reseller_withdrawals.*',
                 'resellers.name',
-                'admins.name AS admin'
+                'admins.name AS admin',
+                'resellers.currency AS currency',
             )
             ->allowedFilters([
                 AllowedFilter::partial('name', 'resellers.name'),
@@ -53,7 +54,7 @@ class ResellerWithdrawalController extends Controller
         $m = $this->model::with('reseller')->findOrFail($this->parameters('reseller_withdrawal'));
         $this->validate($request, [
             'status' => 'required|numeric',
-            'audit' => 'required|array'
+            'extra' => 'required|array'
         ]);
         if ($request->status == ResellerWithdrawal::STATUS['APPROVED']) {
             if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
@@ -69,9 +70,10 @@ class ResellerWithdrawalController extends Controller
         $m->update([
             'audit_admin_id' => Auth::id(),
             'status' => $request->status,
-            'extra' => array_merge($m->extra, [
-                'audit' => $request->audit
-            ])
+            'extra' => array_merge(
+                $m->extra,
+                $request->extra
+            )
         ]);
 
         return $this->response->item($m->refresh(), $this->transformer);

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Observers\ResellerWithdrawalObserver;
 use App\Models\Transaction;
+use App\DTO\ResellerWithdrawalExtra;
 
 class ResellerWithdrawal extends Model
 {
@@ -23,7 +24,7 @@ class ResellerWithdrawal extends Model
     ];
 
     protected $casts = [
-        'extra' => 'array',
+        'extra' => ResellerWithdrawalExtra::class,
         'created_at'  => 'datetime:Y-m-d H:i:s',
         'updated_at'  => 'datetime:Y-m-d H:i:s',
     ];

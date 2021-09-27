@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use App\Models\PaymentChannel;
+use App\Models\ResellerWithdrawal;
 
 class ExecuteSql extends Command
 {
@@ -118,6 +119,20 @@ class ExecuteSql extends Command
                 $table->dropIndex('reseller_withdrawals_reseller_bank_card_id_foreign');
                 $table->unsignedBigInteger('reseller_bank_card_id')->default(0)->change();
             });
+        }
+    }
+
+    protected function resellerWithdrawalsExtra()
+    {
+        foreach (ResellerWithdrawal::all() as $rw) {
+            $extra = $rw->extra;
+            $extra['payment_type'] ??= 'OTHER';
+            $extra['reason'] ??= 'Withdrawal';
+            $extra['remark'] ??= 'OTHER';
+            $extra['memo'] ??= 'success';
+            $extra['creator'] ??= $rw->reseller_bank_card_id ? $rw->reseller_id : $rw->audit_admin_id;
+            $rw->extra = $extra;
+            $rw->save();
         }
     }
 }

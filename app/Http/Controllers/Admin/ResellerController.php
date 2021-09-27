@@ -4,15 +4,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Arr;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Dingo\Api\Http\Request;
 use App\Models\Reseller;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 use App\Models\Transaction;
 
+/**
+ * Reseller Endpoint
+ */
 class ResellerController extends Controller
 {
     protected $model = Reseller::class;
@@ -20,8 +23,8 @@ class ResellerController extends Controller
     protected $transformer = \App\Transformers\Admin\ResellerTransformer::class;
 
     /**
-     * Get reseller lists
-     *
+     * Get agent lists
+     * @param \Dingo\Api\Http\Request
      * @return \Dingo\Api\Http\JsonResponse
      */
     public function index(Request $request)
@@ -53,8 +56,8 @@ class ResellerController extends Controller
     }
 
     /**
-     * Create a reseller
-     *
+     * Create an agent
+     * @param \Dingo\Api\Http\Request
      * @return \Dingo\Api\Http\JsonResponse
      */
     public function store(Request $request)
@@ -95,8 +98,8 @@ class ResellerController extends Controller
     }
 
     /**
-     * Update a reseller via id
-     *
+     * Update an agent via id
+     * @param \Dingo\Api\Http\Request
      * @return \Dingo\Api\Http\JsonResponse
      */
     public function update(Request $request)
@@ -128,8 +131,8 @@ class ResellerController extends Controller
     }
 
     /**
-     * Delete a reseller via id
-     *
+     * Delete an agent via id
+     * @param \Dingo\Api\Http\Request
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request)
@@ -144,8 +147,8 @@ class ResellerController extends Controller
     }
 
     /**
-     * Top up reseller create or coin via id
-     *
+     * Top up agent credit or coin via id
+     * @param \Dingo\Api\Http\Request
      * @return \Dingo\Api\Http\JsonResponse
      */
     public function deposit(Request $request)
@@ -171,11 +174,16 @@ class ResellerController extends Controller
 
         $reseller->deposits()->create([
             'reseller_id' => $reseller->id,
-            'audit_admin_id' => Auth::id(),
+            'audit_admin_id' => $ability ? Auth::id() : 0,
             'type' => $request->type,
             'transaction_type' => $transaction_type,
             'amount' => $request->amount,
-            'extra' => Arr::only($request->extra, ['payment_type', 'reason', 'remark']),
+            'extra' => array_merge(
+                Arr::only($request->extra, ['payment_type', 'reason', 'remark']),
+                $ability ?
+                    ['memo' => "success", 'creator' => Auth::id()] :
+                    ['creator' => Auth::id()]
+            ),
             'status' => $ability ?
                 ResellerDeposit::STATUS['APPROVED'] :
                 ResellerDeposit::STATUS['PENDING']
@@ -185,8 +193,8 @@ class ResellerController extends Controller
     }
 
     /**
-     * Withdraw reseller create or coin via id
-     *
+     * Withdraw agent credit or coin via id
+     * @param \Dingo\Api\Http\Request
      * @return \Dingo\Api\Http\JsonResponse
      */
     public function withdrawal(Request $request)
@@ -213,16 +221,19 @@ class ResellerController extends Controller
         } else {
             throw new \Exception('Unsupported transaction type');
         }
-        $ability = Auth::user()->can('admin.reseller_withdrawals.update');
+        $ability = auth()->user()->can('admin.reseller_withdrawals.update');
 
         $reseller->withdrawals()->create([
             'reseller_id' => $reseller->id,
-            'audit_admin_id' => Auth::id(),
+            'audit_admin_id' => $ability ? Auth::id() : 0,
             'type' => $request->type,
             'transaction_type' => $transaction_type,
             'amount' => $request->amount,
-            'extra' => Arr::only($request->extra, ['payment_type', 'reason', 'remark']),
-            'status' => $ability?
+            'extra' => array_merge(
+                Arr::only($request->extra, ['payment_type', 'reason', 'remark']),
+                ['memo' => $ability ? 'success' : '', 'creator' => auth()->id()]
+            ),
+            'status' => $ability ?
                 ResellerWithdrawal::STATUS['APPROVED'] :
                 ResellerWithdrawal::STATUS['PENDING']
         ]);
@@ -231,19 +242,19 @@ class ResellerController extends Controller
     }
 
     /**
-     * Reset reseller password via id
-     *
+     * Reset agent password via id
+     * @param \Dingo\Api\Http\Request
      * @return \Dingo\Api\Http\JsonResponse
      */
     public function reset(Request $request)
     {
-        $merchant = $this->model::findOrFail($this->parameters('reseller'));
+        $m = $this->model::findOrFail($this->parameters('reseller'));
         $this->validate($request, [
             'password' => 'required|confirmed',
         ]);
-        $merchant->password = $request->password;
-        $merchant->save();
+        $m->password = $request->password;
+        $m->save();
 
-        return $this->response->item($merchant, $this->transformer);
+        return $this->response->item($m, $this->transformer);
     }
 }

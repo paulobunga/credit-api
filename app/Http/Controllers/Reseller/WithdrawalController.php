@@ -11,6 +11,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\Transaction;
 use App\Models\ResellerBankCard;
 use App\Models\ResellerWithdrawal;
+use App\DTO\ResellerWithdrawalExtra;
 
 class WithdrawalController extends Controller
 {
@@ -58,18 +59,19 @@ class WithdrawalController extends Controller
         ]);
         ResellerBankCard::where([
             'id' => $request->card,
-            'reseller_id' => Auth::id()
+            'reseller_id' => auth()->id()
         ])->firstOrFail();
         if ($request->amount > Auth::user()->coin - Auth::user()->withdrawalPendingCoin) {
             throw new \Exception('Pending amount exceed coin value', 405);
         }
         $withdrawal = $this->model::create([
-            'reseller_id' => Auth::id(),
+            'reseller_id' => auth()->id(),
             'reseller_bank_card_id' => $request->card,
             'type' => ResellerWithdrawal::TYPE['COIN'],
             'transaction_type' => Transaction::TYPE['RESELLER_WITHDRAW_COIN'],
             'amount' => $request->amount,
             'status' => ResellerWithdrawal::STATUS['PENDING'],
+            'extra' => new ResellerWithdrawalExtra(['creator'=> auth()->id()])
         ]);
 
         return $this->response->item($withdrawal, $this->transformer);
