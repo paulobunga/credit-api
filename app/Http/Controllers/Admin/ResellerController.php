@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
@@ -170,19 +168,17 @@ class ResellerController extends Controller
         } else {
             throw new \Exception('Unsupported transaction type');
         }
-        $ability = Auth::user()->can('admin.reseller_deposits.update');
+        $ability = auth()->user()->can('admin.reseller_deposits.update');
 
         $reseller->deposits()->create([
             'reseller_id' => $reseller->id,
-            'audit_admin_id' => $ability ? Auth::id() : 0,
+            'audit_admin_id' => $ability ? auth()->id() : 0,
             'type' => $request->type,
             'transaction_type' => $transaction_type,
             'amount' => $request->amount,
             'extra' => array_merge(
-                Arr::only($request->extra, ['payment_type', 'reason', 'remark']),
-                $ability ?
-                    ['memo' => "success", 'creator' => Auth::id()] :
-                    ['creator' => Auth::id()]
+                $request->extra,
+                ['memo' => $ability ? 'success' : '', 'creator' => auth()->id()]
             ),
             'status' => $ability ?
                 ResellerDeposit::STATUS['APPROVED'] :
@@ -225,12 +221,12 @@ class ResellerController extends Controller
 
         $reseller->withdrawals()->create([
             'reseller_id' => $reseller->id,
-            'audit_admin_id' => $ability ? Auth::id() : 0,
+            'audit_admin_id' => $ability ? auth()->id() : 0,
             'type' => $request->type,
             'transaction_type' => $transaction_type,
             'amount' => $request->amount,
             'extra' => array_merge(
-                Arr::only($request->extra, ['payment_type', 'reason', 'remark']),
+                $request->extra,
                 ['memo' => $ability ? 'success' : '', 'creator' => auth()->id()]
             ),
             'status' => $ability ?

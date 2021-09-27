@@ -66,7 +66,11 @@ class ResellerSeeder extends Seeder
                 'amount' => 10000,
                 'status' => ResellerDeposit::STATUS['APPROVED'],
                 'extra' => [
-                    'payment_type' => 'By Cash'
+                    'payment_type' => 'By Cash',
+                    'reason' => 'Deposit',
+                    'remark' => 'OK',
+                    'memo' => 'OK',
+                    'creator' => 1
                 ]
             ]);
         }

@@ -20,7 +20,12 @@ class PermissionAndRoleSeeder extends Seeder
         Artisan::call('permission:list');
         $role = Role::create(['name' => 'Market']);
         $role->givePermissionTo(
-            Permission::whereNotIn('name', ['admin.permissions.index'])->pluck('name')->toArray()
+            Permission::whereNotIn('name', [
+                'admin.permissions.index',
+                'admin.roles.index',
+                'admin.reseller_deposits.update',
+                'admin.reseller_withdrawals.update',
+                ])->pluck('name')->toArray()
         );
         $role = Role::create(['name' => 'IT']);
         $role->givePermissionTo(

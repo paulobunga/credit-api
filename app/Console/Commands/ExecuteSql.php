@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use App\Models\PaymentChannel;
+use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 
 class ExecuteSql extends Command
@@ -133,6 +134,20 @@ class ExecuteSql extends Command
             $extra['creator'] ??= $rw->reseller_bank_card_id ? $rw->reseller_id : $rw->audit_admin_id;
             $rw->extra = $extra;
             $rw->save();
+        }
+    }
+
+    protected function resellerDepositsExtra()
+    {
+        foreach (ResellerDeposit::all() as $rd) {
+            $extra = $rd->extra;
+            $extra['payment_type'] ??= 'OTHER';
+            $extra['reason'] ??= 'OTHER';
+            $extra['remark'] ??= 'Top Up';
+            $extra['memo'] ??= $extra['audit']['memo'] ?? 'success';
+            $extra['creator'] ??= $rd->audit_admin_id;
+            $rd->extra = $extra;
+            $rd->save();
         }
     }
 }

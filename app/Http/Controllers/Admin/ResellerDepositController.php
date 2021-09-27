@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -23,7 +22,7 @@ class ResellerDepositController extends Controller
                 'auditAdmin'
             ])
             ->join('resellers', 'resellers.id', '=', 'reseller_deposits.reseller_id')
-            ->join('admins', 'admins.id', '=', 'reseller_deposits.audit_admin_id')
+            ->leftjoin('admins', 'admins.id', '=', 'reseller_deposits.audit_admin_id')
             ->select(
                 'reseller_deposits.*',
                 'resellers.name AS name',
@@ -65,15 +64,16 @@ class ResellerDepositController extends Controller
                 ResellerDeposit::STATUS['APPROVED'],
                 ResellerDeposit::STATUS['REJECTED'],
             ]),
-            'audit' => 'required|array'
+            'extra' => 'required|array'
         ]);
 
         $m->update([
-            'audit_admin_id' => Auth::id(),
+            'audit_admin_id' => auth()->id(),
             'status' => $request->status,
-            'extra' => array_merge($m->extra, [
-                'audit' => $request->audit
-            ])
+            'extra' => array_merge(
+                $m->extra,
+                $request->extra
+            )
         ]);
 
         return $this->response->item($m->refresh(), $this->transformer);

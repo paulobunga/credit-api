@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -68,7 +67,7 @@ class ResellerWithdrawalController extends Controller
             }
         }
         $m->update([
-            'audit_admin_id' => Auth::id(),
+            'audit_admin_id' => auth()->id(),
             'status' => $request->status,
             'extra' => array_merge(
                 $m->extra,

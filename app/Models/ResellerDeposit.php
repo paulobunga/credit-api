@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Observers\ResellerDepositObserver;
 use App\Models\Transaction;
+use App\DTO\ResellerDepositExtra;
 
 class ResellerDeposit extends Model
 {
@@ -22,7 +23,7 @@ class ResellerDeposit extends Model
     ];
 
     protected $casts = [
-        'extra' => 'array',
+        'extra' => ResellerDepositExtra::class,
         'created_at'  => 'datetime:Y-m-d H:i:s',
         'updated_at'  => 'datetime:Y-m-d H:i:s',
     ];
