@@ -64,10 +64,15 @@ $api->group([
                 'as' => 'resellers.withdrawal', 'uses' => 'ResellerController@withdrawal'
             ]);
             $api->put("/resellers/reset_password/{reseller}", [
-                'as' => 'resellers.reset_password', 'uses' => 'ResellerController@reset'
+                'as' => 'resellers.reset_password', 'uses' => 'ResellerController@resetPassword'
+            ]);
+            $api->put("/resellers/make_up/{reseller}", [
+                'as' => 'resellers.makeUp', 'uses' => 'ResellerController@makeUp'
             ]);
 
-            $api->resource('reseller_bank_cards', 'ResellerBankCardController', ['only' => ['index', 'update', 'destroy']]);
+            $api->resource('reseller_bank_cards', 'ResellerBankCardController', [
+                'only' => ['index', 'update', 'destroy']
+            ]);
 
             $api->resource('reseller_deposits', 'ResellerDepositController', ['only' => ['index', 'update']]);
 

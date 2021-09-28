@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
+use App\Models\Merchant;
 use App\Models\Reseller;
+use App\Models\ResellerBankCard;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
+use App\Models\MerchantDeposit;
 use App\Models\Transaction;
 
 /**
@@ -242,7 +247,7 @@ class ResellerController extends Controller
      * @param \Dingo\Api\Http\Request
      * @return \Dingo\Api\Http\JsonResponse
      */
-    public function reset(Request $request)
+    public function resetPassword(Request $request)
     {
         $m = $this->model::findOrFail($this->parameters('reseller'));
         $this->validate($request, [
@@ -252,5 +257,48 @@ class ResellerController extends Controller
         $m->save();
 
         return $this->response->item($m, $this->transformer);
+    }
+
+    /**
+     * Make up agent pay in order
+     * @param \Dingo\Api\Http\Request
+     * @return \Dingo\Api\Http\JsonResponse
+     */
+    public function makeUp(Request $request)
+    {
+        $m = $this->model::findOrFail($this->parameters('reseller'));
+        $this->validate($request, [
+            'merchant_id' => 'required',
+            'reseller_bank_card_id' => 'required',
+            'method' => 'required',
+            'amount' => 'required|numeric'
+        ]);
+        $merchant = Merchant::findOrFail($request->merchant_id);
+        $reseller_bank_card = ResellerBankCard::where([
+            'reseller_id' => $m->id,
+            'id' => $request->reseller_bank_card_id,
+        ])->firstOrFail();
+        if (!in_array($request->method, $reseller_bank_card->paymentChannel->paymentMethods)) {
+            throw new \Exception('Method is not supported!', 405);
+        }
+        DB::beginTransaction();
+        try {
+            MerchantDeposit::create([
+                'merchant_id' => $request->merchant_id,
+                'reseller_id' => $m->id,
+                'reseller_bank_card_id' => $request->reseller_bank_card_id,
+                'merchant_order_id' => Str::uuid(),
+                'method' => $request->method,
+                'amount' => $request->amount,
+                'currency' => $m->currency,
+                'status' => MerchantDeposit::STATUS['MAKEUP'],
+                'callback_url' => $merchant->callback_url,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+        DB::commit();
+        return $this->success();
     }
 }

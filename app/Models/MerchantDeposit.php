@@ -24,7 +24,8 @@ class MerchantDeposit extends Model
         'callback_status',
         'attempts',
         'callback_url',
-        'extra'
+        'extra',
+        'notified_at'
     ];
 
     protected $casts = [
@@ -41,6 +42,7 @@ class MerchantDeposit extends Model
         'ENFORCED' => 4,
         'CANCELED' => 5,
         'EXPIRED' => 6,
+        'MAKEUP' => 7,
     ];
 
     public const CALLBACK_STATUS = [

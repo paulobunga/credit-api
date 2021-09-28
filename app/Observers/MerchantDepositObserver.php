@@ -42,7 +42,8 @@ trait MerchantDepositObserver
     {
         if (in_array($status, [
             MerchantDeposit::STATUS['APPROVED'],
-            MerchantDeposit::STATUS['ENFORCED']
+            MerchantDeposit::STATUS['ENFORCED'],
+            MerchantDeposit::STATUS['MAKEUP'],
         ])) {
             if ($m->reseller->credit < $m->amount) {
                 throw new \Exception('exceed agent credit', 405);
