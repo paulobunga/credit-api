@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use Dingo\Api\Http\Request;
 use App\Http\Controllers\Controller as Controller;
 use App\Transformers\Admin\AuthTransformer;
 
@@ -19,20 +18,20 @@ class AuthController extends Controller
     {
         $credentials = $request->only(['username', 'password']);
 
-        if (!$token = Auth::guard('admin')->attempt($credentials)) {
+        if (!$token = auth()->guard('admin')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
 
         if (
-            !Auth::guard('admin')->user()->isSuperAdmin &&
+            !auth()->guard('admin')->user()->isSuperAdmin &&
             !in_array($request->ip(), app(\App\Settings\AdminSetting::class)->white_lists)
         ) {
-            Log::error($request->ip() . " is not in admin[" . Auth::id() . '] white list.');
-            Auth::guard('admin')->logout();
+            Log::error($request->ip() . " is not in admin[" . auth()->id() . '] white list.');
+            auth()->guard('admin')->logout();
             return response()->json(['message' => 'Unauthorized IP Address!'], 401);
         }
 
-        return $this->response->item(Auth::user(), new AuthTransformer($token));
+        return $this->response->item(auth()->user(), new AuthTransformer($token));
     }
 
     /**
@@ -42,7 +41,7 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }
 
     /**
@@ -52,7 +51,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        Auth::logout();
+        auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
     }
@@ -64,6 +63,6 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->response->item(Auth::user(), new AuthTransformer(Auth::refresh()));
+        return $this->response->item(auth()->user(), new AuthTransformer(auth()->refresh()));
     }
 }

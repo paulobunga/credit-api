@@ -12,6 +12,9 @@ use Spatie\QueryBuilder\QueryBuilder;
 use App\Exceptions\RouteNotFoundException;
 use App\Exceptions\ValidationHttpException;
 
+/**
+ * Base Http Controller
+ */
 abstract class Controller extends BaseController
 {
     use Helpers;
@@ -55,10 +58,10 @@ abstract class Controller extends BaseController
     }
 
     /**
-     * Get url parameters
-     * @param string $name name of parameter
-     * @param string $default default value if parameter not found
-     * @return string parameter
+     * Get URL route parameter
+     * @param string $name Name of url route parameter
+     * @param string $default Default value if url route parameter not found
+     * @return string
      */
     protected function parameters(string $name, string $default = null): string
     {
@@ -69,24 +72,27 @@ abstract class Controller extends BaseController
 
     /**
      * Default success response
-     * @return array
+     * @return \Illuminate\Http\JsonResponse
      */
-    protected function success(): array
+    protected function success(): \Illuminate\Http\JsonResponse
     {
-        return [
+        return response()->json([
             'message' => 'success'
-        ];
+        ]);
     }
 
     /**
-     *
+     * Export csv blob response or json response by query header
+     * @param \Spatie\QueryBuilder\QueryBuilder $builder Query builder
+     * @param string|callable|object $transformer
+     * @return mixed
      */
     protected function paginate(QueryBuilder $builder, $transformer)
     {
         if ($this->export) {
             $routes = array_slice(explode('.', request()->route()[1]['as']), 0, 2);
             $routes = array_map(fn ($r) => ucfirst(Str::camel(Str::singular($r))), $routes);
-            $class = '\\App\\Exports\\' . implode('\\', $routes) .'Export';
+            $class = '\\App\\Exports\\' . implode('\\', $routes) . 'Export';
             return new $class($builder->get());
         }
 

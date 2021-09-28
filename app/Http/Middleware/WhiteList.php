@@ -3,8 +3,8 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use App\Models\Merchant;
 
@@ -18,7 +18,7 @@ class WhiteList
      * @param  string|null  $guard
      * @return mixed
      */
-    public function handle($request, Closure $next, $guard = null)
+    public function handle(Request $request, Closure $next, $guard = null)
     {
         if ($guard == null) {
             return $next($request);
@@ -32,8 +32,8 @@ class WhiteList
             $merchant = Merchant::where('uuid', $uuid)->firstOrFail();
             $white_lists = $merchant->WhiteList->api ?? [];
         } elseif ($guard == 'merchant_backend') {
-            $white_lists = Auth::user()->WhiteList->backend ?? [];
-        } elseif ($guard == 'admin' && !Auth::user()->isSuperAdmin) {
+            $white_lists = auth()->user()->WhiteList->backend ?? [];
+        } elseif ($guard == 'admin' && !auth()->user()->isSuperAdmin) {
             $white_lists = app(\App\Settings\AdminSetting::class)->white_lists;
         } else {
             return $next($request);
