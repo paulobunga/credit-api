@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-final class PayOut extends Base
+final class PaymentChannelPayIn extends Base
 {
     public int $min;
 
