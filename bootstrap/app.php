@@ -101,7 +101,7 @@ $app->routeMiddleware([
 | totally optional, so you are not required to uncomment this line.
 |
  */
-$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
@@ -113,14 +113,17 @@ $app->register(SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 // $app->register(App\Channels\Fcm\FcmServiceProvider::class);
-$app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\RouteServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+if (class_exists(\Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class)) {
+    $app->register(\Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+}
 if (class_exists(\Knuckles\Scribe\ScribeServiceProvider::class)) {
     $app->register(\Knuckles\Scribe\ScribeServiceProvider::class);
     $app->configure('scribe');
 }
+$app->register(App\Providers\AppServiceProvider::class);
+// $app->register(App\Providers\RouteServiceProvider::class);
+// $app->register(App\Providers\AuthServiceProvider::class);
+// $app->register(App\Providers\EventServiceProvider::class);
 
 $app->alias('cache', \Illuminate\Cache\CacheManager::class);
 /*

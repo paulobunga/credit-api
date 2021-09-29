@@ -13,16 +13,29 @@ use App\Exceptions\RouteNotFoundException;
 use App\Exceptions\ValidationHttpException;
 
 /**
- * Base Http Controller
+ * Base Http Controller.
+ * Implement actions from laravel resource routes and integrate helper functions with Dingo and customize functions.
+ * @author Charlie Yuan <youmax210139@gmail.com>
+ * @version 1.0
  */
 abstract class Controller extends BaseController
 {
     use Helpers;
 
-    protected $perPage;
+    /**
+     * @var int $parPage Define page count of pagination
+     */
+    protected int $perPage;
 
-    protected $export;
+    /**
+     * @var bool $export Define index action should export or not
+     */
+    protected bool $export;
 
+    /**
+     * Set up perPage and export from request
+     * @return void
+     */
     public function __construct()
     {
         $this->perPage = min(request()->get('per_page', 10), 100);
@@ -30,12 +43,12 @@ abstract class Controller extends BaseController
     }
 
     /**
-     * Validate Http request with rules
+     * Validate Http request by rules
      * @param \Illuminate\Http\Request $request Http request
      * @param array $rules validation rules
      * @param array $messages invalid messages
      * @param array $customAttributes custom format
-     *
+     * @throws \App\Exceptions\ValidationHttpException $exception if request not pass rules
      */
     public function validate(
         ValidationRequest $request,
@@ -84,8 +97,8 @@ abstract class Controller extends BaseController
     /**
      * Export csv blob response or json response by query header
      * @param \Spatie\QueryBuilder\QueryBuilder $builder Query builder
-     * @param string|callable|object $transformer
-     * @return mixed
+     * @param string|callable|object $transformer transform model to reseponse
+     * @return \Dingo\Api\Http\Response
      */
     protected function paginate(QueryBuilder $builder, $transformer)
     {
@@ -105,7 +118,8 @@ abstract class Controller extends BaseController
 
     /**
      * Default index action, should be overwritten
-     * @param \Dingo\Api\Http\Request $request Http request
+     * @param \Dingo\Api\Http\Request $request
+     * @throws \App\Exceptions\RouteNotFoundException $exception if method is not overrided
      */
     public function index(Request $request)
     {
@@ -114,7 +128,8 @@ abstract class Controller extends BaseController
 
     /**
      * Default show action, should be overwritten
-     * @param \Dingo\Api\Http\Request $request Http request
+     * @param \Dingo\Api\Http\Request $request
+     * @throws \App\Exceptions\RouteNotFoundException $exception if method is not overrided
      */
     public function show(Request $request)
     {
@@ -123,7 +138,8 @@ abstract class Controller extends BaseController
 
     /**
      * Default store action, should be overwritten
-     * @param \Dingo\Api\Http\Request $request Http request
+     * @param \Dingo\Api\Http\Request $request
+     * @throws \App\Exceptions\RouteNotFoundException $exception if method is not overrided
      */
     public function store(Request $request)
     {
@@ -132,7 +148,8 @@ abstract class Controller extends BaseController
 
     /**
      * Default update action, should be overwritten
-     * @param \Dingo\Api\Http\Request $request Http request
+     * @param \Dingo\Api\Http\Request $request
+     * @throws \App\Exceptions\RouteNotFoundException $exception if method is not overrided
      */
     public function update(Request $request)
     {
@@ -141,7 +158,8 @@ abstract class Controller extends BaseController
 
     /**
      * Default destroy action, should be overwritten
-     * @param \Dingo\Api\Http\Request $request Http request
+     * @param \Dingo\Api\Http\Request $request
+     * @throws \App\Exceptions\RouteNotFoundException $exception
      */
     public function destroy(Request $request)
     {
