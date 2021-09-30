@@ -96,7 +96,7 @@ class GuzzleJob extends Job
         $data['json'] = $payload;
         $response = null;
         try {
-            $response = $client->request($this->method, 'https://private.credit-api.test', $data);
+            $response = $client->request($this->method, $this->model->callback_url, $data);
             $response = json_decode($response->getBody()->getContents(), true);
             if (!isset($response['message']) || $response['message'] != 'ok') {
                 throw new \Exception('response format is incorrect');
