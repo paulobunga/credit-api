@@ -2,10 +2,12 @@
 
 namespace App\Jobs;
 
-use Illuminate\Queue\Middleware\WithoutOverlapping;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use League\Fractal\TransformerAbstract;
 use GuzzleHttp\Client;
+use Carbon\Carbon;
 use App\Trait\SignValidator;
 
 class GuzzleJob extends Job
@@ -78,45 +80,53 @@ class GuzzleJob extends Job
             'timeout'  => 15,
             'connect_timeout' => 15
         ]);
+        $data = [];
+        // create payload
         $payload = new \League\Fractal\Resource\Item(
             $this->model,
             $this->transformer,
             false
         );
         $payload = app('api.transformer')->getFractal()->createData($payload)->toArray();
+        if (env('APP_ENV') !== 'production') {
+            $payload['uuid'] = $this->model->merchant->uuid;
+            $data['verify'] =  false;
+        }
         $payload['sign'] = $this->createSign($payload, $this->key);
+        $data['json'] = $payload;
+        $response = null;
         try {
-            $response = $client->request($this->method, $this->model->callback_url, [
-                'json' => $payload
-            ]);
+            $response = $client->request($this->method, 'https://private.credit-api.test', $data);
             $response = json_decode($response->getBody()->getContents(), true);
-            \Log::info([
-                'payload' => $payload,
-                'response' => $response
-            ]);
             if (!isset($response['message']) || $response['message'] != 'ok') {
                 throw new \Exception('response format is incorrect');
             }
-            $this->model->update([
-                'callback_status' => 2
+            Log::channel('callback')->info([
+                'data' => $data,
+                'response' => $response
             ]);
+            $this->model->timestamps = false;
+            $this->model->callback_status = 2;
+            $this->model->notified_at = Carbon::now();
+            $this->model->save();
         } catch (\Exception $e) {
-            \Log::error([
-                'payload' => $payload,
+            Log::channel('callback')->error([
+                'data' => $data,
+                'response' => $response,
                 'exception' => $e->getMessage()
             ]);
-            $this->model->update([
-                'attempts' => $this->model->attempts + 1
-            ]);
+            $this->model->timestamps = false;
+            $this->model->attempts = $this->model->attempts + 1;
+            $this->model->save();
             throw $e;
         }
     }
 
     public function failed(\Throwable $exception)
     {
-        $this->model->update([
-            'callback_status' => 3
-        ]);
+        $this->model->timestamps = false;
+        $this->model->callback_status = 3;
+        $this->model->save();
     }
 
     public function middleware()

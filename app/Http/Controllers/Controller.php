@@ -34,7 +34,6 @@ abstract class Controller extends BaseController
 
     /**
      * Set up perPage and export from request
-     * @return void
      */
     public function __construct()
     {
@@ -85,9 +84,9 @@ abstract class Controller extends BaseController
 
     /**
      * Default success response
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Dingo\Api\Http\Response
      */
-    protected function success(): \Illuminate\Http\JsonResponse
+    protected function success()
     {
         return response()->json([
             'message' => 'success'

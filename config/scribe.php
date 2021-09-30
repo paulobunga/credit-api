@@ -9,7 +9,7 @@ return [
     /*
      * The HTML <title> for the generated documentation. If this is empty, Scribe will infer it from config('app.name').
      */
-    'title' => 'Credit System Api',
+    'title' => 'GamePTS Api',
 
     /*
      * A short description of your API. Will be included in the docs webpage, Postman collection and OpenAPI spec.
@@ -55,7 +55,6 @@ return [
              */
             'include' => [
                 'api.*'
-                // 'users.index', 'healthcheck*'
             ],
 
             /*
@@ -193,6 +192,14 @@ return [
          * Leave as null to use the current app URL (config(app.url)).
          */
         'base_url' => env('DOC_BASE_URL'),
+        /**
+         * Fetch a CSRF token before each request, and add it as an X-XSRF-TOKEN header. Needed if you're using Laravel Sanctum.
+         */
+        'use_csrf' => false,
+        /**
+         * The URL to fetch the CSRF token from (if `use_csrf` is true).
+         */
+        'csrf_url' => '/sanctum/csrf-cookie',
     ],
 
     /*

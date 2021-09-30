@@ -4,7 +4,7 @@ use Laravel\Lumen\Routing\UrlGenerator;
 use Illuminate\Support\Str;
 use Illuminate\Support\HtmlString;
 
-if (! function_exists('public_path')) {
+if (!function_exists('public_path')) {
     /**
      * Get the path to the public folder.
      *
@@ -13,7 +13,7 @@ if (! function_exists('public_path')) {
      */
     function public_path($path = '')
     {
-        return rtrim(app()->basePath('public/'.$path), DIRECTORY_SEPARATOR);
+        return rtrim(app()->basePath('public/' . $path), DIRECTORY_SEPARATOR);
     }
 }
 

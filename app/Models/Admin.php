@@ -14,8 +14,8 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
- * Admin Model
- * @package App\Models
+ * Model of admin
+ * @package Models
  */
 class Admin extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {

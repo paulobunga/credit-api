@@ -37,7 +37,7 @@ class MerchantDepositSeeder extends Seeder
                     'method' => Arr::random($reseller_bank_card->PaymentChannel->payment_methods),
                     'amount' => 1000,
                     'currency' => $credit->currency,
-                    'callback_url' => $this->faker->domainName . '/' . $this->faker->word,
+                    'callback_url' => app('api.url')->version(env('API_VERSION'))->route('api.demos.callback'),
                     'merchant_id' => $merchant->id,
                     'reseller_bank_card_id' => $reseller_bank_card->id,
                     'status' => MerchantDeposit::STATUS['APPROVED'],

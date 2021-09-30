@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * Bank Model
- * @package App\Models
+ * Model of bank
+ * @package Models
  */
 class Bank extends Model
 {

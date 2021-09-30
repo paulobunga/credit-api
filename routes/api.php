@@ -9,7 +9,8 @@ $api->group([
 ], function ($api) {
     $api->get("/demos/payin", ['as' => 'demos.payin.create', 'uses' => 'DemoController@payin']);
     $api->post("/demos/payin", ['as' => 'demos.payin.store', 'uses' => 'DemoController@payin']);
-    
+    $api->post("/demos/callback", ['as' => 'demos.callback', 'uses' => 'DemoController@callback']);
+
     $api->get("/pay/deposits", ['as' => 'deposits.pay', 'uses' => 'DepositController@pay']);
     $api->group([
         'middleware' => [

@@ -99,17 +99,22 @@ class MerchantDepositController extends Controller
 
         return $this->response->item($m, $this->transformer);
     }
-
+    
+    /**
+     * Resend callback to merchant
+     *
+     * @return \Dingo\Api\Http\Response $response
+     */
     public function resend()
     {
         $m = $this->model::where([
             'id' => $this->parameters('merchant_deposit'),
         ])->firstOrFail();
 
-        $m->update([
-            'attempts' => 0,
-            'callback_status' => $this->model::CALLBACK_STATUS['PENDING'],
-        ]);
+        $m->timestamps = false;
+        $m->attempts = 0;
+        $m->callback_status = $this->model::CALLBACK_STATUS['PENDING'];
+        $m->save();
 
         // push deposit information callback to callback url
         Queue::push((new \App\Jobs\GuzzleJob(

@@ -4,22 +4,28 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Dingo\Api\Http\Request;
 use App\Trait\SignValidator;
 use App\Models\Merchant;
 use App\Models\PaymentChannel;
 
 /**
- * @group Deposit API
- *
- * Simple html to try payin and payout API.
- *
- *
+ * Demo endpoint
+ * @package Controllers\Api
  */
 class DemoController extends Controller
 {
     use SignValidator;
 
+    /**
+     * Function to get payin demo page, post form data
+     * and redirect to payment pages.
+     * @param \Dingo\Api\Http\Request $request Http request
+     * @throws \Exception $exception if method is not supported
+     * @return html
+     */
     public function payin(Request $request)
     {
         switch ($request->method()) {
@@ -43,11 +49,11 @@ class DemoController extends Controller
                 $data['sign'] = $this->createSign($data, $merchant->api_key);
                 try {
                     $response = app('api.dispatcher')->post('/deposits', $data);
-                    return redirect()->to($response->payUrl);
                 } catch (\Dingo\Api\Exception\InternalHttpException $e) {
                     $response = $e->getResponse();
                     return json_decode($response->getContent(), true);
                 }
+                return redirect()->to($response->payUrl);
             case 'GET':
                 $merchant = Merchant::with('credits')
                     ->where(
@@ -60,17 +66,37 @@ class DemoController extends Controller
                     'currency',
                     $currency
                 )
-                ->get()
-                ->map(function ($c) {
-                    return [
-                        'name' => $c->name,
-                        'currency' => $c->currency,
-                        'methods' => $c->payment_methods,
-                    ];
-                });
-                return view('demos.payin', compact('merchant', 'currency', 'channels'));
-            default:
-                throw new \Exception('invalid request', 405);
+                    ->get()
+                    ->map(function ($c) {
+                        return [
+                            'name' => $c->name,
+                            'currency' => $c->currency,
+                            'methods' => $c->payment_methods,
+                        ];
+                    });
+                $action = app('api.url')->version(env('API_VERSION'))->route('api.demos.payin.create');
+                return view('demos.payin', compact('merchant', 'currency', 'channels', 'action'));
         }
+        throw new \Exception('invalid request', 405);
+    }
+
+
+    /**
+     * Demo callback function
+     * logging request and response success callback response.
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @throws \Exception $e if sign is invalid
+     * @return \Dingo\Api\Http\Response $response
+     */
+    public function callback(Request $request)
+    {
+        Log::channel('callback')->info($request->all());
+        if ($this->validateSign($request)) {
+            return response()->json([
+                'message' => 'ok'
+            ]);
+        }
+        throw new \Exception('Sign is invalide', 405);
     }
 }

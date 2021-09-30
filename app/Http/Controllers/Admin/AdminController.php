@@ -8,8 +8,8 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
 
 /**
- * Controller of CRUD administrator
- * @package App\Http\Controllers\Admin
+ * Admin endpoint
+ * @package Controllers\Admin
  */
 class AdminController extends Controller
 {
