@@ -18,6 +18,8 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
     use Notifiable;
 
+    public $pushNotificationType = 'users';
+
     protected $fillable = [
         'level',
         'upline_id',

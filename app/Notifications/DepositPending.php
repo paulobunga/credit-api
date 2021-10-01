@@ -3,12 +3,13 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use App\Channels\PusherBeams\PusherBeams;
+use App\Channels\PusherBeams\PusherMessage;
 
-class DepositPending extends Notification implements ShouldBroadcast
+class DepositPending extends Notification
 {
     use Queueable;
 
@@ -31,14 +32,17 @@ class DepositPending extends Notification implements ShouldBroadcast
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast'];
+        return [
+            'database',
+            'broadcast',
+            PusherBeams::class
+        ];
     }
 
     public function broadcastType()
     {
         return 'notifications.deposit';
     }
-
     /**
      * Get the array representation of the notification.
      *
@@ -48,12 +52,36 @@ class DepositPending extends Notification implements ShouldBroadcast
     public function toArray($notifiable)
     {
         return [
-            'id' => $this->deposit->id,
-            'message' => $this->deposit->merchant_order_id,
-            'time' => $this->deposit->updated_at->toDateTimeString(),
+            // 'id' => $this->deposit->id,
+            'title' => 'New Deposit',
+            'body' => "You got a new Pending, {$this->deposit->merchant_order_id}",
+            "icon" => '/icons/favicon-96x96.png',
         ];
     }
 
+    /**
+     * Notification message for IOS, Android, Web
+     *
+     * @param  mixed $notifiable
+     * @return void
+     */
+    public function toPushNotification($notifiable)
+    {
+        $data = $this->toArray($notifiable);
+
+        return PusherMessage::create()
+            ->web()
+            ->badge(1)
+            ->title($data['title'])
+            ->body($data['body']);
+    }
+    
+    /**
+     * Websocket message
+     *
+     * @param  mixed $notifiable
+     * @return \Illuminate\Notifications\Messages\BroadcastMessage $message
+     */
     public function toBroadcast($notifiable)
     {
         return (new BroadcastMessage($this->toArray($notifiable)))->onQueue('echo');

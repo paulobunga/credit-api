@@ -41,6 +41,11 @@ return [
             ],
         ],
 
+        'beams' => [
+            'secret_key' => env('PUSHER_BEAMS_SECRET_KEY'),
+            'instance_id' => env('PUSHER_BEAMS_INSTANCE_ID'),
+        ],
+
         'redis' => [
             'driver' => 'redis',
             'connection' => env('BROADCAST_REDIS_CONNECTION', 'default'),

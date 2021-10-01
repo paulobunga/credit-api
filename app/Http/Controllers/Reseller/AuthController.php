@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Reseller;
 
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Broadcast;
+use Pusher\PushNotifications\PushNotifications;
 use App\Http\Controllers\Controller as Controller;
 use App\Transformers\Reseller\AuthTransformer;
 use App\Models\Reseller;
@@ -22,11 +25,11 @@ class AuthController extends Controller
     {
         $credentials = $request->only(['username', 'password']);
 
-        if (!$token = Auth::guard('reseller')->attempt($credentials)) {
+        if (!$token = auth('reseller')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
 
-        return $this->response->item(Auth::guard('reseller')->user(), new AuthTransformer($token));
+        return $this->response->item(auth('reseller')->user(), new AuthTransformer($token));
     }
 
     /**
@@ -142,10 +145,12 @@ class AuthController extends Controller
     }
 
     /**
-     * Activate user via code.
+     * Activate user by code.
+     *
+     * @param \Dingo\Api\Http\Request $request
      * @method PUT
      *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @return \Dingo\Api\Http\JsonResponse $response
      */
     public function activate(Request $request)
     {
@@ -172,5 +177,52 @@ class AuthController extends Controller
         ]);
 
         return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+    }
+
+
+    /**
+     * Authenticate beam notification
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function beam(Request $request)
+    {
+        $this->validate($request, [
+            'user_id' => 'required',
+            'platform' => 'required',
+        ]);
+        $user_id = Arr::last(explode('.', $request->user_id));
+        if ($user_id !=  auth()->id()) {
+            return response('Inconsistent request', 401);
+        }
+        $beam = new PushNotifications([
+            'secretKey' => config('broadcasting.connections.beams.secret_key'),
+            'instanceId' => config('broadcasting.connections.beams.instance_id'),
+        ]);
+        $token = $beam->generateToken('App.Models.Reseller.' . auth()->id());
+        // auth()->user()->devices()->firstOrCreate(
+        //     [
+        //         'platform' => $request->platform
+        //     ],
+        //     [
+        //         'token' => $token['token'],
+        //         'logined_at' => \Carbon\Carbon::now()
+        //     ]
+        // );
+
+        return response()->json($token);
+    }
+
+    /**
+     * Authenticate private channel request
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @throws \Exception $e if id not matched
+     * @return \Dingo\Api\Http\Response $response
+     */
+    public function channel(Request $request)
+    {
+        return Broadcast::auth($request);
     }
 }
