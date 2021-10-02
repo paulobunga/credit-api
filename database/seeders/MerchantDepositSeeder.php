@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use App\Models\Merchant;
 use App\Models\ResellerBankCard;
 use App\Models\MerchantDeposit;
-use App\Models\MerchantWithdrawal;
+use App\Models\MerchantSettlement;
 use App\Models\Reseller;
 use App\Models\ResellerWithdrawal;
 use App\Models\Transaction;
@@ -42,11 +42,11 @@ class MerchantDepositSeeder extends Seeder
                     'reseller_bank_card_id' => $reseller_bank_card->id,
                     'status' => MerchantDeposit::STATUS['APPROVED'],
                 ]);
-                MerchantWithdrawal::create([
+                MerchantSettlement::create([
                     'merchant_id' => $merchant->id,
                     'amount' => 100,
                     'currency' => $credit->currency,
-                    'status' => MerchantWithdrawal::STATUS['APPROVED'],
+                    'status' => MerchantSettlement::STATUS['APPROVED'],
                 ]);
             }
         }

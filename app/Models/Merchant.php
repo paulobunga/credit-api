@@ -45,6 +45,25 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
         return $this->hasMany(MerchantCredit::class);
     }
 
+    public function withdrawals()
+    {
+        return $this->hasMany(MerchantWithdrawal::class);
+    }
+
+    public function getCredit($currency)
+    {
+        return $this->credits()->where('currency', strtoupper($currency))->first()->credit ?? 0;
+    }
+
+    public function getWithdrawalCredit($currency)
+    {
+        return $this->getCredit($currency) -
+            $this->withdrawals()->where([
+                'status' => MerchantWithdrawal::STATUS['PENDING'],
+                'currency' => strtoupper($currency)
+            ])->sum('amount');
+    }
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;

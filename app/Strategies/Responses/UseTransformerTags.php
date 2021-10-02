@@ -109,7 +109,7 @@ class UseTransformerTags extends Strategy
         preg_match('/^(\d{3})?\s?([\S]*)\s?([\S]*)?$/', $content, $result);
         $status = (int)($result[1] ?: 200);
         $transformerClass = $result[2];
-        $append = json_decode(str_replace(':base_url', env('DOC_BASE_URL'), $result[3]), true);
+        $append = json_decode(str_replace(':base_url', env('APP_URL'), $result[3]), true);
 
         return [$status, $transformerClass, $append];
     }

@@ -66,6 +66,8 @@ class UseResponseTag extends Strategy
             }
             $name = implode(' ', array_map('ucfirst', explode('_', $name)));
             $description = "Example {$name} {$description}";
+            $content = str_replace(':base_url', env('APP_URL'), $content);
+
             return [
                 'content' => $content,
                 'status' => (int) $status,

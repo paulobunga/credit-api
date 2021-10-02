@@ -5,7 +5,7 @@ namespace App\Transformers\Api;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\TransformerAbstract;
 
-class DepositTransformer extends TransformerAbstract
+class WithdrawalTransformer extends TransformerAbstract
 {
     protected array $params;
 
@@ -13,7 +13,7 @@ class DepositTransformer extends TransformerAbstract
     {
         $this->params = $params;
     }
-    
+
     /**
      * Transform response
      *
@@ -30,6 +30,6 @@ class DepositTransformer extends TransformerAbstract
             'currency' => $m->currency,
             'status' => $m->status,
             'callback_url' => $m->callback_url,
-        ] + $this->params;
+        ] + $this->params + $m->attributes;
     }
 }

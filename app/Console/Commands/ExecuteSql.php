@@ -150,4 +150,43 @@ class ExecuteSql extends Command
             $rd->save();
         }
     }
+
+    protected function merchantSettlementMerchantWithdrawals()
+    {
+        if (!Schema::hasTable('merchant_settlements')) {
+            Schema::rename('merchant_withdrawals', 'merchant_settlements');
+        }
+        if (!Schema::hasTable('merchant_withdrawals')) {
+            Schema::create('merchant_withdrawals', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('merchant_id')
+                    ->constrained();
+                $table->foreignId('reseller_id')
+                    ->constrained();
+                $table->foreignId('payment_channel_id')
+                    ->constrained();
+                $table->string('order_id', 60)->unique();
+                $table->string('merchant_order_id', 60);
+                $table->json('attributes')->default(new Expression('(JSON_ARRAY())'));
+                $table->decimal('amount', 14, 4);
+                $table->string('currency', 6);
+                $table->unsignedTinyInteger('status')
+                    ->default(0)
+                    ->comment('0:Created,1:Pending,2:Approved,3:Rejected,4:Enforced,5:Canceled');
+                $table->unsignedTinyInteger('callback_status')
+                    ->default(0)
+                    ->comment('0:Created,1:Pending,2:Finish,3:Failed');
+                $table->unsignedTinyInteger('attempts')
+                    ->default(0);
+                $table->string('callback_url');
+                $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
+                $table->timestamps();
+                $table->timestamp('notified_at')->nullable();
+                $table->unique(
+                    ['merchant_id', 'merchant_order_id', 'currency'],
+                    'merchant_withdrawals_merchant_order_id_unique'
+                );
+            });
+        }
+    }
 }

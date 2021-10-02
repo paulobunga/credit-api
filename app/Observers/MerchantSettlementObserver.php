@@ -5,10 +5,10 @@ namespace App\Observers;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\MerchantWithdrawal;
+use App\Models\MerchantSettlement;
 use App\Models\Transaction;
 
-trait MerchantWithdrawalObserver
+trait MerchantSettlementObserver
 {
     protected static function boot()
     {
@@ -16,7 +16,7 @@ trait MerchantWithdrawalObserver
 
         // auto-sets values on creation
         static::creating(function ($query) {
-            $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM merchant_withdrawals")[0]->ID ?? 0;
+            $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM merchant_settlements")[0]->ID ?? 0;
             $query->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(20);
         });
 
@@ -35,16 +35,18 @@ trait MerchantWithdrawalObserver
     /**
      * Handle the status "changed" event.
      *
-     * @param  \App\Models\MerchantDeposit
+     * @param int $status
+     * @param \App\Models\MerchantSettlement $m
+     * @throws \Exception $e if currency type is not supported
+     * @throws \Exception $e if DB transaction error occurs
      * @return void
      */
-    protected static function onStatusChangeEvent($status, MerchantWithdrawal $m)
+    protected static function onStatusChangeEvent($status, MerchantSettlement $m)
     {
-
         DB::beginTransaction();
         try {
             // approve
-            if ($status == MerchantWithdrawal::STATUS['APPROVED']) {
+            if ($status == MerchantSettlement::STATUS['APPROVED']) {
                 $credit = $m->merchant->credits()->where('currency', $m->currency)->first();
                 if (!$credit) {
                     throw new \Exception('Currency type is not supported!');
