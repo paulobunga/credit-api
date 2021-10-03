@@ -62,6 +62,11 @@ class MerchantWithdrawal extends Model
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
     }
 
+    public function paymentChannel()
+    {
+        return $this->belongsTo(PaymentChannel::class);
+    }
+
     public function getStatusTextAttribute()
     {
         return array_keys(self::STATUS)[$this->attributes['status']];
@@ -79,5 +84,11 @@ class MerchantWithdrawal extends Model
             ->route('api.withdrawals.pay', $params + [
                 'sign' => $this->createSign($params, $this->merchant->api_key)
             ]);
+    }
+
+    public function getExpiredAtAttribute()
+    {
+        $min = app(\App\Settings\CurrencySetting::class)->getExpiredMinutes($this->attributes['currency']);
+        return $this->created_at->addMinutes($min);
     }
 }

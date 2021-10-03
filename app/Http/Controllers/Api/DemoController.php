@@ -94,7 +94,6 @@ class DemoController extends Controller
                 $this->validate($request, [
                     'currency' => 'required',
                     'channel' => 'required',
-                    'method' => 'required',
                     'amount' => 'required|numeric',
                 ]);
                 $merchant = Merchant::with('credits')
@@ -106,10 +105,11 @@ class DemoController extends Controller
                 $data = array_merge($request->all(), [
                     'merchant_order_id' => Str::uuid()->toString(),
                     'uuid' => $merchant->uuid,
+                    'callback_url' => env('APP_URL') . '/demos/callback'
                 ]);
                 $data['sign'] = $this->createSign($data, $merchant->api_key);
                 try {
-                    $response = app('api.dispatcher')->post('/deposits', $data);
+                    $response = app('api.dispatcher')->post('/withdrawals', $data);
                 } catch (\Dingo\Api\Exception\InternalHttpException $e) {
                     $response = $e->getResponse();
                     return json_decode($response->getContent(), true);
