@@ -51,10 +51,13 @@ trait MerchantSettlementObserver
                 if (!$credit) {
                     throw new \Exception('Currency type is not supported!');
                 }
+                if ($credit->credit < $m->amount) {
+                    throw new \Exception('exceed merchant credit', 405);
+                }
                 $m->transactions()->create([
                     'user_id' => $m->merchant_id,
                     'user_type' => 'merchant',
-                    'type' => Transaction::TYPE['MERCHANT_WITHDRAW_CREDIT'],
+                    'type' => Transaction::TYPE['MERCHANT_SETTLE_CREDIT'],
                     'amount' => $m->amount,
                     'before' => $credit->credit,
                     'after' => $credit->credit - $m->amount,

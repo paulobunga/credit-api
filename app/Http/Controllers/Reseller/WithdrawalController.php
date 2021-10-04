@@ -4,18 +4,14 @@ namespace App\Http\Controllers\Reseller;
 
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Models\Transaction;
-use App\Models\ResellerBankCard;
-use App\Models\ResellerWithdrawal;
-use App\DTO\ResellerWithdrawalExtra;
+use App\Models\MerchantWithdrawal;
 
 class WithdrawalController extends Controller
 {
-    protected $model = ResellerWithdrawal::class;
+    protected $model = MerchantWithdrawal::class;
 
     protected $transformer = \App\Transformers\Reseller\WithdrawalTransformer::class;
 
@@ -45,35 +41,9 @@ class WithdrawalController extends Controller
                 'status',
                 'created_at',
             ])
-            ->where('reseller_id', Auth::id())
+            ->where('reseller_id', auth()->id())
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($withdrawals, $this->transformer);
-    }
-
-    public function store(Request $request)
-    {
-        $this->validate($request, [
-            'card' => 'required|numeric',
-            'amount' => 'required|numeric|min:1',
-        ]);
-        ResellerBankCard::where([
-            'id' => $request->card,
-            'reseller_id' => auth()->id()
-        ])->firstOrFail();
-        if ($request->amount > Auth::user()->coin - Auth::user()->withdrawalPendingCoin) {
-            throw new \Exception('Pending amount exceed coin value', 405);
-        }
-        $withdrawal = $this->model::create([
-            'reseller_id' => auth()->id(),
-            'reseller_bank_card_id' => $request->card,
-            'type' => ResellerWithdrawal::TYPE['COIN'],
-            'transaction_type' => Transaction::TYPE['RESELLER_WITHDRAW_COIN'],
-            'amount' => $request->amount,
-            'status' => ResellerWithdrawal::STATUS['PENDING'],
-            'extra' => new ResellerWithdrawalExtra(['creator'=> auth()->id()])
-        ]);
-
-        return $this->response->item($withdrawal, $this->transformer);
     }
 }

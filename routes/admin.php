@@ -54,6 +54,8 @@ $api->group([
 
             $api->resource('merchant_withdrawals', 'MerchantWithdrawalController', ['only' => ['index']]);
 
+            $api->resource('merchant_settlements', 'MerchantSettlementController', ['only' => ['index']]);
+
             $api->resource('payment_channels', 'PaymentChannelController', ['except' => ['show']]);
 
             $api->resource('resellers', 'ResellerController', ['except' => ['show']]);

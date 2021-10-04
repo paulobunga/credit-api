@@ -1,11 +1,10 @@
 <?php
-
-namespace App\Transformers\Reseller;
+namespace App\Transformers\Admin;
 
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\TransformerAbstract;
 
-class WithdrawalTransformer extends TransformerAbstract
+class MerchantSettlementTransformer extends TransformerAbstract
 {
     protected $defaultIncludes = [
         'transactions',
@@ -15,12 +14,11 @@ class WithdrawalTransformer extends TransformerAbstract
     {
         return [
             'id' => $m->id,
+            'name' => $m->merchant->name,
             'order_id' => $m->order_id,
-            'attributes' => $m->attributes,
             'amount' => $m->amount,
+            'currency' => $m->currency,
             'status' => $m->status,
-            'extra' => $m->extra,
-            'created_at' => (string)$m->created_at
         ];
     }
 

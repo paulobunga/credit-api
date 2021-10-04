@@ -5,7 +5,7 @@ namespace App\Transformers\Reseller;
 use Illuminate\Database\Eloquent\Model;
 use League\Fractal\TransformerAbstract;
 
-class WithdrawalTransformer extends TransformerAbstract
+class SettlementTransformer extends TransformerAbstract
 {
     protected $defaultIncludes = [
         'transactions',
@@ -16,7 +16,7 @@ class WithdrawalTransformer extends TransformerAbstract
         return [
             'id' => $m->id,
             'order_id' => $m->order_id,
-            'attributes' => $m->attributes,
+            'card' => $m->bankCard->primary ?? '--',
             'amount' => $m->amount,
             'status' => $m->status,
             'extra' => $m->extra,

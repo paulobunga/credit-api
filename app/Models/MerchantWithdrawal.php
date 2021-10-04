@@ -57,9 +57,9 @@ class MerchantWithdrawal extends Model
         return $this->belongsTo(Merchant::class);
     }
 
-    public function transactions()
+    public function reseller()
     {
-        return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
+        return $this->belongsTo(Reseller::class);
     }
 
     public function paymentChannel()
@@ -67,6 +67,11 @@ class MerchantWithdrawal extends Model
         return $this->belongsTo(PaymentChannel::class);
     }
 
+    public function transactions()
+    {
+        return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
+    }
+    
     public function getStatusTextAttribute()
     {
         return array_keys(self::STATUS)[$this->attributes['status']];

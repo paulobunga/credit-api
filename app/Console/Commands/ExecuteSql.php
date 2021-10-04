@@ -155,6 +155,18 @@ class ExecuteSql extends Command
     {
         if (!Schema::hasTable('merchant_settlements')) {
             Schema::rename('merchant_withdrawals', 'merchant_settlements');
+            Schema::table('merchant_settlements', function ($table) {
+                $table->renameIndex(
+                    'merchant_withdrawals_order_id_unique',
+                    'merchant_settlements_order_id_unique'
+                );
+                $table->renameIndex(
+                    'merchant_withdrawals_merchant_id_foreign',
+                    'merchant_settlements_merchant_id_foreign'
+                );
+                $table->dropForeign('merchant_withdrawals_merchant_id_foreign');
+                $table->foreign('merchant_id')->references('id')->on('merchants');
+            });
         }
         if (!Schema::hasTable('merchant_withdrawals')) {
             Schema::create('merchant_withdrawals', function (Blueprint $table) {

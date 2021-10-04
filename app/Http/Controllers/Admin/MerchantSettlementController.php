@@ -2,32 +2,32 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\DB;
+use Dingo\Api\Http\Request;
+use App\Http\Controllers\Controller;
 
-class MerchantWithdrawalController extends Controller
+class MerchantSettlementController extends Controller
 {
-    protected $model = \App\Models\MerchantWithdrawal::class;
+    protected $model = \App\Models\MerchantSettlement::class;
 
-    protected $transformer = \App\Transformers\Admin\MerchantWithdrawalTransformer::class;
+    protected $transformer = \App\Transformers\Admin\MerchantSettlementTransformer::class;
 
     public function index(Request $request)
     {
-        $merchant_withdrawals = QueryBuilder::for($this->model)
+        $merchant_settlements = QueryBuilder::for($this->model)
             ->with([
                 'merchant'
             ])
-            ->join('merchants', 'merchants.id', '=', 'merchant_withdrawals.merchant_id')
-            ->select('merchant_withdrawals.*', 'merchants.name')
+            ->join('merchants', 'merchants.id', '=', 'merchant_settlements.merchant_id')
+            ->select('merchant_settlements.*', 'merchants.name')
             ->allowedFilters([
                 AllowedFilter::partial('name', 'merchants.name'),
                 AllowedFilter::exact('status'),
                 AllowedFilter::callback(
                     'created_at_between',
-                    fn ($query, $v) => $query->whereBetween('merchant_withdrawals.created_at', $v)
+                    fn ($query, $v) => $query->whereBetween('merchant_settlements.created_at', $v)
                 ),
             ])
             ->allowedSorts([
@@ -39,21 +39,21 @@ class MerchantWithdrawalController extends Controller
                 'status'
             ]);
 
-        return $this->paginate($merchant_withdrawals, $this->transformer);
+        return $this->paginate($merchant_settlements, $this->transformer);
     }
 
     public function update(Request $request)
     {
-        $merchant_withdrawal = $this->model::findOrFail($this->parameters('merchant_withdrawal'));
+        $merchant_settlement = $this->model::findOrFail($this->parameters('merchant_settlement'));
         $this->validate($request, [
             'admin_id' => 'required|exists:admins,id',
             'status' => 'required|numeric',
         ]);
         DB::beginTransaction();
         try {
-            $merchant_withdrawal->update([
+            $merchant_settlement->update([
                 'status' => $request->status,
-                'info' => [
+                'extra' => [
                     'admin_id' => $request->admin_id
                 ]
             ]);
@@ -63,6 +63,6 @@ class MerchantWithdrawalController extends Controller
         }
         DB::commit();
 
-        return $this->response->item($merchant_withdrawal, $this->transformer);
+        return $this->response->item($merchant_settlement, $this->transformer);
     }
 }

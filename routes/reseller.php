@@ -39,7 +39,9 @@ $api->group([
 
         $api->resource('payment_channels', 'PaymentChannelController', ['only' => ['index']]);
         
-        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'store']]);
+        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index']]);
+
+        $api->resource('settlements', 'SettlementController', ['only' => ['index', 'store']]);
         
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
         $api->get("/reports/month", ['as' => 'reports.month', 'uses' => 'ReportController@month']);
