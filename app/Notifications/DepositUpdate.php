@@ -3,10 +3,12 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use App\Channels\PusherBeams\PusherBeams;
+use App\Channels\PusherBeams\PusherMessage;
 
 class DepositUpdate extends Notification implements ShouldBroadcast
 {
@@ -31,7 +33,11 @@ class DepositUpdate extends Notification implements ShouldBroadcast
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast'];
+        return [
+            'database',
+            'broadcast',
+            PusherBeams::class
+        ];
     }
 
     public function broadcastType()
@@ -54,16 +60,21 @@ class DepositUpdate extends Notification implements ShouldBroadcast
         ];
     }
 
-    protected function getStatus()
+    /**
+     * Notification message for IOS, Android, Web
+     *
+     * @param  mixed $notifiable
+     * @return void
+     */
+    public function toPushNotification($notifiable)
     {
-        switch ($this->deposit->status) {
-            case 2:
-                return 'approved';
-            case 3:
-                return 'rejected';
-            default:
-                return 'error';
-        }
+        $data = $this->toArray($notifiable);
+
+        return PusherMessage::create()
+            ->web()
+            ->badge(1)
+            ->title($data['title'])
+            ->body($data['body']);
     }
 
     public function toBroadcast($notifiable)

@@ -200,18 +200,20 @@ class AuthController extends Controller
             'secretKey' => config('broadcasting.connections.beams.secret_key'),
             'instanceId' => config('broadcasting.connections.beams.instance_id'),
         ]);
-        $token = $beam->generateToken('App.Models.Reseller.' . auth()->id());
-        // auth()->user()->devices()->firstOrCreate(
-        //     [
-        //         'platform' => $request->platform
-        //     ],
-        //     [
-        //         'token' => $token['token'],
-        //         'logined_at' => \Carbon\Carbon::now()
-        //     ]
-        // );
 
-        return response()->json($token);
+        $device = auth()->user()->devices()->firstOrCreate(
+            [
+                'platform' => $request->platform
+            ],
+            [
+                'token' => $beam->generateToken('App.Models.Reseller.' . auth()->id())['token'],
+                'logined_at' => \Carbon\Carbon::now()
+            ]
+        );
+
+        return response()->json([
+            'token' => $device->token
+        ]);
     }
 
     /**
