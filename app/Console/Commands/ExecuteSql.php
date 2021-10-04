@@ -201,4 +201,19 @@ class ExecuteSql extends Command
             });
         }
     }
+
+    protected function createDevicesTable()
+    {
+        if (!Schema::hasTable('devices')) {
+            Schema::create('devices', function (Blueprint $table) {
+                $table->bigIncrements('id')->unsigned();
+                $table->unsignedBigInteger('user_id');
+                $table->string('user_type', 30);
+                $table->string('platform', 10);
+                $table->text('token');
+                $table->timestamp('created_at')->useCurrent();
+                $table->timestamp('logined_at');
+            });
+        }
+    }
 }
