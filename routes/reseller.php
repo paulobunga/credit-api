@@ -39,7 +39,7 @@ $api->group([
 
         $api->resource('payment_channels', 'PaymentChannelController', ['only' => ['index']]);
         
-        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index']]);
+        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'update']]);
 
         $api->resource('settlements', 'SettlementController', ['only' => ['index', 'store']]);
         

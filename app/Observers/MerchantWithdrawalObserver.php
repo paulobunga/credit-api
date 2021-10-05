@@ -72,6 +72,37 @@ trait MerchantWithdrawalObserver
                 'credit',
                 $m->amount * (1 + $credit->transaction_fee)
             );
+        } elseif (in_array($status, [
+            MerchantWithdrawal::STATUS['REJECTED'],
+            MerchantWithdrawal::STATUS['CANCELED'],
+        ])) {
+            // rollback merchant credit
+            $credit = $m->merchant->credits()->where('currency', $m->currency)->first();
+            if (!$credit) {
+                throw new \Exception('Currency type is not supported!');
+            }
+            $m->transactions()->create([
+                'user_id' => $m->merchant_id,
+                'user_type' => 'merchant',
+                'type' => Transaction::TYPE['SYSTEM_TOPUP_CREDIT'],
+                'amount' => $m->amount,
+                'before' => $credit->credit,
+                'after' => $credit->credit + $m->amount,
+                'currency' => $m->currency,
+            ]);
+            $m->transactions()->create([
+                'user_id' => $m->merchant_id,
+                'user_type' => 'merchant',
+                'type' => Transaction::TYPE['SYSTEM_TOPUP_CREDIT'],
+                'amount' => $m->amount * $credit->transaction_fee,
+                'before' => $credit->credit + $m->amount,
+                'after' => $credit->credit + $m->amount * (1 + $credit->transaction_fee),
+                'currency' => $m->currency,
+            ]);
+            $credit->increment(
+                'credit',
+                $m->amount * (1 + $credit->transaction_fee)
+            );
         } elseif ($status == MerchantWithdrawal::STATUS['APPROVED']) {
             // reseller
             $m->transactions()->create([

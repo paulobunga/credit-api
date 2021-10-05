@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 use App\Trait\SignValidator;
 use App\Observers\MerchantWithdrawalObserver;
 
@@ -71,7 +73,7 @@ class MerchantWithdrawal extends Model
     {
         return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
     }
-    
+
     public function getStatusTextAttribute()
     {
         return array_keys(self::STATUS)[$this->attributes['status']];
@@ -95,5 +97,20 @@ class MerchantWithdrawal extends Model
     {
         $min = app(\App\Settings\CurrencySetting::class)->getExpiredMinutes($this->attributes['currency']);
         return $this->created_at->addMinutes($min);
+    }
+
+    public function getSlipUrlAttribute()
+    {
+        if (!in_array($this->attributes['status'], [
+            self::STATUS['FINISHED'],
+            self::STATUS['FINISHED'],
+            self::STATUS['REJECTED'],
+        ])) {
+            return null;
+        }
+        return  Storage::disk('s3')->temporaryUrl(
+            'withdrawals/' . $this->attributes['order_id'],
+            Carbon::now()->addMinutes(1)
+        );
     }
 }

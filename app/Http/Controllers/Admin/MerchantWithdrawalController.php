@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class MerchantWithdrawalController extends Controller
 {
@@ -53,7 +54,7 @@ class MerchantWithdrawalController extends Controller
         try {
             $merchant_withdrawal->update([
                 'status' => $request->status,
-                'info' => [
+                'extra' => [
                     'admin_id' => $request->admin_id
                 ]
             ]);
@@ -64,5 +65,31 @@ class MerchantWithdrawalController extends Controller
         DB::commit();
 
         return $this->response->item($merchant_withdrawal, $this->transformer);
+    }
+
+    /**
+     * Resend callback to merchant
+     *
+     * @return \Dingo\Api\Http\Response $response
+     */
+    public function resend()
+    {
+        $m = $this->model::where([
+            'id' => $this->parameters('merchant_withdrawal'),
+        ])->firstOrFail();
+
+        $m->timestamps = false;
+        $m->attempts = 0;
+        $m->callback_status = $this->model::CALLBACK_STATUS['PENDING'];
+        $m->save();
+
+        // push deposit information callback to callback url
+        Queue::push((new \App\Jobs\GuzzleJob(
+            $m,
+            new \App\Transformers\Api\DepositTransformer,
+            $m->merchant->api_key
+        )));
+
+        return $this->response->item($m, $this->transformer);
     }
 }

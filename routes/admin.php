@@ -52,7 +52,10 @@ $api->group([
                 'as' => 'merchant_deposits.resend', 'uses' => 'MerchantDepositController@resend'
             ]);
 
-            $api->resource('merchant_withdrawals', 'MerchantWithdrawalController', ['only' => ['index']]);
+            $api->resource('merchant_withdrawals', 'MerchantWithdrawalController', ['only' => ['index', 'update']]);
+            $api->put("/merchant_withdrawals/resend/{merchant_withdrawal}", [
+                'as' => 'merchant_withdrawals.resend', 'uses' => 'MerchantWithdrawalController@resend'
+            ]);
 
             $api->resource('merchant_settlements', 'MerchantSettlementController', ['only' => ['index']]);
 

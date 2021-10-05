@@ -92,7 +92,7 @@ class MerchantDepositController extends Controller
 
         $m->update([
             'status' => $request->status,
-            'info' => [
+            'extra' => [
                 'admin_id' => $request->admin_id
             ]
         ]);
