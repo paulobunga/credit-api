@@ -69,14 +69,16 @@ class WithdrawalController extends Controller
                 'image',
             ]
         ]);
-        if (Storage::disk('s3')->exists("withdrawals/$withdrawal->order_id")) {
-            throw new \Exception('Slip is already exists!', 405);
+        if ($request->status == MerchantWithdrawal::STATUS['FINISHED']) {
+            if (Storage::disk('s3')->exists("withdrawals/$withdrawal->order_id")) {
+                throw new \Exception('Slip is already exists!', 405);
+            }
+            $request->file('slip')->storeAs(
+                'withdrawals',
+                $withdrawal->order_id,
+                's3'
+            );
         }
-        $request->file('slip')->storeAs(
-            'withdrawals',
-            $withdrawal->order_id,
-            's3'
-        );
         $withdrawal->update([
             'status' => $request->status,
         ]);
