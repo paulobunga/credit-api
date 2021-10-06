@@ -28,56 +28,69 @@
         </select>
     </div>
     <!-- VND NETBANK -->
-    <div class="mb-6" x-show="currency=='VND' && channel=='NETBANK'">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="account_name">
-            Account name
-        </label>
-        <input name="account_name"
-            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" />
-    </div>
-    <div class="mb-6" x-show="currency=='VND' && channel=='NETBANK'">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="account_number">
-            Account number
-        </label>
-        <input name="account_number"
-            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" />
-    </div>
-    <div class="mb-6" x-show="currency=='VND' && channel=='NETBANK'">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="bank_name">
-            Bank name
-        </label>
-        <input name="bank_name"
-            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" />
+    <div x-show="currency=='VND' && channel=='NETBANK'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="account_name">
+                Account name
+            </label>
+            <input name="account_name"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='VND' && channel=='NETBANK')" />
+        </div>
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="account_number">
+                Account number
+            </label>
+            <input name="account_number"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='VND' && channel=='NETBANK')" />
+        </div>
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="bank_name">
+                Bank name
+            </label>
+            <input name="bank_name"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='VND' && channel=='NETBANK')" />
+        </div>
     </div>
     <!-- INR NETBANK -->
-    <div class="mb-6" x-show="currency=='INR' && channel=='NETBANK'">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="account_name">
-            Account name
-        </label>
-        <input name="account_name"
-            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" />
-    </div>
-    <div class="mb-6" x-show="currency=='INR' && channel=='NETBANK'">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="account_number">
-            Account number
-        </label>
-        <input name="account_number"
-            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" />
-    </div>
-    <div class="mb-6" x-show="currency=='INR' && channel=='NETBANK'">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="ifsc_code">
-            IFSC Code
-        </label>
-        <input name="ifsc_code"
-            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" />
+    <div x-show="currency=='INR' && channel=='NETBANK'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="account_name">
+                Account name
+            </label>
+            <input name="account_name"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='INR' && channel=='NETBANK')" />
+        </div>
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="account_number">
+                Account number
+            </label>
+            <input name="account_number"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='INR' && channel=='NETBANK')" />
+        </div>
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="ifsc_code">
+                IFSC Code
+            </label>
+            <input name="ifsc_code"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='INR' && channel=='NETBANK')" />
+        </div>
     </div>
     <!-- INR UPI -->
-    <div class="mb-6" x-show="currency=='INR' && channel=='UPI'">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="upi_id">
-            UPI ID
-        </label>
-        <input name="upi_id"
-            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" />
+    <div x-show="currency=='INR' && channel=='UPI'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="upi_id">
+                UPI ID
+            </label>
+            <input name="upi_id"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='INR' && channel=='UPI')" />
+        </div>
     </div>
     <div class="mb-6">
         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grip-amount">
