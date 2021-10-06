@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Reseller;
 
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
+use Carbon\Carbon;
 use Pusher\PushNotifications\PushNotifications;
 use App\Http\Controllers\Controller as Controller;
 use App\Transformers\Reseller\AuthTransformer;
@@ -95,7 +95,7 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }
 
     /**
@@ -106,7 +106,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        Auth::logout();
+        auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
     }
@@ -119,7 +119,7 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->response->item(Auth::user(), new AuthTransformer(Auth::refresh()));
+        return $this->response->item(auth()->user(), new AuthTransformer(auth()->refresh()));
     }
 
     /**
@@ -131,17 +131,17 @@ class AuthController extends Controller
     public function update(Request $request)
     {
         $this->validate($request, [
-            'name' => "required|unique:resellers,name," . Auth::id(),
-            'username' => "required|unique:resellers,username," . Auth::id(),
+            'name' => "required|unique:resellers,name," . auth()->id(),
+            'username' => "required|unique:resellers,username," . auth()->id(),
             'phone' => 'required'
         ]);
-        Auth::user()->update([
+        auth()->user()->update([
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
         ]);
 
-        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }
 
     /**
@@ -160,23 +160,23 @@ class AuthController extends Controller
         $code = ResellerActivateCode::where([
             'code' => $request->code,
             'status' => ResellerActivateCode::STATUS['PENDING']
-        ])->where('expired_at', '>', \Carbon\Carbon::now())
+        ])->where('expired_at', '>', Carbon::now())
             ->firstOrFail();
-        if ($code->reseller->currency != Auth::user()->currency) {
+        if ($code->reseller->currency != auth()->user()->currency) {
             throw new \Exception('Activated Code Currency is not match your currency');
         }
 
         $code->update([
-            'active_reseller_id' => Auth::id(),
+            'active_reseller_id' => auth()->id(),
             'status' => ResellerActivateCode::STATUS['ACTIVATED'],
-            'activated_at' => \Carbon\Carbon::now()
+            'activated_at' => Carbon::now()
         ]);
-        Auth::user()->update([
+        auth()->user()->update([
             'upline_id' => $code->reseller_id,
             'status' => Reseller::STATUS['ACTIVE'],
         ]);
 
-        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }
 
 
@@ -201,15 +201,16 @@ class AuthController extends Controller
             'instanceId' => config('broadcasting.connections.beams.instance_id'),
         ]);
 
-        $device = auth()->user()->devices()->firstOrCreate(
+        $device = auth()->user()->devices()->firstOrNew(
             [
                 'platform' => $request->platform
             ],
             [
                 'token' => $beam->generateToken('App.Models.Reseller.' . auth()->id())['token'],
-                'logined_at' => \Carbon\Carbon::now()
             ]
         );
+        $device->logined_at = Carbon::now();
+        $device->save();
 
         return response()->json([
             'token' => $device->token
