@@ -40,22 +40,5 @@ class MerchantSeeder extends Seeder
             'credit' => 0,
             'transaction_fee' => 0.001
         ]);
-        foreach (range(1, 2) as $i) {
-            $merchant = Merchant::factory()->create([
-                'username' => "merchant{$i}@gmail.com",
-            ]);
-            $count = 0;
-            foreach ($c->currency as $currency => $v) {
-                if ($count == $i) {
-                    break;
-                }
-                $merchant->credits()->create([
-                    'currency' => $currency,
-                    'credit' => 0,
-                    'transaction_fee' => $v['transaction_fee_percentage']
-                ]);
-                ++$count;
-            }
-        }
     }
 }

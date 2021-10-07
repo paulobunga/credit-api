@@ -34,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
             'merchant' => 'App\Models\Merchant',
             'merchant.deposit' => 'App\Models\MerchantDeposit',
             'merchant.withdrawal' => 'App\Models\MerchantWithdrawal',
+            'merchant.settlement' => 'App\Models\MerchantSettlement',
             'reseller.deposit' => 'App\Models\ResellerDeposit',
             'reseller.withdrawal' => 'App\Models\ResellerWithdrawal',
         ]);

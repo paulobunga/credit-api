@@ -177,7 +177,7 @@ trait MerchantWithdrawalObserver
                 $m->reseller->notify(new \App\Notifications\WithdrawalPending($m));
                 break;
             case MerchantWithdrawal::STATUS['APPROVED']:
-                $m->merchant->notify(new \App\Notifications\WithdrawalApproved($m));
+                $m->merchant->notify(new \App\Notifications\WithdrawalFinish($m));
                 $m->update([
                     'callback_status' => MerchantWithdrawal::CALLBACK_STATUS['PENDING']
                 ]);

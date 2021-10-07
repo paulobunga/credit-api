@@ -3,7 +3,6 @@
 namespace App\Transformers\Reseller;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use League\Fractal\TransformerAbstract;
 use App\Models\Transaction;
 
@@ -17,7 +16,7 @@ class DepositTransformer extends TransformerAbstract
     {
         return [
             'id' => $m->id,
-            'merchant_order_id' => $m->merchant_order_id,
+            'order_id' => $m->order_id,
             'channel' => $m->paymentChannel->name,
             'card' => $m->resellerBankCard->primary,
             'method' => $m->method,
@@ -37,7 +36,7 @@ class DepositTransformer extends TransformerAbstract
                     Transaction::TYPE['SYSTEM_TOPUP_COMMISSION'],
                 ])
                 ->where('user_type', 'reseller')
-                ->where('user_id', Auth::id())
+                ->where('user_id', auth()->id())
                 ->get(),
             new TransactionTransformer,
             false

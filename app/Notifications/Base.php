@@ -10,19 +10,15 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use App\Channels\PusherBeams\PusherBeams;
 use App\Channels\PusherBeams\PusherMessage;
 
-class WithdrawalApproved extends Notification implements ShouldBroadcast
+abstract class Base extends Notification implements ShouldBroadcast
 {
     use Queueable;
+    
+    public Model $model;
 
-    public Model $m;
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
     public function __construct(Model $m)
     {
-        $this->m = $m;
+        $this->model = $m;
     }
 
     /**
@@ -49,9 +45,6 @@ class WithdrawalApproved extends Notification implements ShouldBroadcast
     public function toArray($notifiable)
     {
         return [
-            'id' => $this->m->id,
-            'message' => $this->m->merchant_order_id,
-            'time' => $this->m->updated_at->toDateTimeString(),
             "icon" => '/icons/favicon-96x96.png',
         ];
     }
@@ -73,11 +66,6 @@ class WithdrawalApproved extends Notification implements ShouldBroadcast
             ->body($data['body']);
     }
 
-    public function broadcastType()
-    {
-        return 'withdrawal';
-    }
-
     /**
      * Websocket message
      *
@@ -86,6 +74,6 @@ class WithdrawalApproved extends Notification implements ShouldBroadcast
      */
     public function toBroadcast($notifiable)
     {
-        return (new BroadcastMessage($this->toArray($notifiable)))->onQueue('echo');
+        return (new BroadcastMessage($this->toArray($notifiable)))->onQueue('pusher');
     }
 }

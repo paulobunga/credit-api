@@ -67,7 +67,7 @@ class MerchantDepositSeeder extends Seeder
                     }),
                     'amount' => 100,
                     'currency' => $credit->currency,
-                    'status' => MerchantWithdrawal::STATUS['PENDING'],
+                    'status' => MerchantWithdrawal::STATUS['APPROVED'],
                     'callback_url' => app('api.url')->version(env('API_VERSION'))->route('api.demos.callback'),
                 ]);
                 MerchantSettlement::create([
@@ -79,6 +79,9 @@ class MerchantDepositSeeder extends Seeder
             }
         }
         foreach (Reseller::with('bankCards')->where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
+            if ($reseller->coin < 1) {
+                continue;
+            }
             ResellerWithdrawal::create([
                 'reseller_id' => $reseller->id,
                 'reseller_bank_card_id' => $reseller->bankCards->random()->id,
@@ -90,7 +93,7 @@ class MerchantDepositSeeder extends Seeder
                 'extra' => [
                     'payment_type' => 'BY BANK TRANSFER',
                     'reason' => 'Withdraw',
-                    'remark' => 'OK',
+                    'remark' => 'Test',
                     'memo' => 'success',
                     'creator' => $reseller->id
                 ]

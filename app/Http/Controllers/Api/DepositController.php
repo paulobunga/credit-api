@@ -245,6 +245,7 @@ class DepositController extends Controller
             WHERE
                 r.currency = '{$request->currency}'
                 AND r.credit >= {$request->amount}
+                AND r.LEVEL = :r_level
                 AND r.STATUS = :r_status
                 AND rbc.STATUS = :rbc_status
                 AND pc.payin->>'$.status' = :pc_status
@@ -271,6 +272,7 @@ class DepositController extends Controller
         // dd($sql);
         $reseller_bank_cards = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
+            'r_level' => Reseller::LEVEL['RESELLER'],
             'pc_status' => PaymentChannel::STATUS['ACTIVE'],
             'md_status' => MerchantDeposit::STATUS['PENDING'],
             'rbc_status' => ResellerBankCard::STATUS['ACTIVE'],

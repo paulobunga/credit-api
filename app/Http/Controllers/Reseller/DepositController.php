@@ -44,7 +44,7 @@ class DepositController extends Controller
                 'payment_channels.name AS channel'
             )
             ->allowedFilters([
-                AllowedFilter::partial('merchant_order_id'),
+                AllowedFilter::partial('order_id'),
                 AllowedFilter::partial('amount'),
                 AllowedFilter::callback(
                     'status',
@@ -63,7 +63,7 @@ class DepositController extends Controller
             ])
             ->allowedSorts([
                 'id',
-                'merchant_order_id',
+                'order_id',
                 'channel',
                 'amount',
                 'status',

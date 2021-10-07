@@ -151,7 +151,7 @@ trait MerchantDepositObserver
             case MerchantDeposit::STATUS['REJECTED']:
             case MerchantDeposit::STATUS['APPROVED']:
             case MerchantDeposit::STATUS['ENFORCED']:
-                $m->merchant->notify(new \App\Notifications\DepositUpdate($m));
+                $m->merchant->notify(new \App\Notifications\DepositFinish($m));
                 $m->update([
                     'callback_status' => MerchantDeposit::CALLBACK_STATUS['PENDING']
                 ]);

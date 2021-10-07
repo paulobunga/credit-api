@@ -4,8 +4,8 @@ namespace App\Observers;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\ResellerWithdrawal;
-use App\Models\Transaction;
 
 trait ResellerWithdrawalObserver
 {
@@ -46,6 +46,9 @@ trait ResellerWithdrawalObserver
             if ($status == ResellerWithdrawal::STATUS['APPROVED']) {
                 $reseller = $m->reseller;
                 if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
+                    if ($reseller->withdrawalCredit < $m->amount) {
+                        throw new \Exception('exceed agent withdrawal credit', 405);
+                    }
                     $m->transactions()->create([
                         'user_id' => $m->reseller_id,
                         'user_type' => 'reseller',
@@ -57,6 +60,9 @@ trait ResellerWithdrawalObserver
                     ]);
                     $reseller->decrement('credit', $m->amount);
                 } elseif ($m->type == ResellerWithdrawal::TYPE['COIN']) {
+                    if ($reseller->withdrawalCoin < $m->amount) {
+                        throw new \Exception('exceed agent withdrawal coin', 405);
+                    }
                     $m->transactions()->create([
                         'user_id' => $m->reseller_id,
                         'user_type' => 'reseller',
@@ -70,7 +76,7 @@ trait ResellerWithdrawalObserver
                 }
             }
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+            Log::error($e->getMessage());
             DB::rollback();
             throw $e;
         }
