@@ -141,7 +141,7 @@ class AuthController extends Controller
                 'platform' => $request->platform
             ],
             [
-                'token' => $beam->generateToken('App.Models.Reseller.' . auth()->id())['token'],
+                'token' => $beam->generateToken('App.Models.Merchant.' . auth()->id())['token'],
             ]
         );
         $device->logined_at = Carbon::now();
