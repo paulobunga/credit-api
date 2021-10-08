@@ -101,3 +101,42 @@ if (!function_exists('asset')) {
         return (new UrlGenerator(app()))->to($path, null, $secure);
     }
 }
+
+if (!function_exists('admin_url')) {
+    /**
+     * Generate an asset path to admin panel.
+     *
+     * @param  string $path
+     * @return string
+     */
+    function admin_url($path = '')
+    {
+        return str_replace('//api', '//admin', env('APP_URL')) . $path;
+    }
+}
+
+if (!function_exists('reseller_url')) {
+    /**
+     * Generate an asset path to agent panel.
+     *
+     * @param  string $path
+     * @return string
+     */
+    function reseller_url($path = '')
+    {
+        return str_replace('//api', '//reseller', env('APP_URL')) . $path;
+    }
+}
+
+if (!function_exists('merchant_url')) {
+    /**
+     * Generate an asset path to merchant panel.
+     *
+     * @param  string $path
+     * @return string
+     */
+    function merchant_url($path = '')
+    {
+        return str_replace('//api', '//merchant', env('APP_URL')) . $path;
+    }
+}

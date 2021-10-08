@@ -20,6 +20,8 @@ class WithdrawalController extends Controller
     {
         $withdrawals = QueryBuilder::for($this->model)
             ->allowedFilters([
+                AllowedFilter::partial('order_id'),
+                AllowedFilter::partial('amount'),
                 AllowedFilter::callback(
                     'status',
                     function (Builder $query, $v) {

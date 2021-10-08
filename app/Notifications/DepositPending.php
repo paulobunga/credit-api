@@ -5,12 +5,31 @@ namespace App\Notifications;
 class DepositPending extends Base
 {
     /**
-     * Get the array representation of the notification.
+     * Get icon path
+     *
+     * @return string
+     */
+    protected function getIcon(): string
+    {
+        return reseller_url('/icons/favicon-32x32.png');
+    }
+
+    /**
+     * Get notification link
+     *
+     * @return string
+     */
+    protected function getLink(): string
+    {
+        return reseller_url('/deposits?order_id=' . $this->model->order_id);
+    }
+    /**
+     * Get data of message
      *
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    protected function getData($notifiable)
     {
         return [
             'id' => $this->model->id,
