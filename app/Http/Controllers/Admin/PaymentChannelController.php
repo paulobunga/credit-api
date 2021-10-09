@@ -22,13 +22,13 @@ class PaymentChannelController extends Controller
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('currency'),
-                AllowedFilter::exact('status'),
+                AllowedFilter::exact('payin_status', "payin->status"),
+                AllowedFilter::exact('payout_status', "payout->status"),
             ])
             ->allowedSorts([
                 'id',
                 'name',
                 'currency',
-                'status',
             ])
             ->paginate($this->perPage);
 
