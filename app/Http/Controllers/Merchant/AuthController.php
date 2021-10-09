@@ -136,20 +136,18 @@ class AuthController extends Controller
             'instanceId' => config('broadcasting.connections.beams.instance_id'),
         ]);
 
-        $device = auth()->user()->devices()->firstOrNew(
+        $token = $beam->generateToken('App.Models.Merchant.' . auth()->id());
+        auth()->user()->devices()->updateOrCreate(
             [
                 'platform' => $request->platform
             ],
             [
-                'token' => $beam->generateToken('App.Models.Merchant.' . auth()->id())['token'],
+                'logined_at' => Carbon::now(),
+                'token' => $token['token']
             ]
         );
-        $device->logined_at = Carbon::now();
-        $device->save();
 
-        return response()->json([
-            'token' => $device->token
-        ]);
+        return response()->json($token);
     }
 
     /**

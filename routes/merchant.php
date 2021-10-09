@@ -28,7 +28,10 @@ $api->group([
         $api->resource('deposits', 'DepositController', ['only' => ['index']]);
         $api->put("/deposits/resend/{deposit}", ['as' => 'deposits.resend', 'uses' => 'DepositController@resend']);
 
-        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'store']]);
+        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index']]);
+        $api->put("/withdrawals/resend/{withdrawal}", ['as' => 'withdrawals.resend', 'uses' => 'WithdrawalController@resend']);
+
+        $api->resource('settlements', 'SettlementController', ['only' => ['index']]);
 
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
         $api->get("/reports/month", ['as' => 'reports.month', 'uses' => 'ReportController@month']);
