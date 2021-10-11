@@ -49,19 +49,13 @@ class MerchantSettlementController extends Controller
             'admin_id' => 'required|exists:admins,id',
             'status' => 'required|numeric',
         ]);
-        DB::beginTransaction();
-        try {
-            $merchant_settlement->update([
-                'status' => $request->status,
-                'extra' => [
-                    'admin_id' => $request->admin_id
-                ]
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
+
+        $merchant_settlement->update([
+            'status' => $request->status,
+            'extra' => [
+                'admin_id' => $request->admin_id
+            ]
+        ]);
 
         return $this->response->item($merchant_settlement, $this->transformer);
     }

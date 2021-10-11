@@ -25,8 +25,8 @@ class CreateTableResellers extends Migration
             $table->decimal('credit', 14, 4)->default(0);
             $table->decimal('coin', 14, 4)->default(0);
             $table->string('currency', 6);
-            $table->decimal('commission_percentage', 5, 4)->default(0);
-            $table->unsignedInteger('pending_limit')->default(0);
+            $table->json('payin')->default(new Expression('(JSON_OBJECT())'));
+            $table->json('payout')->default(new Expression('(JSON_OBJECT())'));
             $table->unsignedInteger('downline_slot')->default(0);
             $table->tinyInteger('status')->default(0)->comment('0:inactive,1:active,2:disabled');
             $table->string('password', 60);

@@ -43,17 +43,17 @@ trait MerchantSettlementObserver
      */
     protected static function onStatusChangeEvent($status, MerchantSettlement $m)
     {
-        DB::beginTransaction();
-        try {
-            // approve
-            if ($status == MerchantSettlement::STATUS['APPROVED']) {
-                $credit = $m->merchant->credits()->where('currency', $m->currency)->first();
-                if (!$credit) {
-                    throw new \Exception('Currency type is not supported!');
-                }
-                if ($credit->credit < $m->amount) {
-                    throw new \Exception('exceed merchant credit', 405);
-                }
+        // approve
+        if ($status == MerchantSettlement::STATUS['APPROVED']) {
+            $credit = $m->merchant->credits()->where('currency', $m->currency)->first();
+            if (!$credit) {
+                throw new \Exception('Currency type is not supported!');
+            }
+            if ($credit->credit < $m->amount) {
+                throw new \Exception('exceed merchant credit', 405);
+            }
+            DB::beginTransaction();
+            try {
                 $m->transactions()->create([
                     'user_id' => $m->merchant_id,
                     'user_type' => 'merchant',
@@ -64,12 +64,12 @@ trait MerchantSettlementObserver
                     'currency' => $m->currency,
                 ]);
                 $credit->decrement('credit', $m->amount);
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+                DB::rollback();
+                throw $e;
             }
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            DB::rollback();
-            throw $e;
+            DB::commit();
         }
-        DB::commit();
     }
 }

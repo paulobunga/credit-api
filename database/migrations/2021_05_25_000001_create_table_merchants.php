@@ -60,6 +60,7 @@ class CreateTableMerchants extends Migration
             $table->string('method', 10);
             $table->string('order_id', 60)->unique();
             $table->string('merchant_order_id', 60);
+            $table->string('player_id', 40)->default(0);
             $table->decimal('amount', 14, 4);
             $table->string('currency', 6);
             $table->unsignedTinyInteger('status')
@@ -90,6 +91,7 @@ class CreateTableMerchants extends Migration
                 ->constrained();
             $table->string('order_id', 60)->unique();
             $table->string('merchant_order_id', 60);
+            $table->string('player_id', 40)->default(0);
             $table->json('attributes')->default(new Expression('(JSON_ARRAY())'));
             $table->decimal('amount', 14, 4);
             $table->string('currency', 6);

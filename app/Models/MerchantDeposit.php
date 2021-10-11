@@ -17,6 +17,7 @@ class MerchantDeposit extends Model
         'reseller_bank_card_id',
         'order_id',
         'merchant_order_id',
+        'player_id',
         'method',
         'amount',
         'currency',

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use App\Models\Reseller;
 use App\Models\PaymentChannel;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
@@ -151,6 +152,7 @@ class ExecuteSql extends Command
         }
     }
 
+    # payout migration
     protected function merchantSettlementMerchantWithdrawals()
     {
         if (!Schema::hasTable('merchant_settlements')) {
@@ -213,6 +215,64 @@ class ExecuteSql extends Command
                 $table->text('token');
                 $table->timestamp('created_at')->useCurrent();
                 $table->timestamp('logined_at');
+            });
+        }
+    }
+
+    protected function resellerPayinPayOut()
+    {
+        $cs = app(\App\Settings\CurrencySetting::class);
+        $rs = app(\App\Settings\ResellerSetting::class);
+        if (!Schema::hasColumn('resellers', 'payin')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->json('payin')->after('currency')->default(new Expression('(JSON_OBJECT())'));
+            });
+            foreach (Reseller::all() as $r) {
+                $r->payin = [
+                    'commission_percentage' => $r->commission_percentage ??
+                        $cs->getCommissionPercentage($r->currency, $r->level),
+                    'pending_limit' => $r->pending_limit ?? $rs->getDefaultPendingLimit($r->level),
+                    'status' => $r->level == Reseller::LEVEL['RESELLER']
+                ];
+                $r->save();
+            }
+        }
+        if (!Schema::hasColumn('resellers', 'payout')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->json('payout')->after('payin')->default(new Expression('(JSON_OBJECT())'));
+            });
+            foreach (Reseller::all() as $r) {
+                $r->payout = [
+                    'commission_percentage' => $r->commission_percentage ??
+                        $cs->getCommissionPercentage($r->currency, $r->level),
+                    'pending_limit' => $r->pending_limit ?? $rs->getDefaultPendingLimit($r->level),
+                    'status' => $r->level == Reseller::LEVEL['RESELLER'],
+                ];
+                $r->save();
+            }
+        }
+        if (Schema::hasColumn('resellers', 'pending_limit')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->dropColumn(['pending_limit']);
+            });
+        }
+        if (Schema::hasColumn('resellers', 'commission_percentage')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->dropColumn(['commission_percentage']);
+            });
+        }
+    }
+
+    protected function addPayinPayoutPlayerID()
+    {
+        if (!Schema::hasColumn('merchant_deposits', 'player_id')) {
+            Schema::table('merchant_deposits', function (Blueprint $table) {
+                $table->string('player_id', 40)->after('merchant_order_id')->default(0);
+            });
+        }
+        if (!Schema::hasColumn('merchant_withdrawals', 'player_id')) {
+            Schema::table('merchant_withdrawals', function (Blueprint $table) {
+                $table->string('player_id', 40)->after('merchant_order_id')->default(0);
             });
         }
     }

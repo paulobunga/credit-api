@@ -13,6 +13,7 @@ use App\Models\Reseller;
 use App\Models\MerchantDeposit;
 use App\Models\PaymentChannel;
 use App\Models\ResellerBankCard;
+use App\DTO\ResellerPayIn;
 use App\Transformers\Api\DepositTransformer;
 
 /**
@@ -236,7 +237,7 @@ class DepositController extends Controller
                         ELSE 0 
                     END 
                 ) AS same_amount,
-                r.pending_limit AS pending_limit 
+                r.payin->>'$.pending_limit' AS pending_limit 
             FROM
                 reseller_bank_cards AS rbc
                 LEFT JOIN resellers AS r ON rbc.reseller_id = r.id
@@ -247,6 +248,7 @@ class DepositController extends Controller
                 AND r.credit >= {$request->amount}
                 AND r.LEVEL = :r_level
                 AND r.STATUS = :r_status
+                AND r.payin->>'$.status' = :r_payin_status
                 AND rbc.STATUS = :rbc_status
                 AND pc.payin->>'$.status' = :pc_status
                 AND pc.currency = '{$request->currency}'
@@ -267,11 +269,12 @@ class DepositController extends Controller
                 reseller_channels
                 JOIN reseller_pending USING ( reseller_id ) 
             WHERE total_pending < pending_limit 
-                AND channel = '{$request->channel}'
+                AND channel = '{$request->channel}' 
                 AND same_amount = 0";
         // dd($sql);
         $reseller_bank_cards = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
+            'r_payin_status' => ResellerPayIn::STATUS['ACTIVE'],
             'r_level' => Reseller::LEVEL['RESELLER'],
             'pc_status' => PaymentChannel::STATUS['ACTIVE'],
             'md_status' => MerchantDeposit::STATUS['PENDING'],

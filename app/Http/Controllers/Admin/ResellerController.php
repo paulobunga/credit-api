@@ -48,8 +48,6 @@ class ResellerController extends Controller
                 'phone',
                 'credit',
                 'coin',
-                'pending_limit',
-                'commission_percentage',
                 'downline_slot',
                 'status'
             ])
@@ -102,6 +100,7 @@ class ResellerController extends Controller
 
     /**
      * Update an agent via id
+     *
      * @param \Dingo\Api\Http\Request
      * @return \Dingo\Api\Http\JsonResponse
      */
@@ -113,20 +112,22 @@ class ResellerController extends Controller
             'name' => "required|unique:resellers,name,{$reseller->id}",
             'username' => "required|unique:resellers,username,{$reseller->id}",
             'phone' => "required",
-            'commission_percentage' => 'required|numeric',
-            'pending_limit' =>
-            'required|numeric|max:' . app(\App\Settings\ResellerSetting::class)->max_pending_limit,
             'downline_slot' =>
             'required_with:level,1,2|numeric|max:' . app(\App\Settings\AgentSetting::class)->max_downline_slot,
             'status' => 'required|numeric|in:' . implode(',', Reseller::STATUS),
+            'payin' => 'required',
+            'payout' => 'required',
         ]);
         $reseller->update([
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
-            'commission_percentage' => $request->commission_percentage,
-            'pending_limit' => $request->pending_limit,
-            'downline_slot' => in_array($request->level, [1, 2]) ? $request->downline_slot : 0,
+            'payin' => $request->payin,
+            'payout' => $request->payout,
+            'downline_slot' => in_array($request->level, [
+                Reseller::LEVEL['AGENT_MASTER'],
+                Reseller::LEVEL['AGENT']
+            ]) ? $request->downline_slot : 0,
             'status' => $request->status
         ]);
 
