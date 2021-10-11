@@ -14,6 +14,7 @@ use App\Models\Reseller;
 use App\Models\MerchantDeposit;
 use App\Models\MerchantWithdrawal;
 use App\Models\PaymentChannel;
+use App\DTO\ResellerPayOut;
 use App\Transformers\Api\WithdrawalTransformer;
 
 /**
@@ -254,16 +255,18 @@ class WithdrawalController extends Controller
                 r.currency AS currency,
                 COUNT(DISTINCT md.id) AS payin,
                 COUNT(DISTINCT mw.id) AS payout,
-                r.pending_limit AS pending_limit 
+                r.payout->>'$.pending_limit' AS pending_limit 
             FROM
                 resellers AS r
                 LEFT JOIN merchant_withdrawals AS mw ON mw.reseller_id = r.id 
+                AND mw.status = :mw_status
                 LEFT JOIN reseller_bank_cards AS rbc ON rbc.reseller_id = r.id
                 LEFT JOIN merchant_deposits AS md ON md.reseller_bank_card_id = rbc.id
                 AND md.status IN (:md_status) AND md.updated_at BETWEEN :md_start AND :md_end
             WHERE
                 r.currency = '{$request->currency}'
                 AND r.STATUS = :r_status
+                AND r.payout->>'$.status' = :r_payout_status
                 AND r.LEVEL = :r_level
                 GROUP BY r.id
             )
@@ -277,6 +280,8 @@ class WithdrawalController extends Controller
         $resellers = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
             'r_level' => Reseller::LEVEL['RESELLER'],
+            'r_payout_status' => ResellerPayOut::STATUS['ACTIVE'],
+            'mw_status' => MerchantWithdrawal::STATUS['PENDING'],
             'md_status' => implode(',', [
                 MerchantDeposit::STATUS['APPROVED'],
                 MerchantDeposit::STATUS['ENFORCED']
