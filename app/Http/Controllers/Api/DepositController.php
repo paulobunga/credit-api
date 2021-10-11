@@ -79,24 +79,46 @@ class DepositController extends Controller
      * @queryParam page number Set Page Number. Default: 1. Example: 1
      * @queryParam filter[status] number Filter status of deposit. Example: 1
      * @queryParam sign string required Signature. Example: 44ab5404efb22f3e3b28fec1c29f2eae
-     * @transformerCollection App\Transformers\Api\DepositTransformer
-     * @transformerModel App\Models\MerchantDeposit
-     * @transformerPaginator League\Fractal\Pagination\IlluminatePaginatorAdapter 10
+     * @response status=200
+     * {
+     *   "data": {
+     *     "name": "Test Merchant",
+     *     "order_id": "DAaR2@WdEtinadjy",
+     *     "merchant_order_id": "9798223690986",
+     *     "player_id": "1",
+     *     "amount": "500.0000",
+     *     "currency": "INR",
+     *     "status": 1,
+     *     "callback_url": ":base_url/demos/callback/9798223690986"
+     *   },
+     *   "meta": {
+     *     "pagination": {
+     *       "total": 1,
+     *       "count": 1,
+     *       "per_page": 10,
+     *       "current_page": 1,
+     *       "total_pages": 1,
+     *       "links": {},
+     *       "sortBy": "id",
+     *       "descending": false
+     *     }
+     *   }
+     * }
      * @response status=200 scenario="empty record"
      * {
-     *      "data": [],
-     *      "meta": {
-     *          "pagination": {
-     *              "total": 0,
-     *              "count": 0,
-     *              "per_page": 10,
-     *              "current_page": 1,
-     *              "total_pages": 1,
-     *              "links": {},
-     *              "sortBy": "id",
-     *              "descending": false
-     *          }
-     *      }
+     *    "data": [],
+     *    "meta": {
+     *        "pagination": {
+     *            "total": 0,
+     *            "count": 0,
+     *            "per_page": 10,
+     *            "current_page": 1,
+     *            "total_pages": 1,
+     *            "links": {},
+     *            "sortBy": "id",
+     *            "descending": false
+     *        }
+     *    }
      * }
      *
      */
@@ -123,8 +145,19 @@ class DepositController extends Controller
      * @urlParam id required The Merchant Order ID of the deposit. Example: 9798223690986
      * @queryParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
      * @queryParam sign string required Signature. Example: e38c3a02a3d9757c912d0dc6240a5c88
-     * @transformer App\Transformers\Api\DepositTransformer
-     * @transformerModel App\Models\MerchantDeposit
+     * @response status=200
+     * {
+     *   "data": {
+     *     "name": "Test Merchant",
+     *     "order_id": "DAaR2@WdEtinadjy",
+     *     "merchant_order_id": "9798223690986",
+     *     "player_id": "1",
+     *     "amount": "500.0000",
+     *     "currency": "INR",
+     *     "status": 1,
+     *     "callback_url": ":base_url/demos/callback/9798223690986"
+     *   }
+     * }
      * @response status=404 scenario="not found"
      * {"message": "No query results for model [App\\Models\\MerchantDeposit]."}
      */
@@ -145,20 +178,30 @@ class DepositController extends Controller
      * This endpoint lets you create a deposit.
      *
      * @authenticated
-     * @bodyParam merchant_order_id string required The order id created by merchant. Example: 97982236909861
-     * @bodyParam currency string required The currency of the deposit. Example: VND
-     * @bodyParam channel string required Payment Channel of the deposit. Example: MOMOPAY
+     * @bodyParam merchant_order_id string required The order id created by merchant. Example: 9798223690986
+     * @bodyParam player_id string required Unique id of player. Example: 1
+     * @bodyParam currency string required The currency of the deposit. Example: INR
+     * @bodyParam channel string required Payment Channel of the deposit. Example: UPI
      * @bodyParam method string required Payment method supported by selected Payment channel.
      * Example: QRCODE
      * @bodyParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
      * @bodyParam sign string required Signature. Example: c8104a183967516bbb542d10dcc04f2e
-     * @bodyParam amount string required Amount of the deposit. Example: 1000
-     * @bodyParam callback_url url Callback URL of the deposit,
-     * if not set, it would be the setting in merchant panel.
-     * Example: http://callback.url/0001
-     * @transformer App\Transformers\Api\DepositTransformer
-     * {"pay_url":":base_url/pay/deposits?uuid=224d4a1f-6fc5-4039-bd81-fcbc7f88c659&merchant_order_id=97982236909861&time=1630476187&sign=57cb165e201dea3a4084e0f97eeda637"}
-     * @transformerModel App\Models\MerchantDeposit
+     * @bodyParam amount string required Amount of the deposit. Example: 500
+     * @bodyParam callback_url url Callback URL of the deposit, Example: :base_url/demos/callback/9798223690986
+     * @response status=200
+     * {
+     *   "data": {
+     *     "name": "Test Merchant",
+     *     "order_id": "DAaR2@WdEtinadjy",
+     *     "merchant_order_id": "9798223690986",
+     *     "player_id": "1",
+     *     "amount": "500.0000",
+     *     "currency": "INR",
+     *     "status": 1,
+     *     "callback_url": ":base_url/demos/callback/9798223690986",
+     *     "pay_url": ":base_url/pay/deposits?uuid=224d4a1f-6fc5-4039-bd81-fcbc7f88c659&merchant_order_id=9798223690986&time=1633170173&sign=b4bf486861328f5a5dd43afe83958fdf"
+     *   }
+     * }
      * @response status=422 scenario="parameter error"
      * {
      *      "message": "The merchant order id has already been taken.",
@@ -173,11 +216,11 @@ class DepositController extends Controller
      * // Verify the signature with the request data
      * {
      *     "name": "Test Merchant",
-     *     "order_id": "N18t1@5iIxqZ4IXb",
+     *     "order_id": "DAaR2@WdEtinadjy",
      *     "merchant_order_id": "9798223690986",
-     *     "amount": "1000.0000",
+     *     "amount": "500.0000",
      *     "status": 2,
-     *     "callback_url": "rohan.com/provident",
+     *     "callback_url": ":base_url/demos/callback/9798223690986",
      *     "sign": "09508cdf7f1d089e108d462d182204e6"
      * }
      * @callback_response status=200
@@ -222,7 +265,6 @@ class DepositController extends Controller
                 405
             );
         }
-        // $attributes = $channel->validate($request->all());
 
         $sql = "WITH reseller_channels AS (
             SELECT
@@ -286,24 +328,18 @@ class DepositController extends Controller
         }
         $reseller_bank_card = Arr::random($reseller_bank_cards);
 
-        DB::beginTransaction();
-        try {
-            $merchant_deposit = $this->model::create([
-                'merchant_id' => $merchant->id,
-                'reseller_id' => $reseller_bank_card->reseller_id,
-                'reseller_bank_card_id' => $reseller_bank_card->reseller_bank_card_id,
-                'merchant_order_id' => $request->merchant_order_id,
-                'method' => $request->method,
-                'amount' => $request->amount,
-                'currency' => $request->currency,
-                'status' => MerchantDeposit::STATUS['PENDING'],
-                'callback_url' => $request->get('callback_url', $merchant->callback_url),
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
+        $merchant_deposit = $this->model::create([
+            'merchant_id' => $merchant->id,
+            'reseller_id' => $reseller_bank_card->reseller_id,
+            'reseller_bank_card_id' => $reseller_bank_card->reseller_bank_card_id,
+            'merchant_order_id' => $request->merchant_order_id,
+            'player_id' => $request->get('player_id', 0),
+            'method' => $request->method,
+            'amount' => $request->amount,
+            'currency' => $request->currency,
+            'status' => MerchantDeposit::STATUS['PENDING'],
+            'callback_url' => $request->get('callback_url', $merchant->callback_url),
+        ]);
 
         return $this->response->item($merchant_deposit, new DepositTransformer([
             'pay_url' => $merchant_deposit->payUrl

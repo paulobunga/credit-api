@@ -80,9 +80,32 @@ class WithdrawalController extends Controller
      * @queryParam page number Set Page Number. Default: 1. Example: 1
      * @queryParam filter[status] number Filter status of withdrawal. Example: 1
      * @queryParam sign string required Signature. Example: 7d61c7fbce30dcdcefa8a9353a093656
-     * @transformerCollection App\Transformers\Api\withdrawalTransformer
-     * @transformerModel App\Models\Merchantwithdrawal
-     * @transformerPaginator League\Fractal\Pagination\IlluminatePaginatorAdapter 1
+     * @response status=200
+     * {
+     *   "data": {
+     *     "name": "Test Merchant",
+     *     "order_id": "DAaR2@WdEtinadjy",
+     *     "merchant_order_id": "9798223690986",
+     *     "player_id": "1",
+     *     "amount": "500.0000",
+     *     "currency": "INR",
+     *     "status": 1,
+     *     "callback_url": ":base_url/demos/callback/9798223690986",
+     *     "upi_id": "test1234@upi"
+     *   },
+     *   "meta": {
+     *     "pagination": {
+     *       "total": 1,
+     *       "count": 1,
+     *       "per_page": 10,
+     *       "current_page": 1,
+     *       "total_pages": 1,
+     *       "links": {},
+     *       "sortBy": "id",
+     *       "descending": false
+     *     }
+     *   }
+     * }
      * @response status=200 scenario="empty record"
      * {
      *      "data": [],
@@ -124,8 +147,20 @@ class WithdrawalController extends Controller
      * @urlParam id required The Merchant Order ID of the withdrawal. Example: 9798223690986
      * @queryParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
      * @queryParam sign string required Signature. Example: e38c3a02a3d9757c912d0dc6240a5c88
-     * @transformer App\Transformers\Api\WithdrawalTransformer
-     * @transformerModel App\Models\MerchantWithdrawal
+     * @response status=200
+     * {
+     *   "data": {
+     *     "name": "Test Merchant",
+     *     "order_id": "DAaR2@WdEtinadjy",
+     *     "merchant_order_id": "9798223690986",
+     *     "player_id": "1",
+     *     "amount": "500.0000",
+     *     "currency": "INR",
+     *     "status": 1,
+     *     "callback_url": ":base_url/demos/callback/9798223690986",
+     *     "upi_id": "test1234@upi"
+     *   }
+     * }
      * @response status=404 scenario="not found"
      * {"message": "No query results for model [App\\Models\\MerchantWithdrawal]."}
      */
@@ -172,17 +207,30 @@ class WithdrawalController extends Controller
      *
      * @authenticated
      * @bodyParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
-     * @bodyParam merchant_order_id string required The order id created by merchant. Example: 97982236909861
+     * @bodyParam merchant_order_id string required The order id created by merchant. Example: 9798223690986
+     * @bodyParam player_id string required Unique id of player. Example: 1
      * @bodyParam currency string required The currency of the withdrawal. Example: INR
      * @bodyParam channel string required Payment channel of the withdrawal. Example: UPI
      * @bodyParam upi_id string required Payment channel required field, various with different channel,
      * please refer the table above. Example: test1234@upi
      * @bodyParam amount string required Amount of the withdrawal. Example: 500
-     * @bodyParam callback_url url required Callback URL, Example: :base_url/demos/callback
+     * @bodyParam callback_url url required Callback URL, Example: :base_url/demos/callback/9798223690986
      * @bodyParam sign string required Signature. Example: fe0362897e797b33582a5934912952b9
-     * @transformer App\Transformers\Api\WithdrawalTransformer
-     * {"pay_url":":base_url/pay/withdrawals?uuid=224d4a1f-6fc5-4039-bd81-fcbc7f88c659&merchant_order_id=97982236909861&time=1633170173&sign=b4bf486861328f5a5dd43afe83958fdf"}
-     * @transformerModel App\Models\MerchantWithdrawal
+     * @response status=200
+     * {
+     *   "data": {
+     *     "name": "Test Merchant",
+     *     "order_id": "DAaR2@WdEtinadjy",
+     *     "merchant_order_id": "9798223690986",
+     *     "player_id": "1",
+     *     "amount": "500.0000",
+     *     "currency": "INR",
+     *     "status": 1,
+     *     "callback_url": ":base_url/demos/callback/9798223690986",
+     *     "pay_url": ":base_url/pay/withdrawals?uuid=224d4a1f-6fc5-4039-bd81-fcbc7f88c659&merchant_order_id=97982236909861&time=1633170173&sign=b4bf486861328f5a5dd43afe83958fdf",
+     *     "upi_id": "test1234@upi"
+     *   }
+     * }
      * @response status=422 scenario="parameter error"
      * {
      *      "message": "The merchant order id has already been taken.",
@@ -198,13 +246,13 @@ class WithdrawalController extends Controller
      * // the signature by your api key and apply the validateSign method.
      * {
      *     "name": "Test Merchant",
-     *     "order_id": "N18t1@5iIxqZ4IXb",
-     *     "merchant_order_id": "97982236909861",
+     *     "order_id": "DAaR2@WdEtinadjy",
+     *     "merchant_order_id": "9798223690986",
      *     "amount": "500.0000",
      *     "currency": "INR",
      *     "status": 4,
      *     "upi_id": "test1234@upi",
-     *     "callback_url": ":base_url/demos/callback",
+     *     "callback_url": ":base_url/demos/callback/9798223690986",
      *     "sign": "09508cdf7f1d089e108d462d182204e6"
      * }
      * @callback_response status=200
@@ -295,24 +343,19 @@ class WithdrawalController extends Controller
         }
         $reseller = Arr::first($resellers);
 
-        DB::beginTransaction();
-        try {
-            $merchant_withdrawal = $this->model::create([
-                'merchant_id' => $merchant->id,
-                'reseller_id' => $reseller->id,
-                'payment_channel_id' => $channel->id,
-                'merchant_order_id' => $request->merchant_order_id,
-                'attributes' => $attributes,
-                'amount' => $request->amount,
-                'currency' => $request->currency,
-                'status' => MerchantWithdrawal::STATUS['PENDING'],
-                'callback_url' => $request->callback_url,
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
+        $merchant_withdrawal = $this->model::create([
+            'merchant_id' => $merchant->id,
+            'reseller_id' => $reseller->id,
+            'payment_channel_id' => $channel->id,
+            'merchant_order_id' => $request->merchant_order_id,
+            'player_id' => $request->get('player_id', 0),
+            'attributes' => $attributes,
+            'amount' => $request->amount,
+            'currency' => $request->currency,
+            'status' => MerchantWithdrawal::STATUS['PENDING'],
+            'callback_url' => $request->callback_url,
+        ]);
+
 
         return $this->response->item($merchant_withdrawal, new WithdrawalTransformer([
             'pay_url' => $merchant_withdrawal->payUrl

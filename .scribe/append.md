@@ -14,8 +14,13 @@
 |Currency  |Channel    |Method      |Min   |Max   |
 |----------|-----------|------------|------|------|
 |VND       |NETBANK    |TEXT        |500   |50000 |
-|VND       |ZALOPAY    |QRCODE      |500   |50000 |
-|VND       |VIETTELPAY |QRCODE      |500   |50000 |
-|VND       |MOMOPAY    |QRCODE      |500   |50000 |
 |INR       |UPI        |QRCODE,TEXT |500   |50000 |
 |INR       |NETBANK    |TEXT        |500   |50000 |
+
+### PayOut
+
+|Currency  |Channel    |Method      |Min   |Max   |
+|----------|-----------|------------|------|------|
+|VND       |NETBANK    |TEXT        |2000  |50000 |
+|INR       |UPI        |QRCODE,TEXT |2000  |50000 |
+|INR       |NETBANK    |TEXT        |2000  |50000 |

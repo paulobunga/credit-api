@@ -18,6 +18,7 @@ class MerchantWithdrawal extends Model
         'reseller_id',
         'payment_channel_id',
         'order_id',
+        'player_id',
         'merchant_order_id',
         'attributes',
         'amount',
