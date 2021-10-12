@@ -32,7 +32,7 @@ class ResellerController extends Controller
      */
     public function index(Request $request)
     {
-        $resellers = QueryBuilder::for($this->model)
+        $m = QueryBuilder::for($this->model)
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),
@@ -50,10 +50,9 @@ class ResellerController extends Controller
                 'coin',
                 'downline_slot',
                 'status'
-            ])
-            ->paginate($this->perPage);
+            ]);
 
-        return $this->response->withPaginator($resellers, $this->transformer);
+        return $this->paginate($m, $this->transformer);
     }
 
     /**
@@ -64,31 +63,55 @@ class ResellerController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'level' => 'required|between:0,3',
-            'upline' => 'required_unless:level,0',
+            'level' => 'required|between:' . implode(',', [
+                Reseller::LEVEL['REFERRER'],
+                Reseller::LEVEL['RESELLER'],
+            ]),
+            'upline' => [
+                'required_unless:level,' . Reseller::LEVEL['REFERRER'],
+                'numeric'
+            ],
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
             'phone' => 'required',
-            'currency' => 'required',
+            'currency' => 'required_if:level,' . Reseller::LEVEL['REFERRER'],
             'password' => 'required|confirmed',
         ]);
+
+        if ($request->level != Reseller::LEVEL['REFERRER']) {
+            $upline = Reseller::findOrFail($request->upline);
+            $currency = $upline->currency;
+        } else {
+            $currency = $request->currency;
+        }
         $reseller_setting = app(\App\Settings\ResellerSetting::class);
         $agent_setting = app(\App\Settings\AgentSetting::class);
         $currency_setting = app(\App\Settings\CurrencySetting::class);
 
         $reseller = $this->model::create([
             'level' => $request->level,
-            'upline' => $request->get('upline', 0),
+            'upline_id' => $request->get('upline', 0),
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
-            'currency' => $request->currency,
+            'currency' => $currency,
             'password' => $request->password,
-            'commission_percentage' => $currency_setting->getCommissionPercentage(
-                $request->currency,
-                $request->level
-            ),
-            'pending_limit' => $reseller_setting->getDefaultPendingLimit($request->level),
+            'payin' => [
+                'commission_percentage' => $currency_setting->getCommissionPercentage(
+                    $currency,
+                    $request->level
+                ),
+                'pending_limit' => $reseller_setting->getDefaultPendingLimit($request->level),
+                'status' => true
+            ],
+            'payout' => [
+                'commission_percentage' => $currency_setting->getCommissionPercentage(
+                    $currency,
+                    $request->level
+                ),
+                'pending_limit' => $reseller_setting->getDefaultPendingLimit($request->level),
+                'status' => true
+            ],
             'downline_slot' => $agent_setting->getDefaultDownLineSlot($request->level),
             'status' => ($request->level == Reseller::LEVEL['RESELLER']) ?
                 Reseller::STATUS['INACTIVE'] :
@@ -282,24 +305,18 @@ class ResellerController extends Controller
         if (!in_array($request->method, $reseller_bank_card->paymentChannel->paymentMethods)) {
             throw new \Exception('Method is not supported!', 405);
         }
-        DB::beginTransaction();
-        try {
-            MerchantDeposit::create([
-                'merchant_id' => $request->merchant_id,
-                'reseller_id' => $m->id,
-                'reseller_bank_card_id' => $request->reseller_bank_card_id,
-                'merchant_order_id' => Str::uuid(),
-                'method' => $request->method,
-                'amount' => $request->amount,
-                'currency' => $m->currency,
-                'status' => MerchantDeposit::STATUS['MAKEUP'],
-                'callback_url' => $merchant->callback_url,
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
+        MerchantDeposit::create([
+            'merchant_id' => $request->merchant_id,
+            'reseller_id' => $m->id,
+            'reseller_bank_card_id' => $request->reseller_bank_card_id,
+            'merchant_order_id' => Str::uuid(),
+            'method' => $request->method,
+            'amount' => $request->amount,
+            'currency' => $m->currency,
+            'status' => MerchantDeposit::STATUS['MAKEUP'],
+            'callback_url' => $merchant->callback_url,
+        ]);
+
         return $this->success();
     }
 }
