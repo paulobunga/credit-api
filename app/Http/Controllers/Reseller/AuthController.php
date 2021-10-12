@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Reseller;
 
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
-use Carbon\Carbon;
 use Pusher\PushNotifications\PushNotifications;
 use App\Http\Controllers\Controller as Controller;
 use App\Transformers\Reseller\AuthTransformer;
@@ -17,7 +17,9 @@ class AuthController extends Controller
 {
     /**
      * Get a JWT via given credentials.
+     *
      * @method POST
+     * @param \Dingo\Api\Http\Request $request
      *
      * @return \Dingo\Api\Http\JsonResponse
      */
@@ -33,8 +35,10 @@ class AuthController extends Controller
     }
 
     /**
-     * Get a register setting
+     * Get setting information for registering an agent.
+     *
      * @method POST
+     * @param \App\Settings\CurrencySetting $cs
      *
      * @return \Dingo\Api\Http\JsonResponse
      */
@@ -50,9 +54,12 @@ class AuthController extends Controller
 
     /**
      * Create a reseller
-     * @method POST
      *
-     * @return array success response
+     * @method POST
+     * @param \Dingo\Api\Http\Request $request
+     * @param \App\Settings\CurrencySetting $cs
+     *
+     * @return array
      */
     public function register(Request $request, CurrencySetting $cs)
     {
@@ -89,7 +96,9 @@ class AuthController extends Controller
 
     /**
      * Get the authenticated User.
-     * @method GET
+     *
+     * @method POST
+     * @param \Dingo\Api\Http\Request $request
      *
      * @return \Dingo\Api\Http\JsonResponse
      */
@@ -100,9 +109,11 @@ class AuthController extends Controller
 
     /**
      * Log the user out (Invalidate the token).
-     * @method POST
      *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @method POST
+     * @param \Dingo\Api\Http\Request $request
+     *
+     * @return array
      */
     public function logout()
     {
@@ -113,6 +124,7 @@ class AuthController extends Controller
 
     /**
      * Refresh a token.
+     *
      * @method POST
      *
      * @return \Dingo\Api\Http\JsonResponse
@@ -124,7 +136,9 @@ class AuthController extends Controller
 
     /**
      * Update user information.
+     *
      * @method PUT
+     * @param \Dingo\Api\Http\Request $request
      *
      * @return \Dingo\Api\Http\JsonResponse
      */
@@ -149,6 +163,7 @@ class AuthController extends Controller
      *
      * @param \Dingo\Api\Http\Request $request
      * @method PUT
+     * @throws \Exception $e if activated code is expired
      *
      * @return \Dingo\Api\Http\JsonResponse $response
      */
@@ -181,10 +196,12 @@ class AuthController extends Controller
 
 
     /**
-     * Authenticate beam notification
+     * Get token of beam service
      *
-     * @param  mixed $request
-     * @return void
+     * @method GET
+     * @param \Dingo\Api\Http\Request $request
+     *
+     * @return array
      */
     public function beam(Request $request)
     {
@@ -216,14 +233,40 @@ class AuthController extends Controller
     }
 
     /**
-     * Authenticate private channel request
+     * Authenticate to private channel
      *
+     * @method POST
      * @param  \Dingo\Api\Http\Request $request
-     * @throws \Exception $e if id not matched
-     * @return \Dingo\Api\Http\Response $response
+     * @throws \Exception $e if ID is not matched
+     *
+     * @return \Dingo\Api\Http\Response
      */
     public function channel(Request $request)
     {
         return Broadcast::auth($request);
+    }
+
+    /**
+     * Update pay setting
+     *
+     * @method POST
+     * @param  \Dingo\Api\Http\Request $request
+     * @throws \Exception $e if ID is not matched
+     *
+     * @return \Dingo\Api\Http\Response
+     */
+    public function pay(Request $request)
+    {
+        $this->validate($request, [
+            'type' => 'required|in:' . implode(',', [
+                'payin',
+                'payout',
+            ]),
+            'value' => 'boolean'
+        ]);
+        auth()->user()->{$request->type}->status = $request->value;
+        auth()->user()->save();
+
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }
 }

@@ -19,8 +19,8 @@
 
 ### PayOut
 
-|Currency  |Channel    |Method      |Min   |Max   |
-|----------|-----------|------------|------|------|
-|VND       |NETBANK    |TEXT        |2000  |50000 |
-|INR       |UPI        |QRCODE,TEXT |2000  |50000 |
-|INR       |NETBANK    |TEXT        |2000  |50000 |
+|Currency  |Channel    |Min   |Max   |
+|----------|-----------|------|------|
+|VND       |NETBANK    |2000  |50000 |
+|INR       |UPI        |2000  |50000 |
+|INR       |NETBANK    |2000  |50000 |
