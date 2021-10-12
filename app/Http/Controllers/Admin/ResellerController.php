@@ -69,7 +69,6 @@ class ResellerController extends Controller
             ]),
             'upline' => [
                 'required_unless:level,' . Reseller::LEVEL['REFERRER'],
-                'numeric'
             ],
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
@@ -90,7 +89,7 @@ class ResellerController extends Controller
 
         $reseller = $this->model::create([
             'level' => $request->level,
-            'upline_id' => $request->get('upline', 0),
+            'upline_id' => $upline->id ?? 0,
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
