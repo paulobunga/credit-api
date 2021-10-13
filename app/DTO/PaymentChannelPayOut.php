@@ -9,4 +9,6 @@ final class PaymentChannelPayOut extends Base
     public int $max;
 
     public bool $status;
+
+    public bool $auto_approval;
 }

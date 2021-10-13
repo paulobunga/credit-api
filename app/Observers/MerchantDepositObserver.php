@@ -47,7 +47,7 @@ trait MerchantDepositObserver
             MerchantDeposit::STATUS['MAKEUP'],
         ])) {
             if ($m->reseller->credit < $m->amount) {
-                throw new \Exception('exceed agent credit', 405);
+                throw new \Exception('Amount exceed credit of agent', 405);
             }
             // merchant add credit and deduct transaction fee
             $credit = $m->merchant->credits()->where('currency', $m->currency)->first();
@@ -161,9 +161,7 @@ trait MerchantDepositObserver
             case MerchantDeposit::STATUS['APPROVED']:
             case MerchantDeposit::STATUS['ENFORCED']:
                 $m->merchant->notify(new \App\Notifications\DepositFinish($m));
-                $m->update([
-                    'callback_status' => MerchantDeposit::CALLBACK_STATUS['PENDING']
-                ]);
+                $m->callback_status = MerchantDeposit::CALLBACK_STATUS['PENDING'];
                 // push deposit information callback to callback url
                 Queue::push((new \App\Jobs\GuzzleJob(
                     $m,

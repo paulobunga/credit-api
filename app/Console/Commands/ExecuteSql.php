@@ -276,4 +276,19 @@ class ExecuteSql extends Command
             });
         }
     }
+
+    protected function addPayoutAutoApproval()
+    {
+        DB::beginTransaction();
+        try {
+            DB::statement("
+                Update payment_channels
+                SET payout = JSON_SET(payout, '$.auto_approval', false)
+            ");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        DB::commit();
+    }
 }

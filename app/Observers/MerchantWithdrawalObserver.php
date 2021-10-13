@@ -48,7 +48,7 @@ trait MerchantWithdrawalObserver
                 throw new \Exception('Currency type is not supported!');
             }
             if ($credit->credit < $m->amount) {
-                throw new \Exception('exceed merchant credit', 405);
+                throw new \Exception('Amount exceed credit of merchant', 405);
             }
             DB::beginTransaction();
             try {
@@ -204,9 +204,7 @@ trait MerchantWithdrawalObserver
             case MerchantWithdrawal::STATUS['CANCELED']:
             case MerchantWithdrawal::STATUS['APPROVED']:
                 $m->merchant->notify(new \App\Notifications\WithdrawalFinish($m));
-                $m->update([
-                    'callback_status' => MerchantWithdrawal::CALLBACK_STATUS['PENDING']
-                ]);
+                $m->callback_status = MerchantWithdrawal::CALLBACK_STATUS['PENDING'];
                 // push deposit information callback to callback url
                 Queue::push((new \App\Jobs\GuzzleJob(
                     $m,
