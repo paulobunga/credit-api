@@ -87,4 +87,32 @@ class WithdrawalController extends Controller
 
         return $this->response->item($withdrawal, $this->transformer);
     }
+
+    /**
+     * Get slip url of withdrawal
+     *
+     * @method GET
+     *
+     * @return array
+     */
+    public function slip()
+    {
+        $withdrawal = $this->model::findOrFail($this->parameters('withdrawal'));
+        if ($withdrawal->reseller_id != auth()->id()) {
+            throw new \Exception('Unauthorize', 401);
+        }
+        if (!in_array($withdrawal->status, [
+            MerchantWithdrawal::STATUS['FINISHED'],
+            MerchantWithdrawal::STATUS['APPROVED']
+        ])) {
+            throw new \Exception('Status is invalid', 401);
+        }
+
+        return response()->json([
+            'message' => 'success',
+            'data' => [
+                'url' => $withdrawal->slipUrl
+            ]
+        ]);
+    }
 }
