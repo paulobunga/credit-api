@@ -19,7 +19,7 @@ class WithdrawalTransformer extends TransformerAbstract
             'order_id' => $m->order_id,
             'attributes' => $m->attributes,
             'amount' => $m->amount,
-            'status' => $m->status,
+            'status' => (int) $m->status,
             'extra' => $m->extra,
             'created_at' => (string)$m->created_at
         ];

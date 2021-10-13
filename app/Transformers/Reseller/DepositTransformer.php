@@ -21,7 +21,7 @@ class DepositTransformer extends TransformerAbstract
             'card' => $m->resellerBankCard->primary,
             'method' => $m->method,
             'amount' => $m->amount,
-            'status' => $m->status,
+            'status' => (int) $m->status,
             'extra' => $m->extra,
             'created_at' => (string)$m->created_at
         ];
