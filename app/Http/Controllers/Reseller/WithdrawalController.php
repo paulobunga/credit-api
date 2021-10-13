@@ -103,7 +103,8 @@ class WithdrawalController extends Controller
         }
         if (!in_array($withdrawal->status, [
             MerchantWithdrawal::STATUS['FINISHED'],
-            MerchantWithdrawal::STATUS['APPROVED']
+            MerchantWithdrawal::STATUS['APPROVED'],
+            MerchantWithdrawal::STATUS['CANCELED']
         ])) {
             throw new \Exception('Status is invalid', 401);
         }

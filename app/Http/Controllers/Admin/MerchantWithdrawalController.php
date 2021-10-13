@@ -8,10 +8,11 @@ use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Http\Controllers\Controller;
+use App\Models\MerchantWithdrawal;
 
 class MerchantWithdrawalController extends Controller
 {
-    protected $model = \App\Models\MerchantWithdrawal::class;
+    protected $model = MerchantWithdrawal::class;
 
     protected $transformer = \App\Transformers\Admin\MerchantWithdrawalTransformer::class;
 
@@ -50,19 +51,12 @@ class MerchantWithdrawalController extends Controller
             'admin_id' => 'required|exists:admins,id',
             'status' => 'required|numeric',
         ]);
-        DB::beginTransaction();
-        try {
-            $merchant_withdrawal->update([
-                'status' => $request->status,
-                'extra' => [
-                    'admin_id' => $request->admin_id
-                ]
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
+        $merchant_withdrawal->update([
+            'status' => $request->status,
+            'extra' => [
+                'admin_id' => $request->admin_id
+            ]
+        ]);
 
         return $this->response->item($merchant_withdrawal, $this->transformer);
     }
@@ -91,5 +85,31 @@ class MerchantWithdrawalController extends Controller
         )));
 
         return $this->response->item($m, $this->transformer);
+    }
+
+    /**
+     * Get slip url of withdrawal
+     *
+     * @method GET
+     *
+     * @return array
+     */
+    public function slip()
+    {
+        $withdrawal = $this->model::findOrFail($this->parameters('merchant_withdrawal'));
+        if (!in_array($withdrawal->status, [
+            MerchantWithdrawal::STATUS['FINISHED'],
+            MerchantWithdrawal::STATUS['APPROVED'],
+            MerchantWithdrawal::STATUS['CANCELED']
+        ])) {
+            throw new \Exception('Status is invalid', 401);
+        }
+
+        return response()->json([
+            'message' => 'success',
+            'data' => [
+                'url' => $withdrawal->slipUrl
+            ]
+        ]);
     }
 }

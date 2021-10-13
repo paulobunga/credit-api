@@ -105,7 +105,7 @@ class MerchantWithdrawal extends Model
         if (!in_array($this->attributes['status'], [
             self::STATUS['FINISHED'],
             self::STATUS['APPROVED'],
-            self::STATUS['REJECTED'],
+            self::STATUS['CANCELED'],
         ])) {
             return null;
         }

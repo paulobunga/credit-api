@@ -27,7 +27,6 @@ class MerchantWithdrawalTransformer extends TransformerAbstract
             'callback_url' => $m->callback_url,
             'attempts' => $m->attempts,
             'callback_status' => $m->callback_status,
-            'slip_url' => $m->slip_url,
             'created_at' => (string )$m->created_at,
             'updated_at' => (string) $m->updated_at,
         ];
