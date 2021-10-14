@@ -61,9 +61,6 @@ class SettlementController extends Controller
             'id' => $request->card,
             'reseller_id' => auth()->id()
         ])->firstOrFail();
-        if ($request->amount > auth()->user()->withdrawalCoin) {
-            throw new \Exception('Pending amount exceed coin value', 405);
-        }
         $withdrawal = $this->model::create([
             'reseller_id' => auth()->id(),
             'reseller_bank_card_id' => $request->card,

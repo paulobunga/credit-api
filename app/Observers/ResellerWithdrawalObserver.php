@@ -14,9 +14,18 @@ trait ResellerWithdrawalObserver
         parent::boot();
 
         // auto-sets values on creation
-        static::creating(function ($query) {
+        static::creating(function ($m) {
             $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM reseller_withdrawals")[0]->ID ?? 0;
-            $query->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(20);
+            $m->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(20);
+            if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
+                if ($m->reseller->withdrawalCredit < $m->amount) {
+                    throw new \Exception('Amount exceed coin of agent', 405);
+                }
+            } elseif ($m->type == ResellerWithdrawal::TYPE['COIN']) {
+                if ($m->reseller->withdrawalCoin < $m->amount) {
+                    throw new \Exception('Amount exceed coin of agent', 405);
+                }
+            }
         });
 
         static::created(function ($m) {
@@ -34,21 +43,20 @@ trait ResellerWithdrawalObserver
     /**
      * Handle the status "changed" event.
      *
-     * @param  \App\Models\MerchantDeposit
+     * @param  int $status
+     * @param  mixed $m model or query builder
      * @return void
      */
-    protected static function onStatusChangeEvent($status, ResellerWithdrawal $m)
+    protected static function onStatusChangeEvent($status, $m)
     {
-
-        DB::beginTransaction();
-        try {
-            // approve
-            if ($status == ResellerWithdrawal::STATUS['APPROVED']) {
-                $reseller = $m->reseller;
-                if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
-                    if ($reseller->withdrawalCredit < $m->amount) {
-                        throw new \Exception('exceed agent withdrawal credit', 405);
-                    }
+        $reseller = $m->reseller;
+        if ($status == ResellerWithdrawal::STATUS['APPROVED']) {
+            if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
+                if ($reseller->credit < $m->amount) {
+                    throw new \Exception('Amount exceed credit of agent', 405);
+                }
+                DB::beginTransaction();
+                try {
                     $m->transactions()->create([
                         'user_id' => $m->reseller_id,
                         'user_type' => 'reseller',
@@ -59,10 +67,18 @@ trait ResellerWithdrawalObserver
                         'currency' => $reseller->currency
                     ]);
                     $reseller->decrement('credit', $m->amount);
-                } elseif ($m->type == ResellerWithdrawal::TYPE['COIN']) {
-                    if ($reseller->withdrawalCoin < $m->amount) {
-                        throw new \Exception('exceed agent withdrawal coin', 405);
-                    }
+                } catch (\Exception $e) {
+                    Log::error($e->getMessage());
+                    DB::rollback();
+                    throw $e;
+                }
+                DB::commit();
+            } elseif ($m->type == ResellerWithdrawal::TYPE['COIN']) {
+                if ($reseller->coin < $m->amount) {
+                    throw new \Exception('Amount exceed coin of agent', 405);
+                }
+                DB::beginTransaction();
+                try {
                     $m->transactions()->create([
                         'user_id' => $m->reseller_id,
                         'user_type' => 'reseller',
@@ -73,13 +89,13 @@ trait ResellerWithdrawalObserver
                         'currency' => $reseller->currency
                     ]);
                     $reseller->decrement('coin', $m->amount);
+                } catch (\Exception $e) {
+                    Log::error($e->getMessage());
+                    DB::rollback();
+                    throw $e;
                 }
+                DB::commit();
             }
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            DB::rollback();
-            throw $e;
         }
-        DB::commit();
     }
 }

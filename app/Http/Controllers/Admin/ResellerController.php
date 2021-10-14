@@ -233,14 +233,8 @@ class ResellerController extends Controller
             'extra.remark' => 'required'
         ]);
         if ($request->type == ResellerWithdrawal::TYPE['CREDIT']) {
-            $this->validate($request, [
-                'amount' => 'numeric|between:1,' . $reseller->withdrawalCredit
-            ]);
             $transaction_type = Transaction::TYPE['ADMIN_WITHDRAW_CREDIT'];
         } elseif ($request->type == ResellerWithdrawal::TYPE['COIN']) {
-            $this->validate($request, [
-                'amount' => 'numeric|between:1,' . $reseller->withdrawalCoin
-            ]);
             $transaction_type = Transaction::TYPE['ADMIN_WITHDRAW_COIN'];
         } else {
             throw new \Exception('Unsupported transaction type');

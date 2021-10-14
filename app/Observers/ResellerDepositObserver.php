@@ -4,8 +4,8 @@ namespace App\Observers;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\ResellerDeposit;
-use App\Models\Transaction;
 
 trait ResellerDepositObserver
 {
@@ -14,9 +14,9 @@ trait ResellerDepositObserver
         parent::boot();
 
         // auto-sets values on creation
-        static::creating(function ($query) {
+        static::creating(function ($m) {
             $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM reseller_deposits")[0]->ID ?? 0;
-            $query->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(20);
+            $m->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(20);
         });
 
         static::created(function ($m) {
@@ -39,41 +39,47 @@ trait ResellerDepositObserver
      */
     protected static function onStatusChangeEvent($status, ResellerDeposit $m)
     {
-
-        DB::beginTransaction();
-        try {
-            // approve
-            if ($status == ResellerDeposit::STATUS['APPROVED']) {
-                $reseller = $m->reseller;
-                if ($m->type == ResellerDeposit::TYPE['CREDIT']) {
+        $reseller = $m->reseller;
+        if ($status == ResellerDeposit::STATUS['APPROVED']) {
+            if ($m->type == ResellerDeposit::TYPE['CREDIT']) {
+                DB::beginTransaction();
+                try {
                     $m->transactions()->create([
                         'user_id' => $m->reseller_id,
                         'user_type' => 'reseller',
                         'type' => $m->transaction_type,
                         'amount' => $m->amount,
-                        'before' => $reseller ->credit,
-                        'after' => $reseller ->credit + $m->amount,
-                        'currency' => $reseller ->currency
+                        'before' => $reseller->credit,
+                        'after' => $reseller->credit + $m->amount,
+                        'currency' => $reseller->currency
                     ]);
-                    $reseller ->increment('credit', $m->amount);
-                } elseif ($m->type == ResellerDeposit::TYPE['COIN']) {
+                    $reseller->increment('credit', $m->amount);
+                } catch (\Exception $e) {
+                    Log::error($e->getMessage());
+                    DB::rollback();
+                    throw $e;
+                }
+                DB::commit();
+            } elseif ($m->type == ResellerDeposit::TYPE['COIN']) {
+                DB::beginTransaction();
+                try {
                     $m->transactions()->create([
                         'user_id' => $m->reseller_id,
                         'user_type' => 'reseller',
                         'type' => $m->transaction_type,
                         'amount' => $m->amount,
-                        'before' => $reseller ->coin,
-                        'after' => $reseller ->coin + $m->amount,
+                        'before' => $reseller->coin,
+                        'after' => $reseller->coin + $m->amount,
                         'currency' => $reseller->currency
                     ]);
                     $reseller->increment('coin', $m->amount);
+                } catch (\Exception $e) {
+                    Log::error($e->getMessage());
+                    DB::rollback();
+                    throw $e;
                 }
+                DB::commit();
             }
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-            DB::rollback();
-            throw $e;
         }
-        DB::commit();
     }
 }
