@@ -17,6 +17,7 @@ class WithdrawalTransformer extends TransformerAbstract
         return [
             'id' => $m->id,
             'order_id' => $m->order_id,
+            'channel' => $m->paymentChannel->name,
             'attributes' => $m->attributes,
             'amount' => $m->amount,
             'status' => (int) $m->status,
