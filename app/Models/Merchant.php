@@ -76,6 +76,16 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
             ])->sum('amount');
     }
 
+    public function getTransactionFee($currency)
+    {
+        return $this->credits()->where('currency', strtoupper($currency))->first()->transaction_fee ?? 0;
+    }
+
+    public function getPayOutFee($currency, $amount)
+    {
+        return $this->getTransactionFee($currency) * $amount;
+    }
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;

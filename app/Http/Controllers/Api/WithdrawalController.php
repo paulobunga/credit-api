@@ -285,10 +285,6 @@ class WithdrawalController extends Controller
             'name' => $request->channel
         ])->firstOrFail();
 
-        if ($merchant->getWithdrawalCredit($request->currency) < $request->amount) {
-            throw new \Exception("Amount exceed your credit!", 405);
-        }
-
         if ($request->amount < $channel->payout->min || $request->amount > $channel->payout->max) {
             throw new \Exception(
                 "Amount is not in range[{$channel->payout->min}, {$channel->payout->max}]!",

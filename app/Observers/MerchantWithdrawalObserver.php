@@ -16,9 +16,13 @@ trait MerchantWithdrawalObserver
         parent::boot();
 
         // auto-sets values on creation
-        static::creating(function ($query) {
+        static::creating(function ($m) {
             $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM merchant_deposits")[0]->ID ?? 0;
-            $query->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(10);
+            $m->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(10);
+            if ($m->merchant->getWithdrawalCredit($m->currency) < ($m->amount +
+                $m->merchant->getPayOutFee($m->currency, $m->amount))) {
+                throw new \Exception("Amount exceed credit of merchant!", 405);
+            }
         });
 
         static::created(function ($m) {
@@ -47,7 +51,7 @@ trait MerchantWithdrawalObserver
             if (!$credit) {
                 throw new \Exception('Currency type is not supported!');
             }
-            if ($credit->credit < $m->amount) {
+            if ($credit->credit < $m->amount * (1 + $credit->transaction_fee)) {
                 throw new \Exception('Amount exceed credit of merchant', 405);
             }
             DB::beginTransaction();
