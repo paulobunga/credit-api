@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
@@ -15,6 +13,7 @@ use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 use App\Models\MerchantDeposit;
 use App\Models\Transaction;
+use App\Http\Controllers\Controller;
 
 /**
  * Reseller Endpoint
@@ -57,7 +56,9 @@ class ResellerController extends Controller
 
     /**
      * Create an agent
-     * @param \Dingo\Api\Http\Request
+     *
+     * @param \Dingo\Api\Http\Request $request
+     *
      * @return \Dingo\Api\Http\JsonResponse
      */
     public function store(Request $request)
@@ -79,8 +80,10 @@ class ResellerController extends Controller
 
         if ($request->level != Reseller::LEVEL['REFERRER']) {
             $upline = Reseller::findOrFail($request->upline);
+            $uplines = array_merge($upline->uplines, [$upline->id]);
             $currency = $upline->currency;
         } else {
+            $uplines = [];
             $currency = $request->currency;
         }
         $reseller_setting = app(\App\Settings\ResellerSetting::class);
@@ -90,6 +93,7 @@ class ResellerController extends Controller
         $reseller = $this->model::create([
             'level' => $request->level,
             'upline_id' => $upline->id ?? 0,
+            'uplines' => $uplines,
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,

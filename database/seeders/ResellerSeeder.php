@@ -33,7 +33,8 @@ class ResellerSeeder extends Seeder
                     'name' => $this->getName($currency, $level),
                     'username' => $this->getUserName($currency, $level),
                     'phone' => $this->faker->phoneNumber,
-                    'upline_id' => $level == 0 ? Reseller::LEVEL['REFERRER'] : $r->id,
+                    'upline_id' => $level == Reseller::LEVEL['REFERRER'] ? 0 : $r->id,
+                    'uplines' => $level == Reseller::LEVEL['REFERRER'] ? [] : array_merge($r->uplines, [$r->id]),
                     'level' =>  $level,
                     'currency' => $currency,
                     'credit' => 0,
@@ -53,12 +54,14 @@ class ResellerSeeder extends Seeder
                 ]);
             }
         }
+        $vnd_agent = Reseller::where([
+            'currency' => 'VND',
+            'level' => Reseller::LEVEL['AGENT']
+        ])->first();
         // create test VND
         \App\Models\Reseller::create([
-            'upline_id' => Reseller::where([
-                'currency' => 'VND',
-                'level' => Reseller::LEVEL['AGENT']
-            ])->first()->id,
+            'upline_id' => $vnd_agent->id,
+            'uplines' => array_merge($vnd_agent->uplines, [$vnd_agent->id]),
             'level' => Reseller::LEVEL['RESELLER'],
             'name' => 'Test Reseller',
             'username' => 'reseller@gmail.com',

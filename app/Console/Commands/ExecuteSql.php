@@ -291,4 +291,30 @@ class ExecuteSql extends Command
         }
         DB::commit();
     }
+
+    protected function addAgentLevel()
+    {
+        if (!Schema::hasColumn('resellers', 'uplines')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->json('uplines')->after('upline_id')->default(new Expression('(JSON_ARRAY())'));
+            });
+        }
+        DB::beginTransaction();
+        try {
+            foreach (Reseller::all() as $r) {
+                $uplines = [];
+                $agent = $r->agent;
+                while ($agent) {
+                    array_unshift($uplines, $agent->id);
+                    $agent = $agent->agent;
+                }
+                $r->uplines = $uplines;
+                $r->save();
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        DB::commit();
+    }
 }

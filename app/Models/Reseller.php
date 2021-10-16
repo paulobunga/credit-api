@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
@@ -22,8 +23,9 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     public $pushNotificationType = 'users';
 
     protected $fillable = [
-        'level',
         'upline_id',
+        'uplines',
+        'level',
         'name',
         'username',
         'phone',
@@ -42,6 +44,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     ];
 
     protected $casts = [
+        'uplines' => 'array',
         'payin' => ResellerPayIn::class,
         'payout' => ResellerPayOut::class,
         'created_at'  => 'datetime:Y-m-d H:i:s',
@@ -105,6 +108,11 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
             'type' => ResellerWithdrawal::TYPE['COIN'],
             'status' => ResellerWithdrawal::STATUS['PENDING']
         ])->sum('amount');
+    }
+
+    public function getDownlineAttribute()
+    {
+        return Reseller::whereRaw("JSON_CONTAINS(uplines, '{$this->id}')")->count();
     }
 
     public function setPasswordAttribute($value)

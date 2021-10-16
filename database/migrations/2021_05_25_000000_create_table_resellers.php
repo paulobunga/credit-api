@@ -18,6 +18,7 @@ class CreateTableResellers extends Migration
         Schema::create('resellers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('upline_id')->default(0);
+            $table->json('uplines')->default(new Expression('(JSON_ARRAY())'));
             $table->tinyInteger('level')->comment('0:referrer,1:master agent,2:agent,3:reseller');
             $table->string('name')->unique()->index();
             $table->string('username')->unique()->index();

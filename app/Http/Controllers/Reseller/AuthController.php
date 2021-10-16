@@ -77,16 +77,28 @@ class AuthController extends Controller
         Reseller::create([
             'level' => Reseller::LEVEL['RESELLER'],
             'upline' => 0,
+            'uplines' => [],
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
             'currency' => $request->currency,
             'password' => $request->password,
-            'commission_percentage' => $currency_setting->getCommissionPercentage(
-                $request->currency,
-                Reseller::LEVEL['RESELLER']
-            ),
-            'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
+            'payin' => [
+                'commission_percentage' => $currency_setting->getCommissionPercentage(
+                    $request->currency,
+                    Reseller::LEVEL['RESELLER']
+                ),
+                'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
+                'status' => true
+            ],
+            'payout' => [
+                'commission_percentage' => $currency_setting->getCommissionPercentage(
+                    $request->currency,
+                    Reseller::LEVEL['RESELLER']
+                ),
+                'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
+                'status' => true
+            ],
             'downline_slot' => $agent_setting->getDefaultDownLineSlot(Reseller::LEVEL['RESELLER']),
             'status' =>  Reseller::STATUS['INACTIVE']
         ]);
@@ -175,10 +187,13 @@ class AuthController extends Controller
         $code = ResellerActivateCode::where([
             'code' => $request->code,
             'status' => ResellerActivateCode::STATUS['PENDING']
-        ])->where('expired_at', '>', Carbon::now())
-            ->firstOrFail();
-        if ($code->reseller->currency != auth()->user()->currency) {
+        ])->where('expired_at', '>', Carbon::now())->firstOrFail();
+        $agent = $code->reseller;
+        if ($agent->currency != auth()->user()->currency) {
             throw new \Exception('Activated Code Currency is not match your currency');
+        }
+        if ($agent->downline > $agent->downline_slot) {
+            throw new \Exception('Agent cannot add more downline!');
         }
 
         $code->update([
@@ -187,7 +202,8 @@ class AuthController extends Controller
             'activated_at' => Carbon::now()
         ]);
         auth()->user()->update([
-            'upline_id' => $code->reseller_id,
+            'upline_id' => $agent->id,
+            'uplines' => array_merge($agent->uplines, [$agent->id]),
             'status' => Reseller::STATUS['ACTIVE'],
         ]);
 
