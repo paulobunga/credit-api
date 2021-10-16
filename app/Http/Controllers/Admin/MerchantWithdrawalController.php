@@ -23,13 +23,24 @@ class MerchantWithdrawalController extends Controller
                 'merchant'
             ])
             ->join('merchants', 'merchants.id', '=', 'merchant_withdrawals.merchant_id')
+            ->join('resellers', 'resellers.id', '=', 'merchant_withdrawals.reseller_id')
+            ->join('payment_channels', 'payment_channels.id', '=', 'merchant_withdrawals.payment_channel_id')
             ->select('merchant_withdrawals.*', 'merchants.name')
             ->allowedFilters([
-                AllowedFilter::partial('name', 'merchants.name'),
-                AllowedFilter::exact('status'),
+                AllowedFilter::exact('id'),
+                AllowedFilter::partial('order_id'),
+                AllowedFilter::partial('merchant_order_id'),
+                AllowedFilter::partial('channel', 'payment_channels.name'),
+                AllowedFilter::partial('merchant_name', 'merchants.name'),
+                AllowedFilter::partial('reseller_name', 'resellers.name'),
+                AllowedFilter::exact('status', 'merchant_withdrawals.status'),
                 AllowedFilter::callback(
                     'created_at_between',
                     fn ($query, $v) => $query->whereBetween('merchant_withdrawals.created_at', $v)
+                ),
+                AllowedFilter::callback(
+                    'updated_at_between',
+                    fn ($query, $v) => $query->whereBetween('merchant_withdrawals.updated_at', $v)
                 ),
             ])
             ->allowedSorts([
