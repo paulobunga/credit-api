@@ -60,7 +60,10 @@ class MerchantWithdrawalController extends Controller
         $merchant_withdrawal = $this->model::findOrFail($this->parameters('merchant_withdrawal'));
         $this->validate($request, [
             'admin_id' => 'required|exists:admins,id',
-            'status' => 'required|numeric',
+            'status' => 'required|numeric|in:' . implode(',', [
+                MerchantWithdrawal::STATUS['APPROVED'],
+                MerchantWithdrawal::STATUS['CANCELED'],
+            ]),
         ]);
         $merchant_withdrawal->update([
             'status' => $request->status,
