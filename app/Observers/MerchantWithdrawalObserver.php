@@ -142,7 +142,7 @@ trait MerchantWithdrawalObserver
                 );
                 // commission
                 $rows = DB::select("
-                WITH recursive recuresive_resellers ( id, upline_id, level, name, payout, coin ) AS (
+                WITH agents AS (
                     SELECT
                         id,
                         upline_id,
@@ -153,7 +153,7 @@ trait MerchantWithdrawalObserver
                     FROM
                         resellers 
                     WHERE
-                        id = :id
+                        id = {$m->reseller->id}
                     UNION ALL
                     SELECT
                         r.id,
@@ -163,21 +163,31 @@ trait MerchantWithdrawalObserver
                         r.payout,
                         r.coin 
                     FROM
-                        resellers r
-                        INNER JOIN recuresive_resellers ON r.id = recuresive_resellers.upline_id 
+                    (
+                        SELECT
+                            id,
+                            uplines
+                        FROM
+                            resellers
+                        WHERE
+                            id = {$m->reseller->id} 
+                    ) AS temp
+                    INNER JOIN resellers AS r ON JSON_CONTAINS(
+                        temp.uplines,
+                        CAST( r.id AS json ),
+                        '$' 
+                    ) 
                 )
                 SELECT
                     id AS user_id,
                     'reseller' AS user_type,
                     :type AS type,
-                    :amount * payout->>'$.commission_percentage' AS amount,
+                    {$m->amount} * payout->>'$.commission_percentage' AS amount,
                     coin AS coin 
                 FROM
-                    recuresive_resellers
-                ORDER BY user_id DESC
+                    agents
+                ORDER BY level DESC
                 ", [
-                    'id' => $m->reseller->id,
-                    'amount' => $m->amount,
                     'type' => Transaction::TYPE['SYSTEM_TOPUP_COMMISSION']
                 ]);
                 foreach ($rows as $row) {
