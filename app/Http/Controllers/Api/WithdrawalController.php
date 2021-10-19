@@ -319,7 +319,7 @@ class WithdrawalController extends Controller
             FROM
                 reseller_channels
             WHERE payout < pending_limit 
-            ORDER BY payin DESC";
+            ORDER BY payout ASC, payin DESC";
         // dd($sql);
         $resellers = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],

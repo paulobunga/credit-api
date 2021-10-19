@@ -33,6 +33,7 @@ class Transaction extends Model
         'SYSTEM_TOPUP_COMMISSION' => 11,
         'SYSTEM_TOPUP_CREDIT' => 12,
         'MERCHANT_SETTLE_CREDIT' => 13,
+        'ROLLBACK_TRANSACTION_FEE' => 14,
     ];
 
     public function getTypeAttribute()

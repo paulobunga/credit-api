@@ -44,7 +44,7 @@ class MerchantDepositSeeder extends Seeder
                     'reseller_bank_card_id' => $reseller_bank_card->id,
                     'status' => MerchantDeposit::STATUS['APPROVED'],
                 ]);
-                MerchantWithdrawal::create([
+                $withdrawal = MerchantWithdrawal::create([
                     'merchant_order_id' => $merchant->id == 1 ? '9798223690986' : $this->faker->isbn13,
                     'merchant_id' => $merchant->id,
                     'reseller_id' => $reseller_bank_card->reseller->id,
@@ -67,8 +67,11 @@ class MerchantDepositSeeder extends Seeder
                     }),
                     'amount' => 100,
                     'currency' => $credit->currency,
-                    'status' => MerchantWithdrawal::STATUS['APPROVED'],
+                    'status' => MerchantWithdrawal::STATUS['PENDING'],
                     'callback_url' => app('api.url')->version(env('API_VERSION'))->route('api.demos.callback'),
+                ]);
+                $withdrawal->update([
+                    'status' => MerchantWithdrawal::STATUS['APPROVED']
                 ]);
                 MerchantSettlement::create([
                     'merchant_id' => $merchant->id,

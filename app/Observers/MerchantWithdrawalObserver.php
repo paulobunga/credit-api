@@ -17,7 +17,7 @@ trait MerchantWithdrawalObserver
 
         // auto-sets values on creation
         static::creating(function ($m) {
-            $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM merchant_deposits")[0]->ID ?? 0;
+            $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM merchant_withdrawals")[0]->ID ?? 0;
             $m->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(10);
             if ($m->merchant->getWithdrawalCredit($m->currency) < ($m->amount +
                 $m->merchant->getPayOutFee($m->currency, $m->amount))) {
@@ -107,7 +107,7 @@ trait MerchantWithdrawalObserver
                 $m->transactions()->create([
                     'user_id' => $m->merchant_id,
                     'user_type' => 'merchant',
-                    'type' => Transaction::TYPE['SYSTEM_TOPUP_CREDIT'],
+                    'type' => Transaction::TYPE['ROLLBACK_TRANSACTION_FEE'],
                     'amount' => $m->amount * $credit->transaction_fee,
                     'before' => $credit->credit + $m->amount,
                     'after' => $credit->credit + $m->amount * (1 + $credit->transaction_fee),
@@ -219,7 +219,7 @@ trait MerchantWithdrawalObserver
             case MerchantWithdrawal::STATUS['APPROVED']:
                 $m->merchant->notify(new \App\Notifications\WithdrawalFinish($m));
                 $m->callback_status = MerchantWithdrawal::CALLBACK_STATUS['PENDING'];
-                // push deposit information callback to callback url
+                // push withdrawal information callback to callback url
                 Queue::push((new \App\Jobs\GuzzleJob(
                     $m,
                     new \App\Transformers\Api\WithdrawalTransformer,

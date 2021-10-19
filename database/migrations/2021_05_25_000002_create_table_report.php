@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateTableReport extends Migration
 {
@@ -23,6 +24,7 @@ class CreateTableReport extends Migration
             $table->decimal('credit', 14, 4);
             $table->decimal('transaction_fee', 14, 4);
             $table->string('currency', 6);
+            $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamp('created_at')->useCurrent();
         });
 
@@ -47,6 +49,7 @@ class CreateTableReport extends Migration
             $table->unsignedInteger('turnover');
             $table->decimal('credit', 14, 4);
             $table->decimal('coin', 14, 4);
+            $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamp('created_at')->useCurrent();
         });
 

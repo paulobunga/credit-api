@@ -317,4 +317,18 @@ class ExecuteSql extends Command
         }
         DB::commit();
     }
+
+    protected function addReportExtra()
+    {
+        if (!Schema::hasColumn('report_daily_resellers', 'extra')) {
+            Schema::table('report_daily_resellers', function (Blueprint $table) {
+                $table->json('extra')->after('coin')->default(new Expression('(JSON_OBJECT())'));
+            });
+        }
+        if (!Schema::hasColumn('report_daily_merchants', 'extra')) {
+            Schema::table('report_daily_merchants', function (Blueprint $table) {
+                $table->json('extra')->after('currency')->default(new Expression('(JSON_OBJECT())'));
+            });
+        }
+    }
 }
