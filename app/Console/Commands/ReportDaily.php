@@ -500,7 +500,7 @@ class ReportDaily extends Command
                 'start_at' => $start_datetime,
                 'end_at' => $end_datetime,
             ], [
-                'turnover' => $row->payin->turnover + $row->payout->turnover,
+                'turnover' => $row->payin->success + $row->payout->success,
                 'credit' => $row->payin->credit + $row->payout->credit,
                 'transaction_fee' => $row->payin->transaction_fee + $row->payout->transaction_fee,
                 'extra' => [
