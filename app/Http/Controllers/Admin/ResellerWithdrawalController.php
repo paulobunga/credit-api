@@ -55,16 +55,8 @@ class ResellerWithdrawalController extends Controller
             'status' => 'required|numeric',
             'extra' => 'required|array'
         ]);
-        if ($request->status == ResellerWithdrawal::STATUS['APPROVED']) {
-            if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
-                if ($m->amount > $m->reseller->credit) {
-                    throw new \Exception('exceed credit', 405);
-                }
-            } elseif ($m->type == ResellerWithdrawal::TYPE['COIN']) {
-                if ($m->amount > $m->reseller->coin) {
-                    throw new \Exception('exceed coin', 405);
-                }
-            }
+        if ($m->status != ResellerWithdrawal::STATUS['PENDING']) {
+            throw new \Exception('Status is not allowed to changed!', 405);
         }
         $m->update([
             'audit_admin_id' => auth()->id(),

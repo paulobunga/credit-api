@@ -7,6 +7,10 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
 
+/**
+ * Admin endpoint
+ * @package Controllers\Admin
+ */
 class AdminController extends Controller
 {
     protected $model = \App\Models\Admin::class;
@@ -15,8 +19,8 @@ class AdminController extends Controller
 
     /**
      * Get admininstrator lists
-     *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @param \Dingo\Api\Http\Request $request HTTP request
+     * @return \Dingo\Api\Http\JsonResponse response data by query parameter
      */
     public function index(Request $request)
     {

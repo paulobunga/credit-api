@@ -9,17 +9,17 @@ return [
     /*
      * The HTML <title> for the generated documentation. If this is empty, Scribe will infer it from config('app.name').
      */
-    'title' => 'Credit System Api',
+    'title' => 'GamePTS Api',
 
     /*
      * A short description of your API. Will be included in the docs webpage, Postman collection and OpenAPI spec.
      */
-    'description' => 'Version: 1.0.0',
+    'description' => 'Version: 1.1.0',
 
     /*
      * The base URL displayed in the docs. If this is empty, Scribe will use the value of config('app.url').
      */
-    'base_url' => env('DOC_BASE_URL'),
+    'base_url' => env('APP_URL'),
 
     /*
      * Tell Scribe what routes to generate documentation for.
@@ -55,7 +55,6 @@ return [
              */
             'include' => [
                 'api.*'
-                // 'users.index', 'healthcheck*'
             ],
 
             /*
@@ -68,6 +67,8 @@ return [
                 'merchant.*',
                 'api.deposits.pay',
                 'api.deposits.update',
+                'api.withdrawals.pay',
+                'api.withdrawals.update',
                 'api.demos.*'
             ],
 
@@ -192,7 +193,15 @@ return [
          * The base URL for the API tester to use (for example, you can set this to your staging URL).
          * Leave as null to use the current app URL (config(app.url)).
          */
-        'base_url' => env('DOC_BASE_URL'),
+        'base_url' => env('APP_URL'),
+        /**
+         * Fetch a CSRF token before each request, and add it as an X-XSRF-TOKEN header. Needed if you're using Laravel Sanctum.
+         */
+        'use_csrf' => false,
+        /**
+         * The URL to fetch the CSRF token from (if `use_csrf` is true).
+         */
+        'csrf_url' => '/sanctum/csrf-cookie',
     ],
 
     /*
@@ -342,10 +351,10 @@ INTRO,
         'bodyParameters' => [
             Strategies\BodyParameters\GetFromFormRequest::class,
             Strategies\BodyParameters\GetFromInlineValidator::class,
-            Strategies\BodyParameters\GetFromBodyParamTag::class,
+            App\Strategies\BodyParameters\GetFromBodyParamTag::class,
         ],
         'responses' => [
-            App\Strategies\Responses\UseTransformerTags::class,
+            Strategies\Responses\UseTransformerTags::class,
             App\Strategies\Responses\UseResponseTag::class,
             Strategies\Responses\UseResponseFileTag::class,
             Strategies\Responses\UseApiResourceTags::class,

@@ -20,6 +20,8 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
     use Notifiable;
     use MerchantObserver;
 
+    public $pushNotificationType = 'users';
+
     protected $fillable = [
         'uuid',
         'name',
@@ -43,6 +45,45 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
     public function credits()
     {
         return $this->hasMany(MerchantCredit::class);
+    }
+
+    public function deposits()
+    {
+        return $this->hasMany(MerchantDeposit::class);
+    }
+
+    public function withdrawals()
+    {
+        return $this->hasMany(MerchantWithdrawal::class);
+    }
+
+    public function devices()
+    {
+        return $this->morphMany(Device::class, 'user');
+    }
+
+    public function getCredit($currency)
+    {
+        return $this->credits()->where('currency', strtoupper($currency))->first()->credit ?? 0;
+    }
+
+    public function getWithdrawalCredit($currency)
+    {
+        return $this->getCredit($currency) -
+            $this->withdrawals()->where([
+                'status' => MerchantWithdrawal::STATUS['PENDING'],
+                'currency' => strtoupper($currency)
+            ])->sum('amount');
+    }
+
+    public function getTransactionFee($currency)
+    {
+        return $this->credits()->where('currency', strtoupper($currency))->first()->transaction_fee ?? 0;
+    }
+
+    public function getPayOutFee($currency, $amount)
+    {
+        return $this->getTransactionFee($currency) * $amount;
     }
 
     public function setPasswordAttribute($value)

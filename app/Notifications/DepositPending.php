@@ -2,60 +2,40 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Notifications\Messages\BroadcastMessage;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notification;
-
-class DepositPending extends Notification implements ShouldBroadcast
+class DepositPending extends Base
 {
-    use Queueable;
-
-    public Model $deposit;
     /**
-     * Create a new notification instance.
+     * Get icon path
      *
-     * @return void
+     * @return string
      */
-    public function __construct(Model $deposit)
+    protected function getIcon(): string
     {
-        $this->deposit = $deposit;
+        return reseller_url('/icons/favicon-32x32.png');
     }
 
     /**
-     * Get the notification's delivery channels.
+     * Get notification link
      *
-     * @param  mixed  $notifiable
-     * @return array
+     * @return string
      */
-    public function via($notifiable)
+    protected function getLink(): string
     {
-        return ['database', 'broadcast'];
+        return reseller_url('/deposits?order_id=' . $this->model->order_id);
     }
-
-    public function broadcastType()
-    {
-        return 'notifications.deposit';
-    }
-
     /**
-     * Get the array representation of the notification.
+     * Get data of message
      *
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    protected function getData($notifiable)
     {
         return [
-            'id' => $this->deposit->id,
-            'message' => $this->deposit->merchant_order_id,
-            'time' => $this->deposit->updated_at->toDateTimeString(),
+            'id' => $this->model->id,
+            'title' => 'New cash in order',
+            'body' => "You got a new cash in order, {$this->model->order_id}.",
+            'time' => $this->model->created_at->toDateTimeString(),
         ];
-    }
-
-    public function toBroadcast($notifiable)
-    {
-        return (new BroadcastMessage($this->toArray($notifiable)))->onQueue('echo');
     }
 }

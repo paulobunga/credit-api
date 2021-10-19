@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\Merchant;
 
+use Carbon\Carbon;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Broadcast;
+use Pusher\PushNotifications\PushNotifications;
 use App\Http\Controllers\Controller as Controller;
 use App\Transformers\Merchant\AuthTransformer;
 use App\Models\MerchantWhiteList;
-use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -20,20 +24,20 @@ class AuthController extends Controller
     {
         $credentials = $request->only(['username', 'password']);
 
-        if (!$token = Auth::guard('merchant')->attempt($credentials)) {
+        if (!$token = auth('merchant')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
 
         if (!in_array(
             $request->ip(),
-            MerchantWhiteList::where('merchant_id', Auth::guard('merchant')->id())->first()->backend ?? []
+            MerchantWhiteList::where('merchant_id', auth('merchant')->id())->first()->backend ?? []
         )) {
-            \Log::error($request->ip() . " is not in merchant[" . Auth::guard('merchant')->id() . '] white list.');
-            Auth::guard('merchant')->logout();
+            Log::error($request->ip() . " is not in merchant[" . auth('merchant')->id() . '] white list.');
+            auth('merchant')->logout();
             return response()->json(['message' => 'Unauthorized IP Address!'], 401);
         }
 
-        return $this->response->item(Auth::guard('merchant')->user(), new AuthTransformer($token));
+        return $this->response->item(auth('merchant')->user(), new AuthTransformer($token));
     }
 
     /**
@@ -43,7 +47,7 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }
 
     /**
@@ -53,7 +57,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        Auth::logout();
+        auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
     }
@@ -65,19 +69,19 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->response->item(Auth::user(), new AuthTransformer(Auth::refresh()));
+        return $this->response->item(auth()->user(), new AuthTransformer(auth()->refresh()));
     }
 
     public function update(Request $request)
     {
         $this->validate($request, [
-            'name' => "required|unique:merchants,name," . Auth::id(),
-            'username' => "required|unique:merchants,username," . Auth::id(),
+            'name' => "required|unique:merchants,name," . auth()->id(),
+            'username' => "required|unique:merchants,username," . auth()->id(),
             'phone' => 'required',
             'transaction_fee' => 'required|numeric',
             'callback_url' => 'required',
         ]);
-        Auth::user()->update([
+        auth()->user()->update([
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
@@ -85,15 +89,15 @@ class AuthController extends Controller
             'callback_url' => $request->callback_url,
         ]);
 
-        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }
 
     public function renew(Request $request)
     {
-        Auth::user()->api_key = Str::random(30);
-        Auth::user()->save();
+        auth()->user()->api_key = Str::random(30);
+        auth()->user()->save();
 
-        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }
 
     public function whitelist(Request $request)
@@ -104,10 +108,57 @@ class AuthController extends Controller
             'ip.*' => 'required|distinct|ipv4',
         ]);
         \App\Models\MerchantWhiteList::updateOrCreate(
-            ['merchant_id' => Auth::id()],
+            ['merchant_id' => auth()->id()],
             [$request->type => $request->ip],
         );
 
-        return $this->response->item(Auth::user(), new AuthTransformer($request->bearerToken()));
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
+    }
+
+    /**
+     * Authenticate beam notification
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function beam(Request $request)
+    {
+        $this->validate($request, [
+            'user_id' => 'required',
+            'platform' => 'required',
+        ]);
+        $user_id = Arr::last(explode('.', $request->user_id));
+        if ($user_id !=  auth()->id()) {
+            return response('Inconsistent request', 401);
+        }
+        $beam = new PushNotifications([
+            'secretKey' => config('broadcasting.connections.beams.secret_key'),
+            'instanceId' => config('broadcasting.connections.beams.instance_id'),
+        ]);
+
+        $token = $beam->generateToken('App.Models.Merchant.' . auth()->id());
+        auth()->user()->devices()->updateOrCreate(
+            [
+                'platform' => $request->platform
+            ],
+            [
+                'logined_at' => Carbon::now(),
+                'token' => $token['token']
+            ]
+        );
+
+        return response()->json($token);
+    }
+
+    /**
+     * Authenticate private channel request
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @throws \Exception $e if id not matched
+     * @return \Dingo\Api\Http\Response $response
+     */
+    public function channel(Request $request)
+    {
+        return Broadcast::auth($request);
     }
 }

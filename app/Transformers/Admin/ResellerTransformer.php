@@ -18,8 +18,8 @@ class ResellerTransformer extends TransformerAbstract
             'credit' => $m->credit,
             'coin' => $m->coin,
             'currency' => $m->currency,
-            'pending_limit' => $m->pending_limit,
-            'commission_percentage' => $m->commission_percentage,
+            'payin' => $m->payin,
+            'payout' => $m->payout,
             'downline_slot' => $m->downline_slot,
             'status' => $m->status,
         ];

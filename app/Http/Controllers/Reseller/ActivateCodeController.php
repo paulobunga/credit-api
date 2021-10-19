@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Reseller;
 
-use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
-use Illuminate\Support\Facades\Auth;
 use App\Models\ResellerActivateCode;
-use Carbon\Carbon;
+use App\Http\Controllers\Controller;
 
 class ActivateCodeController extends Controller
 {
     protected $model = ResellerActivateCode::class;
+    
     protected $transformer = \App\Transformers\Reseller\ActivateCodeTransformer::class;
 
     public function index(Request $request)
@@ -30,7 +30,7 @@ class ActivateCodeController extends Controller
                 'ident',
                 'status'
             ])
-            ->where('reseller_id', Auth::id())
+            ->where('reseller_id', auth()->id())
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($codes, $this->transformer);
@@ -38,20 +38,19 @@ class ActivateCodeController extends Controller
 
     public function store(Request $request)
     {
-        $pendings = ResellerActivateCode::where(
+        $pending_codes = ResellerActivateCode::where(
             'reseller_id',
-            Auth::id()
+            auth()->id()
         )->whereIn('status', [
             ResellerActivateCode::STATUS['PENDING'],
-            ResellerActivateCode::STATUS['ACTIVATED'],
         ])->count();
 
-        if ($pendings >= Auth::user()->downline_slot) {
-            throw new \Exception('Exceed downline limit');
+        if ($pending_codes + auth()->user()->downline > auth()->user()->downline_slot) {
+            throw new \Exception('Exceed downline limit!');
         }
 
         $code = $this->model::create([
-            'reseller_id' => Auth::id(),
+            'reseller_id' => auth()->id(),
             'status' => ResellerActivateCode::STATUS['PENDING'],
             'expired_at' => Carbon::now()->addMinutes(600)
         ]);

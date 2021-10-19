@@ -34,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
             'merchant' => 'App\Models\Merchant',
             'merchant.deposit' => 'App\Models\MerchantDeposit',
             'merchant.withdrawal' => 'App\Models\MerchantWithdrawal',
+            'merchant.settlement' => 'App\Models\MerchantSettlement',
             'reseller.deposit' => 'App\Models\ResellerDeposit',
             'reseller.withdrawal' => 'App\Models\ResellerWithdrawal',
         ]);
@@ -47,15 +48,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user) {
             return $user->hasRole('Super Admin') ? true : null;
         });
-        $this->bootBroadCast();
         $this->bootBladeComponents();
-    }
-
-    protected function bootBroadCast()
-    {
-        $router = app('router');
-        $router->get('/broadcasting/auth', ['uses' => '\App\Http\Controllers\BroadcastController@authenticate']);
-        $router->post('/broadcasting/auth', ['uses' => '\App\Http\Controllers\BroadcastController@authenticate']);
     }
 
     protected function bootBladeComponents()

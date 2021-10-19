@@ -22,11 +22,16 @@ $api->group([
         $api->put("/auth/update", ['as' => 'auth.update', 'uses' => 'AuthController@update']);
         $api->put("/auth/renew", ['as' => 'auth.renew', 'uses' => 'AuthController@renew']);
         $api->put("/auth/whitelist", ['as' => 'auth.whitelist', 'uses' => 'AuthController@whitelist']);
+        $api->get('/auth/beam', ['as' => 'auth.beam', 'uses' => 'AuthController@beam']);
+        $api->post('/auth/channel', ['as' => 'auth.channel', 'uses' => 'AuthController@channel']);
 
         $api->resource('deposits', 'DepositController', ['only' => ['index']]);
         $api->put("/deposits/resend/{deposit}", ['as' => 'deposits.resend', 'uses' => 'DepositController@resend']);
 
-        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'store']]);
+        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index']]);
+        $api->put("/withdrawals/resend/{withdrawal}", ['as' => 'withdrawals.resend', 'uses' => 'WithdrawalController@resend']);
+
+        $api->resource('settlements', 'SettlementController', ['only' => ['index']]);
 
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
         $api->get("/reports/month", ['as' => 'reports.month', 'uses' => 'ReportController@month']);

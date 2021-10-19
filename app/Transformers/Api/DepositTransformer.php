@@ -13,16 +13,24 @@ class DepositTransformer extends TransformerAbstract
     {
         $this->params = $params;
     }
-
-    public function transform(Model $deposit)
+    
+    /**
+     * Transform response
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $m
+     * @return void
+     */
+    public function transform(Model $m)
     {
         return [
-            'name' => $deposit->merchant->name,
-            'order_id' => $deposit->order_id,
-            'merchant_order_id' => $deposit->merchant_order_id,
-            'amount' => $deposit->amount,
-            'status' => $deposit->status,
-            'callback_url' => $deposit->callback_url,
+            'name' => $m->merchant->name,
+            'order_id' => $m->order_id,
+            'merchant_order_id' => $m->merchant_order_id,
+            'player_id' => $m->player_id,
+            'amount' => $m->amount,
+            'currency' => $m->currency,
+            'status' => $m->status,
+            'callback_url' => $m->callback_url,
         ] + $this->params;
     }
 }

@@ -17,6 +17,7 @@ class MerchantDeposit extends Model
         'reseller_bank_card_id',
         'order_id',
         'merchant_order_id',
+        'player_id',
         'method',
         'amount',
         'currency',
@@ -32,6 +33,7 @@ class MerchantDeposit extends Model
         'extra' => 'array',
         'created_at'  => 'datetime:Y-m-d H:i:s',
         'updated_at'  => 'datetime:Y-m-d H:i:s',
+        'notified_at'  => 'datetime:Y-m-d H:i:s',
     ];
 
     public const STATUS = [

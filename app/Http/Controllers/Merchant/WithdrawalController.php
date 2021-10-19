@@ -2,49 +2,70 @@
 
 namespace App\Http\Controllers\Merchant;
 
-use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
+use Illuminate\Support\Facades\Queue;
 use Spatie\QueryBuilder\QueryBuilder;
+use App\Http\Controllers\Controller;
+use App\Models\MerchantWithdrawal;
+
 use Spatie\QueryBuilder\AllowedFilter;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class WithdrawalController extends Controller
 {
-    protected $model = \App\Models\MerchantWithdrawal::class;
+    protected $model = MerchantWithdrawal::class;
+
     protected $transformer = \App\Transformers\Merchant\WithdrawalTransformer::class;
 
     public function index(Request $request)
     {
-        $withdrawals = QueryBuilder::for($this->model::where('merchant_id', Auth::id()))
+        $deposits = QueryBuilder::for($this->model)
+            ->join('payment_channels', 'merchant_withdrawals.payment_channel_id', '=', 'payment_channels.id')
+            ->select('merchant_withdrawals.*', 'payment_channels.name AS channel')
+            ->where('merchant_id', auth()->id())
             ->allowedFilters([
-                AllowedFilter::partial('name'),
+                AllowedFilter::exact('id'),
+                AllowedFilter::partial('merchant_order_id'),
+                AllowedFilter::partial('channel', 'payment_channels.name'),
+                AllowedFilter::exact('status'),
+                AllowedFilter::callback(
+                    'created_at_between',
+                    fn ($query, $v) => $query->whereBetween('merchant_withdrawals.created_at', $v)
+                ),
+            ])
+            ->allowedSorts([
+                'id',
+                'merchant_order_id',
+                'amount',
+                'status',
+                'callback_url',
+                'attempts',
+                'callback_status',
+                'created_at',
             ])
             ->paginate($this->perPage);
 
-        return $this->response->withPaginator($withdrawals, $this->transformer);
+        return $this->response->withPaginator($deposits, $this->transformer);
     }
 
-    public function store(Request $request)
+    public function resend()
     {
-        $this->validate($request, [
-            'amount' => 'required|numeric|max:' . Auth::user()->credit,
-        ]);
-        DB::beginTransaction();
-        try {
-            $last_order = $this->model::latest()->first();
-            $withdrawal = $this->model::create([
-                'order_id' => '#' . str_pad($last_order->id + 1, 8, "0", STR_PAD_LEFT) . time(),
-                'merchant_id' => Auth::id(),
-                'amount' => $request->amount,
-                'status' => 0,
-            ]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            throw $e;
-        }
-        DB::commit();
+        $m = $this->model::where([
+            'id' => $this->parameters('withdrawal'),
+            'merchant_id' => auth()->id()
+        ])->firstOrFail();
 
-        return $this->response->item($withdrawal, $this->transformer);
+        $m->timestamps = false;
+        $m->attempts = 0;
+        $m->callback_status = $this->model::CALLBACK_STATUS['PENDING'];
+        $m->save();
+
+        // push deposit information callback to callback url
+        Queue::push((new \App\Jobs\GuzzleJob(
+            $m,
+            new \App\Transformers\Api\WithdrawalTransformer,
+            $m->merchant->api_key
+        )));
+
+        return $this->response->item($m, $this->transformer);
     }
 }

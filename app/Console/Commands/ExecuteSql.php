@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use App\Models\Reseller;
 use App\Models\PaymentChannel;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
@@ -148,6 +149,186 @@ class ExecuteSql extends Command
             $extra['creator'] ??= $rd->audit_admin_id;
             $rd->extra = $extra;
             $rd->save();
+        }
+    }
+
+    # payout migration
+    protected function merchantSettlementMerchantWithdrawals()
+    {
+        if (!Schema::hasTable('merchant_settlements')) {
+            Schema::rename('merchant_withdrawals', 'merchant_settlements');
+            Schema::table('merchant_settlements', function ($table) {
+                $table->renameIndex(
+                    'merchant_withdrawals_order_id_unique',
+                    'merchant_settlements_order_id_unique'
+                );
+                $table->renameIndex(
+                    'merchant_withdrawals_merchant_id_foreign',
+                    'merchant_settlements_merchant_id_foreign'
+                );
+                $table->dropForeign('merchant_withdrawals_merchant_id_foreign');
+                $table->foreign('merchant_id')->references('id')->on('merchants');
+            });
+        }
+        if (!Schema::hasTable('merchant_withdrawals')) {
+            Schema::create('merchant_withdrawals', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('merchant_id')
+                    ->constrained();
+                $table->foreignId('reseller_id')
+                    ->constrained();
+                $table->foreignId('payment_channel_id')
+                    ->constrained();
+                $table->string('order_id', 60)->unique();
+                $table->string('merchant_order_id', 60);
+                $table->json('attributes')->default(new Expression('(JSON_ARRAY())'));
+                $table->decimal('amount', 14, 4);
+                $table->string('currency', 6);
+                $table->unsignedTinyInteger('status')
+                    ->default(0)
+                    ->comment('0:Created,1:Pending,2:Approved,3:Rejected,4:Enforced,5:Canceled');
+                $table->unsignedTinyInteger('callback_status')
+                    ->default(0)
+                    ->comment('0:Created,1:Pending,2:Finish,3:Failed');
+                $table->unsignedTinyInteger('attempts')
+                    ->default(0);
+                $table->string('callback_url');
+                $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
+                $table->timestamps();
+                $table->timestamp('notified_at')->nullable();
+                $table->unique(
+                    ['merchant_id', 'merchant_order_id', 'currency'],
+                    'merchant_withdrawals_merchant_order_id_unique'
+                );
+            });
+        }
+    }
+
+    protected function createDevicesTable()
+    {
+        if (!Schema::hasTable('devices')) {
+            Schema::create('devices', function (Blueprint $table) {
+                $table->bigIncrements('id')->unsigned();
+                $table->unsignedBigInteger('user_id');
+                $table->string('user_type', 30);
+                $table->string('platform', 10);
+                $table->text('token');
+                $table->timestamp('created_at')->useCurrent();
+                $table->timestamp('logined_at');
+            });
+        }
+    }
+
+    protected function resellerPayinPayOut()
+    {
+        $cs = app(\App\Settings\CurrencySetting::class);
+        $rs = app(\App\Settings\ResellerSetting::class);
+        if (!Schema::hasColumn('resellers', 'payin')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->json('payin')->after('currency')->default(new Expression('(JSON_OBJECT())'));
+            });
+            foreach (Reseller::all() as $r) {
+                $r->payin = [
+                    'commission_percentage' => $r->commission_percentage ??
+                        $cs->getCommissionPercentage($r->currency, $r->level),
+                    'pending_limit' => $r->pending_limit ?? $rs->getDefaultPendingLimit($r->level),
+                    'status' => $r->level == Reseller::LEVEL['RESELLER']
+                ];
+                $r->save();
+            }
+        }
+        if (!Schema::hasColumn('resellers', 'payout')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->json('payout')->after('payin')->default(new Expression('(JSON_OBJECT())'));
+            });
+            foreach (Reseller::all() as $r) {
+                $r->payout = [
+                    'commission_percentage' => $r->commission_percentage ??
+                        $cs->getCommissionPercentage($r->currency, $r->level),
+                    'pending_limit' => $r->pending_limit ?? $rs->getDefaultPendingLimit($r->level),
+                    'status' => $r->level == Reseller::LEVEL['RESELLER'],
+                ];
+                $r->save();
+            }
+        }
+        if (Schema::hasColumn('resellers', 'pending_limit')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->dropColumn(['pending_limit']);
+            });
+        }
+        if (Schema::hasColumn('resellers', 'commission_percentage')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->dropColumn(['commission_percentage']);
+            });
+        }
+    }
+
+    protected function addPayinPayoutPlayerID()
+    {
+        if (!Schema::hasColumn('merchant_deposits', 'player_id')) {
+            Schema::table('merchant_deposits', function (Blueprint $table) {
+                $table->string('player_id', 40)->after('merchant_order_id')->default(0);
+            });
+        }
+        if (!Schema::hasColumn('merchant_withdrawals', 'player_id')) {
+            Schema::table('merchant_withdrawals', function (Blueprint $table) {
+                $table->string('player_id', 40)->after('merchant_order_id')->default(0);
+            });
+        }
+    }
+
+    protected function addPayoutAutoApproval()
+    {
+        DB::beginTransaction();
+        try {
+            DB::statement("
+                Update payment_channels
+                SET payout = JSON_SET(payout, '$.auto_approval', false)
+            ");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        DB::commit();
+    }
+
+    protected function addAgentLevel()
+    {
+        if (!Schema::hasColumn('resellers', 'uplines')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->json('uplines')->after('upline_id')->default(new Expression('(JSON_ARRAY())'));
+            });
+        }
+        DB::beginTransaction();
+        try {
+            foreach (Reseller::all() as $r) {
+                $uplines = [];
+                $agent = $r->agent;
+                while ($agent) {
+                    array_unshift($uplines, $agent->id);
+                    $agent = $agent->agent;
+                }
+                $r->uplines = $uplines;
+                $r->save();
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        DB::commit();
+    }
+
+    protected function addReportExtra()
+    {
+        if (!Schema::hasColumn('report_daily_resellers', 'extra')) {
+            Schema::table('report_daily_resellers', function (Blueprint $table) {
+                $table->json('extra')->after('coin')->default(new Expression('(JSON_OBJECT())'));
+            });
+        }
+        if (!Schema::hasColumn('report_daily_merchants', 'extra')) {
+            Schema::table('report_daily_merchants', function (Blueprint $table) {
+                $table->json('extra')->after('currency')->default(new Expression('(JSON_OBJECT())'));
+            });
         }
     }
 }

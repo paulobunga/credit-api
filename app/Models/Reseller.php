@@ -2,25 +2,30 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Lumen\Auth\Authorizable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Trait\HasJWTSubject;
+use App\DTO\ResellerPayIn;
+use App\DTO\ResellerPayOut;
 
 class Reseller extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
-    use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
+    use Authenticatable, Authorizable, HasJWTSubject;
     use Notifiable;
 
+    public $pushNotificationType = 'users';
+
     protected $fillable = [
-        'level',
         'upline_id',
+        'uplines',
+        'level',
         'name',
         'username',
         'phone',
@@ -28,8 +33,8 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         'password',
         'credit',
         'coin',
-        'commission_percentage',
-        'pending_limit',
+        'payin',
+        'payout',
         'downline_slot',
         'status',
     ];
@@ -39,7 +44,9 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     ];
 
     protected $casts = [
-        'commission_percentage' => 'float',
+        'uplines' => 'array',
+        'payin' => ResellerPayIn::class,
+        'payout' => ResellerPayOut::class,
         'created_at'  => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
@@ -82,30 +89,30 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         return $this->hasMany(ResellerWithdrawal::class);
     }
 
-    public function transactions()
-    {
-        return $this->morphToMany(Transaction::class, 'model', 'model_has_transactions');
-    }
-
     public function devices()
     {
         return $this->morphMany(Device::class, 'user');
     }
 
-    public function getWithdrawalPendingCreditAttribute()
+    public function getWithdrawalCreditAttribute()
     {
-        return $this->withdrawals()->where([
+        return $this->attributes['credit'] - $this->withdrawals()->where([
             'type' => ResellerWithdrawal::TYPE['CREDIT'],
             'status' => ResellerWithdrawal::STATUS['PENDING']
         ])->sum('amount');
     }
 
-    public function getWithdrawalPendingCoinAttribute()
+    public function getWithdrawalCoinAttribute()
     {
-        return $this->withdrawals()->where([
+        return $this->attributes['coin'] - $this->withdrawals()->where([
             'type' => ResellerWithdrawal::TYPE['COIN'],
             'status' => ResellerWithdrawal::STATUS['PENDING']
         ])->sum('amount');
+    }
+
+    public function getDownlineAttribute()
+    {
+        return Reseller::whereRaw("JSON_CONTAINS(uplines, '{$this->id}')")->count();
     }
 
     public function setPasswordAttribute($value)

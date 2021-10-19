@@ -2,20 +2,17 @@
 
 namespace App\Http\Controllers\Reseller;
 
-use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Models\Transaction;
-use App\Models\ResellerBankCard;
-use App\Models\ResellerWithdrawal;
-use App\DTO\ResellerWithdrawalExtra;
+use App\Http\Controllers\Controller;
+use App\Models\MerchantWithdrawal;
 
 class WithdrawalController extends Controller
 {
-    protected $model = ResellerWithdrawal::class;
+    protected $model = MerchantWithdrawal::class;
 
     protected $transformer = \App\Transformers\Reseller\WithdrawalTransformer::class;
 
@@ -23,6 +20,8 @@ class WithdrawalController extends Controller
     {
         $withdrawals = QueryBuilder::for($this->model)
             ->allowedFilters([
+                AllowedFilter::partial('order_id'),
+                AllowedFilter::partial('amount'),
                 AllowedFilter::callback(
                     'status',
                     function (Builder $query, $v) {
@@ -45,35 +44,76 @@ class WithdrawalController extends Controller
                 'status',
                 'created_at',
             ])
-            ->where('reseller_id', Auth::id())
+            ->where('reseller_id', auth()->id())
             ->paginate($this->perPage);
 
         return $this->response->withPaginator($withdrawals, $this->transformer);
     }
 
-    public function store(Request $request)
+    public function update(Request $request)
     {
-        $this->validate($request, [
-            'card' => 'required|numeric',
-            'amount' => 'required|numeric|min:1',
-        ]);
-        ResellerBankCard::where([
-            'id' => $request->card,
-            'reseller_id' => auth()->id()
-        ])->firstOrFail();
-        if ($request->amount > Auth::user()->coin - Auth::user()->withdrawalPendingCoin) {
-            throw new \Exception('Pending amount exceed coin value', 405);
+        $withdrawal = $this->model::findOrFail($this->parameters('withdrawal'));
+        if ($withdrawal->reseller_id != auth()->id()) {
+            throw new \Exception('Unauthorize', 401);
         }
-        $withdrawal = $this->model::create([
-            'reseller_id' => auth()->id(),
-            'reseller_bank_card_id' => $request->card,
-            'type' => ResellerWithdrawal::TYPE['COIN'],
-            'transaction_type' => Transaction::TYPE['RESELLER_WITHDRAW_COIN'],
-            'amount' => $request->amount,
-            'status' => ResellerWithdrawal::STATUS['PENDING'],
-            'extra' => new ResellerWithdrawalExtra(['creator'=> auth()->id()])
+        if (!in_array($withdrawal->status, [
+            MerchantWithdrawal::STATUS['PENDING']
+        ])) {
+            throw new \Exception('Status is not allowed to update', 401);
+        }
+        $this->validate($request, [
+            'status' => 'required|numeric|in:' . implode(',', [
+                MerchantWithdrawal::STATUS['FINISHED'],
+                MerchantWithdrawal::STATUS['REJECTED'],
+            ]),
+            'slip' => [
+                'required_if:status,' . MerchantWithdrawal::STATUS['FINISHED'],
+                'image',
+            ]
+        ]);
+        if ($request->status == MerchantWithdrawal::STATUS['FINISHED']) {
+            if (Storage::disk('s3')->exists("withdrawals/$withdrawal->order_id")) {
+                throw new \Exception('Slip is already exists!', 405);
+            }
+            $request->file('slip')->storeAs(
+                'withdrawals',
+                $withdrawal->order_id,
+                's3'
+            );
+        }
+        $withdrawal->update([
+            'status' => $request->status,
         ]);
 
         return $this->response->item($withdrawal, $this->transformer);
+    }
+
+    /**
+     * Get slip url of withdrawal
+     *
+     * @method GET
+     *
+     * @return array
+     */
+    public function slip()
+    {
+        $withdrawal = $this->model::findOrFail($this->parameters('withdrawal'));
+        if ($withdrawal->reseller_id != auth()->id()) {
+            throw new \Exception('Unauthorize', 401);
+        }
+        if (!in_array($withdrawal->status, [
+            MerchantWithdrawal::STATUS['FINISHED'],
+            MerchantWithdrawal::STATUS['APPROVED'],
+            MerchantWithdrawal::STATUS['CANCELED']
+        ])) {
+            throw new \Exception('Status is invalid', 401);
+        }
+
+        return response()->json([
+            'message' => 'success',
+            'data' => [
+                'url' => $withdrawal->slipUrl
+            ]
+        ]);
     }
 }

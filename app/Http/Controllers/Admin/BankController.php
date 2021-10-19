@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Exports\BankExport;
 use App\Settings\CurrencySetting;
 
+/**
+ * Controller of CRUD bank
+ * @package App\Http\Controllers\Admin
+ */
 class BankController extends Controller
 {
     protected $model = \App\Models\Bank::class;
@@ -17,7 +20,7 @@ class BankController extends Controller
 
     /**
      * Get bank lists
-     *
+     * @param \Dingo\Api\Http\Request $request HTTP request
      * @return \Dingo\Api\Http\JsonResponse
      */
     public function index(Request $request)

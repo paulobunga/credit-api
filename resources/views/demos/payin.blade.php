@@ -5,7 +5,7 @@
 @section('content')
 <h2 class="font-bold text-lg my-4">Demo Payin</h2>
 <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" x-data="channels" method="post"
-    action="{{ app('api.url')->version(env('API_VERSION'))->route('api.demos.payin.create') }}">
+    action="{{ $action }}">
     <div class="mb-4">
         <label class="block text-gray-700 text-sm font-bold mb-2" for="currency">
             Currency

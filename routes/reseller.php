@@ -23,6 +23,9 @@ $api->group([
         $api->post('/auth/me', ['as' => 'auth.me', 'uses' => 'AuthController@me']);
         $api->put("/auth/update", ['as' => 'auth.update', 'uses' => 'AuthController@update']);
         $api->put("/auth/activate", ['as' => 'auth.activate', 'uses' => 'AuthController@activate']);
+        $api->get('/auth/beam', ['as' => 'auth.beam', 'uses' => 'AuthController@beam']);
+        $api->post('/auth/channel', ['as' => 'auth.channel', 'uses' => 'AuthController@channel']);
+        $api->put('/auth/pay', ['as' => 'auth.pay', 'uses' => 'AuthController@pay']);
 
         $api->resource('activate_codes', 'ActivateCodeController', ['only' => ['index', 'store']]);
 
@@ -37,7 +40,12 @@ $api->group([
 
         $api->resource('payment_channels', 'PaymentChannelController', ['only' => ['index']]);
         
-        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'store']]);
+        $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'update']]);
+        $api->get("/withdrawals/slip/{withdrawal}", [
+            'as' => 'withdrawals.slip', 'uses' => 'WithdrawalController@slip'
+        ]);
+
+        $api->resource('settlements', 'SettlementController', ['only' => ['index', 'store']]);
         
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
         $api->get("/reports/month", ['as' => 'reports.month', 'uses' => 'ReportController@month']);

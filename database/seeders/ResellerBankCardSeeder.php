@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use \Illuminate\Support\Arr;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Database\Seeder;
 use App\Models\Reseller;
 use App\Models\PaymentChannel;
 use App\Models\ResellerBankCard;
@@ -43,7 +42,7 @@ class ResellerBankCardSeeder extends Seeder
                         break;
                     case 'UPI':
                         $attributes = [
-                            'upi_id' =>  Str::random(40) . '@upi'
+                            'upi_id' =>  Str::random(15) . '@upi'
                         ];
                         break;
                     case 'VIETTELPAY':

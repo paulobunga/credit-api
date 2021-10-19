@@ -42,30 +42,6 @@ class BankSeeder extends Seeder
                     'attributes' => ['upi_id']
                 ],
             ],
-            'MOMOPAY' => [
-                'VND' => [
-                    'methods' => [
-                        PaymentChannel::METHOD['QRCODE'],
-                    ],
-                    'attributes' => ['qrcode']
-                ]
-            ],
-            'ZALOPAY' => [
-                'VND' => [
-                    'methods' => [
-                        PaymentChannel::METHOD['QRCODE'],
-                    ],
-                    'attributes' => ['qrcode']
-                ]
-            ],
-            'VIETTELPAY' => [
-                'VND' => [
-                    'methods' => [
-                        PaymentChannel::METHOD['QRCODE'],
-                    ],
-                    'attributes' => ['qrcode']
-                ]
-            ],
         ];
         foreach ($channels as $name => $ch) {
             foreach ($ch as $currency => $s) {
@@ -77,13 +53,14 @@ class BankSeeder extends Seeder
                     'currency' => $currency,
                     'payin' => [
                         'status' => true,
-                        'min' => 500,
+                        'min' => 20,
                         'max' => 50000
                     ],
                     'payout' => [
                         'status' => true,
-                        'min' => 2000,
-                        'max' => 50000
+                        'min' => 20,
+                        'max' => 50000,
+                        'auto_approval' => false
                     ]
                 ]);
             }

@@ -52,23 +52,23 @@ class DepositController extends Controller
 
     public function resend()
     {
-        $deposit = $this->model::where([
+        $m = $this->model::where([
             'id' => $this->parameters('deposit'),
             'merchant_id' => Auth::id()
         ])->firstOrFail();
 
-        $deposit->update([
-            'attempts' => 0,
-            'callback_status' => MerchantDeposit::CALLBACK_STATUS['PENDING'],
-        ]);
+        $m->timestamps = false;
+        $m->attempts = 0;
+        $m->callback_status = $this->model::CALLBACK_STATUS['PENDING'];
+        $m->save();
 
         // push deposit information callback to callback url
         Queue::push((new \App\Jobs\GuzzleJob(
-            $deposit,
+            $m,
             new \App\Transformers\Api\DepositTransformer,
-            $deposit->merchant->api_key
+            $m->merchant->api_key
         )));
 
-        return $this->response->item($deposit, $this->transformer);
+        return $this->response->item($m, $this->transformer);
     }
 }
