@@ -152,6 +152,7 @@ class ReportDaily extends Command
                         COLUMNS(Value INT PATH '$')
                     ) AS agent
             ) AS r ON rbc.reseller_id = r.id
+            WHERE md.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
             GROUP BY reseller_id
         ),
         daily_cashin AS(
@@ -227,6 +228,7 @@ class ReportDaily extends Command
                         COLUMNS(Value INT PATH '$')
                     ) AS agent
             ) AS r ON mw.reseller_id = r.id
+            WHERE mw.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
             GROUP BY reseller_id
         ),
         daily_cashout AS(
@@ -386,7 +388,8 @@ class ReportDaily extends Command
                 COUNT(DISTINCT md.player_id) AS players,
                 md.currency
             FROM merchant_deposits AS md
-            LEFT JOIN payin_transactions AS ct ON md.id = ct.model_id 
+            LEFT JOIN payin_transactions AS ct ON md.id = ct.model_id
+            WHERE md.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
             GROUP BY merchant_id, currency
         ),
         payout_transactions AS (
@@ -427,7 +430,8 @@ class ReportDaily extends Command
                 COUNT(DISTINCT mw.player_id) AS players,
                 mw.currency
             FROM merchant_withdrawals AS mw
-            LEFT JOIN payout_transactions AS ct ON mw.id = ct.model_id 
+            LEFT JOIN payout_transactions AS ct ON mw.id = ct.model_id
+            WHERE mw.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
             GROUP BY merchant_id, currency
         ),
         daily_merchant AS(
