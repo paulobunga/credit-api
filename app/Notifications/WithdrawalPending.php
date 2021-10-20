@@ -21,7 +21,7 @@ class WithdrawalPending extends Base
      */
     protected function getLink(): string
     {
-        return reseller_url('/withdrawals?order_id=' . $this->model->order_id);
+        return reseller_url('/withdrawals?merchant_order_id=' . $this->model->merchant_order_id);
     }
     /**
      * Get data of message
@@ -34,7 +34,7 @@ class WithdrawalPending extends Base
         return [
             'id' => $this->model->id,
             'title' => 'New cash out order',
-            'body' => "You got a new cash out order, {$this->model->order_id}.",
+            'body' => "You got a new cash out order, {$this->model->merchant_order_id}.",
             'time' => $this->model->created_at->toDateTimeString(),
         ];
     }

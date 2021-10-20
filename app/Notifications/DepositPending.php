@@ -21,7 +21,7 @@ class DepositPending extends Base
      */
     protected function getLink(): string
     {
-        return reseller_url('/deposits?order_id=' . $this->model->order_id);
+        return reseller_url('/deposits?merchant_order_id=' . $this->model->merchant_order_id);
     }
     /**
      * Get data of message
@@ -34,7 +34,7 @@ class DepositPending extends Base
         return [
             'id' => $this->model->id,
             'title' => 'New cash in order',
-            'body' => "You got a new cash in order, {$this->model->order_id}.",
+            'body' => "You got a new cash in order, {$this->model->merchant_order_id}.",
             'time' => $this->model->created_at->toDateTimeString(),
         ];
     }
