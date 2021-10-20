@@ -7,20 +7,21 @@ use League\Fractal\TransformerAbstract;
 class MerchantTransformer extends TransformerAbstract
 {
     protected $defaultIncludes = [
-        'credits'
+        'credits',
     ];
 
-    public function transform(Model $merchant)
+    public function transform(Model $m)
     {
         return [
-            'id' => $merchant->id,
-            'uuid' => $merchant->uuid,
-            'name' => $merchant->name,
-            'username' => $merchant->username,
-            'phone' => $merchant->phone,
-            'api_key' => $merchant->api_key,
-            'callback_url' => $merchant->callback_url,
-            'status' => $merchant->status,
+            'id' => $m->id,
+            'uuid' => $m->uuid,
+            'name' => $m->name,
+            'username' => $m->username,
+            'phone' => $m->phone,
+            'api_key' => $m->api_key,
+            'callback_url' => $m->callback_url,
+            'whiteList' => $m->whiteList,
+            'status' => $m->status,
         ];
     }
 
