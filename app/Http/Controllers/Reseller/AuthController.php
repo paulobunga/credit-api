@@ -159,12 +159,16 @@ class AuthController extends Controller
         $this->validate($request, [
             'name' => "required|unique:resellers,name," . auth()->id(),
             'username' => "required|unique:resellers,username," . auth()->id(),
-            'phone' => 'required'
+            'phone' => 'required',
+            'payout_daily_amount_limit' => 'required|numeric|min:1',
         ]);
         auth()->user()->update([
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
+            'payout' => auth()->user()->payout->clone(
+                daily_amount_limit: $request->payout_daily_amount_limit
+            )
         ]);
 
         return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
