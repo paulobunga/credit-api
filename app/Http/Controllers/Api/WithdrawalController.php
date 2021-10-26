@@ -294,44 +294,62 @@ class WithdrawalController extends Controller
         $attributes = $channel->validate($request->all());
 
         $sql = "WITH reseller_channels AS (
-            SELECT
-                r.id AS id,
-                r.currency AS currency,
-                COUNT(DISTINCT md.id) AS payin,
-                COUNT(DISTINCT mw.id) AS payout,
-                r.payout->>'$.pending_limit' AS pending_limit 
-            FROM
-                resellers AS r
-                LEFT JOIN merchant_withdrawals AS mw ON mw.reseller_id = r.id 
-                AND mw.status = :mw_status
-                LEFT JOIN reseller_bank_cards AS rbc ON rbc.reseller_id = r.id
-                LEFT JOIN merchant_deposits AS md ON md.reseller_bank_card_id = rbc.id
-                AND md.status IN (:md_status) AND md.updated_at BETWEEN :md_start AND :md_end
-            WHERE
-                r.currency = '{$request->currency}'
-                AND r.STATUS = :r_status
-                AND r.payout->>'$.status' = :r_payout_status
-                AND r.LEVEL = :r_level
-                GROUP BY r.id
-            )
-            SELECT
-                * 
-            FROM
-                reseller_channels
-            WHERE payout < pending_limit 
-            ORDER BY payout ASC, payin DESC";
+                SELECT
+                    r.id AS id,
+                    r.currency AS currency,
+                    COUNT(DISTINCT md.id) AS payin,
+                    COUNT(DISTINCT mw.id) AS payout,
+                    r.payout->>'$.pending_limit' AS pending_limit,
+                    r.payout->>'$.daily_amount_limit' AS daily_amount_limit 
+                FROM
+                    resellers AS r
+                    LEFT JOIN merchant_withdrawals AS mw ON mw.reseller_id = r.id 
+                    AND mw.status = :mw_status
+                    LEFT JOIN reseller_bank_cards AS rbc ON rbc.reseller_id = r.id
+                    LEFT JOIN merchant_deposits AS md ON md.reseller_bank_card_id = rbc.id
+                    AND md.status IN (:md_status_0, :md_status_1) 
+                    AND md.updated_at BETWEEN :md_start AND :md_end
+                WHERE
+                    r.currency = '{$request->currency}'
+                    AND r.STATUS = :r_status
+                    AND r.payout->>'$.status' = :r_payout_status
+                    AND r.LEVEL = :r_level
+                    GROUP BY r.id
+                ),
+                reseller_daily AS (
+                SELECT 
+                    rc.*,
+                    SUM(mw.amount) AS daily_amount
+                FROM 
+                    reseller_channels AS rc
+                    LEFT JOIN merchant_withdrawals AS mw 
+                    ON rc.id = mw.reseller_id 
+                    AND mw.status IN (:mw_daily_status_0, :mw_daily_status_1)
+                    AND mw.created_at BETWEEN :mw_daily_start AND :mw_daily_end
+                    GROUP BY rc.id
+                )
+                SELECT
+                    * 
+                FROM
+                    reseller_daily
+                WHERE 
+                    payout < pending_limit 
+                    AND daily_amount + {$request->amount} <= daily_amount_limit
+                ORDER BY payout ASC, payin DESC";
         // dd($sql);
         $resellers = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
             'r_level' => Reseller::LEVEL['RESELLER'],
             'r_payout_status' => ResellerPayOut::STATUS['ACTIVE'],
             'mw_status' => MerchantWithdrawal::STATUS['PENDING'],
-            'md_status' => implode(',', [
-                MerchantDeposit::STATUS['APPROVED'],
-                MerchantDeposit::STATUS['ENFORCED']
-            ]),
+            'md_status_0' => MerchantDeposit::STATUS['APPROVED'],
+            'md_status_1' => MerchantDeposit::STATUS['ENFORCED'],
             'md_start' => Carbon::now()->subHours(24),
             'md_end' => Carbon::now(),
+            'mw_daily_status_0' => MerchantWithdrawal::STATUS['PENDING'],
+            'mw_daily_status_1' => MerchantWithdrawal::STATUS['APPROVED'],
+            'mw_daily_start' => Carbon::now()->startOfDay(),
+            'mw_daily_end' => Carbon::now()->endOfDay(),
         ]);
         // dd($resellers);
         if (empty($resellers)) {

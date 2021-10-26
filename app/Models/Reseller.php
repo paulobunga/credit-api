@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
@@ -72,11 +71,6 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     public function agent()
     {
         return $this->belongsTo(Reseller::class, 'upline_id', 'id');
-    }
-
-    public function getMasterAgent()
-    {
-        return $this->agent->agent ?? null;
     }
 
     public function deposits()
