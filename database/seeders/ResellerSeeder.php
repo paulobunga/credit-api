@@ -24,17 +24,20 @@ class ResellerSeeder extends Seeder
     public function run(
         ResellerSetting $rs,
         AgentSetting $as,
-        CurrencySetting $c
+        CurrencySetting $c,
+        Reseller $agent
     ) {
         // create 4 level agent
         foreach ($c->currency as $currency => $setting) {
             foreach (Reseller::LEVEL as $level) {
-                $r = Reseller::create([
+                $agent = Reseller::create([
                     'name' => $this->getName($currency, $level),
                     'username' => $this->getUserName($currency, $level),
                     'phone' => $this->faker->phoneNumber,
-                    'upline_id' => $level == Reseller::LEVEL['REFERRER'] ? 0 : $r->id,
-                    'uplines' => $level == Reseller::LEVEL['REFERRER'] ? [] : array_merge($r->uplines, [$r->id]),
+                    'upline_id' => $level == Reseller::LEVEL['REFERRER'] ? 0 : $agent->id,
+                    'uplines' => $level == Reseller::LEVEL['REFERRER'] ?
+                        [] :
+                        array_merge($agent->uplines, [$agent->id]),
                     'level' =>  $level,
                     'currency' => $currency,
                     'credit' => 0,
@@ -46,7 +49,8 @@ class ResellerSeeder extends Seeder
                     'payout' => [
                         'commission_percentage' => $c->getCommissionPercentage($currency, $level),
                         'pending_limit' => $rs->getDefaultPendingLimit($level),
-                        'status' => true
+                        'status' => true,
+                        'daily_amount_limit' => 50000,
                     ],
                     'downline_slot' => $as->getDefaultDownLineSlot($level),
                     'status' => Reseller::STATUS['ACTIVE'],
@@ -79,6 +83,7 @@ class ResellerSeeder extends Seeder
                 'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['RESELLER']),
                 'pending_limit' => $rs->default_pending_limit,
                 'status' => true,
+                'daily_amount_limit' => 50000,
             ],
             'downline_slot' => 0,
             'status' => true,
@@ -106,9 +111,10 @@ class ResellerSeeder extends Seeder
     protected function getName($currency, $level)
     {
         $name = '';
+        $currency = strtolower($currency);
         switch ($level) {
             case Reseller::LEVEL['REFERRER']:
-                $name = 'Home';
+                $name = 'House';
                 break;
             case Reseller::LEVEL['AGENT_MASTER']:
                 $name = 'Super Agent';
@@ -125,9 +131,10 @@ class ResellerSeeder extends Seeder
 
     protected function getUserName($currency, $level)
     {
+        $currency = strtolower($currency);
         switch ($level) {
             case Reseller::LEVEL['REFERRER']:
-                return  "{$currency}_home@gmail.com";
+                return  "{$currency}_house@gmail.com";
             case Reseller::LEVEL['AGENT_MASTER']:
                 return  "{$currency}_super_agent@gmail.com";
             case Reseller::LEVEL['AGENT']:

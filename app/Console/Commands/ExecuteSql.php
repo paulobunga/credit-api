@@ -331,4 +331,19 @@ class ExecuteSql extends Command
             });
         }
     }
+
+    protected function addResellersPayoutDailyAmount()
+    {
+        DB::beginTransaction();
+        try {
+            DB::statement("
+                Update resellers
+                SET payout = JSON_SET(payout, '$.daily_amount_limit', 50000)
+            ");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        DB::commit();
+    }
 }
