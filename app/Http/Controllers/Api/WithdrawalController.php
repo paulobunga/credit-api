@@ -319,7 +319,7 @@ class WithdrawalController extends Controller
                 reseller_daily AS (
                 SELECT 
                     rc.*,
-                    SUM(mw.amount) AS daily_amount
+                    COALESCE(SUM(mw.amount),0) AS daily_amount
                 FROM 
                     reseller_channels AS rc
                     LEFT JOIN merchant_withdrawals AS mw 
