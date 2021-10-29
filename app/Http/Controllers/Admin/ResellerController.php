@@ -113,7 +113,8 @@ class ResellerController extends Controller
                     $request->level
                 ),
                 'pending_limit' => $reseller_setting->getDefaultPendingLimit($request->level),
-                'status' => true
+                'status' => true,
+                'daily_amount_limit' => 50000,
             ],
             'downline_slot' => $agent_setting->getDefaultDownLineSlot($request->level),
             'status' => ($request->level == Reseller::LEVEL['RESELLER']) ?
