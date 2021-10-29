@@ -97,7 +97,8 @@ class AuthController extends Controller
                     Reseller::LEVEL['RESELLER']
                 ),
                 'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
-                'status' => true
+                'status' => true,
+                'daily_amount_limit' => 50000,
             ],
             'downline_slot' => $agent_setting->getDefaultDownLineSlot(Reseller::LEVEL['RESELLER']),
             'status' =>  Reseller::STATUS['INACTIVE']
