@@ -47,17 +47,28 @@ class ResellerBankCardController extends Controller
         return $this->response->withPaginator($reseller_bank_card, $this->transformer);
     }
 
+        
+    /**
+     * update bank card of agent
+     *
+     * @param \Dingo\Api\Http\Request $request
+     *
+     * @return json
+     */
     public function update(Request $request)
     {
         $reseller_bank_card = $this->model::findOrFail($this->parameters('reseller_bank_card'));
         $this->validate($request, [
-            'attributes' => "required",
+            'attributes' => "required|array",
             'status' => 'required|in:' . implode(',', ResellerBankCard::STATUS),
         ]);
-        // if (!in_array($request->bank_id, $reseller_bank_card->paymentChannel->banks->pluck('id')->toArray())) {
-        //     throw new \Exception('Bank is not supported for current payment channel', 405);
-        // }
-
+        $attributes = $reseller_bank_card->paymentChannel->validate($request->get('attributes'));
+        ResellerBankCard::validateAttribute(
+            $reseller_bank_card->paymentChannel->name,
+            $reseller_bank_card->reseller->currency,
+            $attributes,
+            $reseller_bank_card->id
+        );
         $reseller_bank_card->update([
             'status' => $request->status,
             'attributes' => $request->get('attributes')

@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Observers\ResellerBankCardObserver;
 
 class ResellerBankCard extends Model
 {
+    use ResellerBankCardObserver;
+    
     protected $fillable = [
         'reseller_id',
         'payment_channel_id',
