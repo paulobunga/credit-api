@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Reseller;
 
-use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\Auth;
+use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\ResellerBankCard;
+use App\Http\Controllers\Controller;
 
 class BankCardController extends Controller
 {
@@ -33,19 +33,27 @@ class BankCardController extends Controller
         return $this->response->withPaginator($bankcards, $this->transformer);
     }
 
+    /**
+     * agent create own bank card
+     *
+     * @param  \Dingo\Api\Http\RequestRequest $request
+     *
+     * @return json
+     */
     public function store(Request $request)
     {
         $this->validate($request, [
             'channel' => 'required',
             'attributes' => 'required|array'
         ]);
-
+        $currency = auth()->user()->currency;
         $payment_channel = \App\Models\PaymentChannel::where('name', $request->channel)
-            ->where('currency', Auth::user()->currency)
+            ->where('currency', $currency)
             ->firstOrFail();
         $attributes = $payment_channel->validate($request->get('attributes'));
+        ResellerBankCard::validateAttribute($request->channel, $currency, $attributes);
         $bankcard = $this->model::create([
-            'reseller_id' => Auth::id(),
+            'reseller_id' => auth()->id(),
             'payment_channel_id' => $payment_channel->id,
             'attributes' => $attributes,
             'status' => ResellerBankCard::STATUS['INACTIVE']
@@ -58,13 +66,19 @@ class BankCardController extends Controller
     {
         $bankcard = $this->model::with('paymentChannel')->where([
             'id' => $this->parameters('bankcard'),
-            'reseller_id' => Auth::id()
+            'reseller_id' => auth()->id()
         ])->firstOrFail();
 
         $this->validate($request, [
             'attributes' => 'required|array'
         ]);
         $attributes = $bankcard->paymentChannel->validate($request->get('attributes'));
+        ResellerBankCard::validateAttribute(
+            $bankcard->paymentChannel->name,
+            auth()->user()->currency,
+            $attributes,
+            $bankcard->id
+        );
         $bankcard->update([
             'attributes' => $attributes,
         ]);
