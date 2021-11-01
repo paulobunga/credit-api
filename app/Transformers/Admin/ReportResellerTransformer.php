@@ -7,17 +7,19 @@ use League\Fractal\TransformerAbstract;
 
 class ReportResellerTransformer extends TransformerAbstract
 {
-    public function transform(Model $report)
+    public function transform(Model $m)
     {
         return [
-            'id' => $report->id,
-            'name' => $report->reseller->name,
-            'start_at' => $report->start_at,
-            'end_at' => $report->end_at,
-            'turnover' => $report->turnover,
-            'credit' => $report->credit,
-            'coin' => $report->coin,
-            'currency' => $report->reseller->currency,
+            'id' => $m->id,
+            'name' => $m->reseller->name,
+            'start_at' => $m->start_at,
+            'end_at' => $m->end_at,
+            'turnover' => $m->turnover,
+            'credit' => $m->credit,
+            'coin' => $m->coin,
+            'cashin' => $m->extra['cashin'],
+            'cashout' => $m->extra['cashout'],
+            'currency' => $m->reseller->currency,
         ];
     }
 }
