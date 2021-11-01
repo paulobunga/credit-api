@@ -16,6 +16,8 @@ class ReportMerchantTransformer extends TransformerAbstract
             'turnover' => $m->turnover,
             'credit' => $m->credit,
             'transaction_fee' => $m->transaction_fee,
+            'payin' => $m->extra['payin'],
+            'payout' => $m->extra['payout'],
             'currency' => $m->currency
         ];
     }

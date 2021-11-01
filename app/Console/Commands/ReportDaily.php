@@ -376,7 +376,8 @@ class ReportDaily extends Command
                 COUNT(DISTINCT md.id) AS turnover,
                 COALESCE(SUM(CASE WHEN md.status in (
                     {$this->deposit_status['APPROVED']},
-                    {$this->deposit_status['ENFORCED']}
+                    {$this->deposit_status['ENFORCED']},
+                    {$this->deposit_status['MAKEUP']}
                 ) THEN 1 END),0) AS success,
                 COALESCE(SUM(CASE WHEN md.status in (
                     {$this->deposit_status['REJECTED']},
