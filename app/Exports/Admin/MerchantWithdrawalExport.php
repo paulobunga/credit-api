@@ -10,7 +10,7 @@ class MerchantWithdrawalExport extends Base
      * Definition of filename
      * Attributes need to be overwritten
      */
-    protected $fileName = 'merchant_deposit.xlsx';
+    protected $fileName = 'merchant_withdrawal.xlsx';
 
     /**
      * Definition of heading and corresponding column name
@@ -18,11 +18,16 @@ class MerchantWithdrawalExport extends Base
      */
     protected $fields = [
         'id' => 'Id',
-        'name' => 'Name',
         'order_id' => 'Order id',
+        'merchant_order_id' => 'Merchant order id',
+        'merchant_name' => 'Merchant name',
+        'reseller_name' => 'Agent name',
+        'attributes' => 'Attributes',
         'amount' => 'Amount',
         'currency' => 'Currency',
         'status' => 'Status',
+        'created_at' => 'Created time',
+        'updated_at' => 'Updated time',
     ];
 
     /**
@@ -35,6 +40,8 @@ class MerchantWithdrawalExport extends Base
     protected function transform(mixed $model, String $key, mixed $val): String
     {
         switch ($key) {
+            case 'attributes':
+                return json_encode($model->attributes);
             case 'status':
                 return $model->statusText;
             default:

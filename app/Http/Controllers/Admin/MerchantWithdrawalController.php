@@ -19,13 +19,16 @@ class MerchantWithdrawalController extends Controller
     public function index(Request $request)
     {
         $merchant_withdrawals = QueryBuilder::for($this->model)
-            ->with([
-                'merchant'
-            ])
+            ->with(['merchant', 'reseller', 'paymentChannel'])
             ->join('merchants', 'merchants.id', '=', 'merchant_withdrawals.merchant_id')
             ->join('resellers', 'resellers.id', '=', 'merchant_withdrawals.reseller_id')
             ->join('payment_channels', 'payment_channels.id', '=', 'merchant_withdrawals.payment_channel_id')
-            ->select('merchant_withdrawals.*', 'merchants.name')
+            ->select(
+                'merchant_withdrawals.*',
+                'merchants.name AS merchant_name',
+                'resellers.name AS reseller_name',
+                'payment_channels.name AS channel'
+            )
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('order_id'),
@@ -45,11 +48,15 @@ class MerchantWithdrawalController extends Controller
             ])
             ->allowedSorts([
                 'id',
-                'name',
                 'order_id',
+                'merchant_order_id',
+                'merchant_name',
+                'reseller_name',
                 'amount',
                 'currency',
-                'status'
+                'status',
+                'created_at',
+                'updated_at',
             ]);
 
         return $this->paginate($merchant_withdrawals, $this->transformer);
