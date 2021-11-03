@@ -24,6 +24,7 @@ class MerchantWithdrawalTransformer extends TransformerAbstract
             'amount' => $m->amount,
             'currency' => $m->currency,
             'status' => $m->status,
+            'extra' => $m->extra,
             'callback_url' => $m->callback_url,
             'attempts' => $m->attempts,
             'callback_status' => $m->callback_status,

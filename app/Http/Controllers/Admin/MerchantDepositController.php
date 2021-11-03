@@ -88,18 +88,28 @@ class MerchantDepositController extends Controller
                 MerchantDeposit::STATUS['ENFORCED'],
                 MerchantDeposit::STATUS['CANCELED'],
             ]),
+            'reference_id' => 'required_if:status,' . MerchantDeposit::STATUS['ENFORCED'],
         ]);
-
-        $m->update([
-            'status' => $request->status,
-            'extra' => [
-                'admin_id' => $request->admin_id
-            ]
-        ]);
+        if ($request->status == MerchantDeposit::STATUS['ENFORCED']) {
+            $m->update([
+                'status' => $request->status,
+                'extra' => [
+                    'admin_id' => $request->admin_id,
+                    'reference_id' => $request->reference_id
+                ]
+            ]);
+        } else {
+            $m->update([
+                'status' => $request->status,
+                'extra' => [
+                    'admin_id' => $request->admin_id
+                ]
+            ]);
+        }
 
         return $this->response->item($m, $this->transformer);
     }
-    
+
     /**
      * Resend callback to merchant
      *
