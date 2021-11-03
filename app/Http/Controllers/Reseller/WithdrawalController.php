@@ -69,7 +69,8 @@ class WithdrawalController extends Controller
             'slip' => [
                 'required_if:status,' . MerchantWithdrawal::STATUS['FINISHED'],
                 'image',
-            ]
+            ],
+            'reference_id' => 'required_if:status,' . MerchantWithdrawal::STATUS['FINISHED'],
         ]);
         if ($request->status == MerchantWithdrawal::STATUS['FINISHED']) {
             if (Storage::disk('s3')->exists("withdrawals/$withdrawal->order_id")) {
@@ -80,10 +81,15 @@ class WithdrawalController extends Controller
                 $withdrawal->order_id,
                 's3'
             );
+            $withdrawal->update([
+                'status' => $request->status,
+                'extra' => $withdrawal->extra + ['reference_id' => $request->reference_id]
+            ]);
+        } else {
+            $withdrawal->update([
+                'status' => $request->status,
+            ]);
         }
-        $withdrawal->update([
-            'status' => $request->status,
-        ]);
 
         return $this->response->item($withdrawal, $this->transformer);
     }

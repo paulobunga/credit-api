@@ -6,8 +6,11 @@ use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use App\Models\Reseller;
 use App\Models\PaymentChannel;
 use App\Models\ResellerDeposit;
@@ -345,5 +348,17 @@ class ExecuteSql extends Command
             throw $e;
         }
         DB::commit();
+    }
+
+    protected function reportRegenerate($start_date, $end_date = null)
+    {
+        DB::statement('TRUNCATE TABLE report_daily_merchants');
+        DB::statement('TRUNCATE TABLE report_daily_resellers');
+        $end_date ??= Carbon::yesterday()->toDateString();
+        $periods = CarbonPeriod::create($start_date, $end_date);
+        foreach ($periods as $date) {
+            $this->info($date->format('Y-m-d'));
+            Artisan::call("report:daily {$date->format('Y-m-d')}");
+        }
     }
 }
