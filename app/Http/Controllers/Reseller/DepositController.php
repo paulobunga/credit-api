@@ -89,11 +89,19 @@ class DepositController extends Controller
                 MerchantDeposit::STATUS['APPROVED'],
                 MerchantDeposit::STATUS['REJECTED'],
             ]),
+            'reference_id' => 'required_if:status,' . MerchantDeposit::STATUS['APPROVED'],
         ]);
 
-        $deposit->update([
-            'status' => $request->status,
-        ]);
+        if ($request->status == MerchantDeposit::STATUS['APPROVED']) {
+            $deposit->update([
+                'status' => $request->status,
+                'extra' => $deposit->extra + ['reference_id' => $request->reference_id]
+            ]);
+        } else {
+            $deposit->update([
+                'status' => $request->status,
+            ]);
+        }
 
         return $this->response->item($deposit, $this->transformer);
     }
