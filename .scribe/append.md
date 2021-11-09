@@ -6,6 +6,7 @@
 |:--------|
 |VND      |
 |INR      |
+|BDT      |
 
 ## Payment Channel List
 
