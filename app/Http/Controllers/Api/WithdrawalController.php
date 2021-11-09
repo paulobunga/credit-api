@@ -394,11 +394,8 @@ class WithdrawalController extends Controller
             case MerchantWithdrawal::STATUS['PENDING']:
                 $steps[] = ['label' => 'Confirm', 'status' => 0];
                 break;
-            case MerchantWithdrawal::STATUS['EXPIRED']:
-                $steps[] = ['label' => 'Confirm', 'status' => 0];
-                break;
             case MerchantWithdrawal::STATUS['APPROVED']:
-            case MerchantWithdrawal::STATUS['ENFORCED']:
+            case MerchantWithdrawal::STATUS['FINISHED']:
                 $steps[] = ['label' => 'Confirm', 'status' => 2];
                 break;
             case MerchantWithdrawal::STATUS['REJECTED']:

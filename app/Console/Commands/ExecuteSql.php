@@ -361,4 +361,82 @@ class ExecuteSql extends Command
             Artisan::call("report:daily {$date->format('Y-m-d')}");
         }
     }
+
+    protected function addBDTCurrencyAndPaymentChannel()
+    {
+        $cs = app(\App\Settings\CurrencySetting::class);
+        $currency = array_merge($cs->currency, [
+            'BDT' => [
+                'referrer_percentage' => 0,
+                'master_agent_percentage' => 0.003,
+                'agent_percentage' => 0.004,
+                'reseller_percentage' => 0.005,
+                'transaction_fee_percentage' => 0.001,
+                'expired_minutes' => 5,
+            ]
+        ]);
+        $cs->currency = $currency;
+        $cs->save();
+        $cs->refresh();
+        $channels = [
+            'BKASH' => [
+                'BDT' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['wallet_number']
+                ],
+            ],
+            'NAGAD' => [
+                'BDT' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['wallet_number']
+                ],
+            ],
+            'ROCKET' => [
+                'BDT' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['wallet_number']
+                ],
+            ],
+            'UPAY' => [
+                'BDT' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['wallet_number']
+                ],
+            ],
+        ];
+        foreach ($channels as $name => $ch) {
+            foreach ($ch as $currency => $s) {
+                PaymentChannel::firstOrCreate(
+                    [
+                        'name' => $name,
+                        'currency' => $currency,
+                    ],
+                    [
+                        'payment_methods' => implode(',', $s['methods']),
+                        'attributes' => $s['attributes'],
+                        'banks' => implode(',', $s['banks'] ?? []),
+                        'payin' => [
+                            'status' => false,
+                            'min' => 500,
+                            'max' => 30000
+                        ],
+                        'payout' => [
+                            'status' => true,
+                            'min' => 500,
+                            'max' => 30000,
+                            'auto_approval' => false
+                        ]
+                    ]
+                );
+            }
+        }
+    }
 }

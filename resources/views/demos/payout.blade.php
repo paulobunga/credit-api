@@ -92,6 +92,50 @@
                 x-bind:disabled="!(currency=='INR' && channel=='UPI')" />
         </div>
     </div>
+    <!-- BDT BKASH -->
+    <div x-show="currency=='BDT' && channel=='BKASH'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="wallet_number">
+                Wallet Number
+            </label>
+            <input name="wallet_number"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='BDT' && channel=='BKASH')" />
+        </div>
+    </div>
+    <!-- BDT NAGAD -->
+    <div x-show="currency=='BDT' && channel=='NAGAD'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="wallet_number">
+                Wallet Number
+            </label>
+            <input name="wallet_number"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='BDT' && channel=='NAGAD')" />
+        </div>
+    </div>
+    <!-- BDT ROCKET -->
+    <div x-show="currency=='BDT' && channel=='ROCKET'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="wallet_number">
+                Wallet Number
+            </label>
+            <input name="wallet_number"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='BDT' && channel=='ROCKET')" />
+        </div>
+    </div>
+    <!-- BDT UPAY -->
+    <div x-show="currency=='BDT' && channel=='UPAY'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="wallet_number">
+                Wallet Number
+            </label>
+            <input name="wallet_number"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='BDT' && channel=='UPAY')" />
+        </div>
+    </div>
     <div class="mb-6">
         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grip-amount">
             Amount
