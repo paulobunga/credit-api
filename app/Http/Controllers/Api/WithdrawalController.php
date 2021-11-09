@@ -203,6 +203,26 @@ class WithdrawalController extends Controller
      * <td>NETBANK</td>
      * <td>account_number,account_name,bank_name</td>
      * </tr>
+     * <tr>
+     * <td>BDT</td>
+     * <td>BKASH</td>
+     * <td>wallet_number</td>
+     * </tr>
+     * <tr>
+     * <td>BDT</td>
+     * <td>NAGAD</td>
+     * <td>wallet_number</td>
+     * </tr>
+     * <tr>
+     * <td>BDT</td>
+     * <td>ROCKET</td>
+     * <td>wallet_number</td>
+     * </tr>
+     * <tr>
+     * <td>BDT</td>
+     * <td>UPAY</td>
+     * <td>wallet_number</td>
+     * </tr>
      * </table>
      *
      * @authenticated
