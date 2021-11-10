@@ -176,22 +176,32 @@ class MerchantController extends Controller
     }
 
     /**
-     * Update merchant multi currency transaction fee via id
+     * Update merchant transaction fee or Add new currency via id
      *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @param \Dingo\Api\Http\Request
+     * @method PUT
+     *
+     * @return json
      */
     public function fee(Request $request)
     {
         $merchant = $this->model::findOrFail($this->parameters('merchant'));
         $this->validate($request, [
             'currency' => 'required|array',
-            'currency.*.currency' => 'required|distinct',
+            'currency.*.currency' => 'required|distinct|in:' .
+                implode(',', array_keys(app(\App\Settings\CurrencySetting::class)->currency)),
             'currency.*.transaction_fee' => 'required|numeric',
         ]);
         foreach ($request->currency as $c) {
-            MerchantCredit::where('currency', $c['currency'])
-                ->where('merchant_id', $merchant->id)
-                ->update(['transaction_fee' => $c['transaction_fee']]);
+            MerchantCredit::updateOrCreate(
+                [
+                    'merchant_id' => $merchant->id,
+                    'currency' => $c['currency']
+                ],
+                [
+                    'transaction_fee' => $c['transaction_fee']
+                ]
+            );
         }
 
         return $this->response->item($merchant, $this->transformer);
