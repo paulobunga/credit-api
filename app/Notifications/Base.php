@@ -5,12 +5,13 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use App\Channels\PusherBeams\PusherBeams;
 use App\Channels\PusherBeams\PusherMessage;
 
-abstract class Base extends Notification implements ShouldBroadcast
+abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
 {
     use Queueable;
 
