@@ -22,7 +22,7 @@
         </label>
         <select name="channel" x-model="channel"
             class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-            <template x-for="c in getChannels">
+            <template x-for="c in channelFilter">
                 <option x-bind:val="c.name" x-text="c.name"></option>
             </template>
         </select>
@@ -49,9 +49,11 @@
             <label class="block text-gray-700 text-sm font-bold mb-2" for="bank_name">
                 Bank name
             </label>
-            <input name="bank_name"
-                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                x-bind:disabled="!(currency=='VND' && channel=='NETBANK')" />
+            <select name="bank_name" x-model="bank_name" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+              <template x-for="b in bankFilter">
+                  <option x-bind:val="b.name" x-text="b.name"></option>
+              </template>
+            </select>
         </div>
     </div>
     <!-- INR NETBANK -->
@@ -158,14 +160,21 @@
         Alpine.data('channels', ()=>({
             currency: '{{ $channels[0]["currency"]??'' }}',
             channel: '{{ $channels[0]["name"]??'' }}',
+            bank_name: '{{ $banks[0]["name"]??'' }}',
             _channels: @json($channels),
+            _banks: @json($banks),
+            channelFilter: [],
+            bankFilter: [],
             getChannels(){
-                return this._channels.filter(channel=>channel.currency == this.currency);
+              this.channelFilter = this._channels.filter(channel=>channel.currency == this.currency);
+              this.bankFilter = this._banks.filter(bank=>bank.currency == this.currency);
             },
             init(){
-                this.$watch('currency', (value) => {
-                    this.channel = this.getChannels()[0].name;
-                })
+              this.getChannels();
+              this.$watch('currency', (value) => {
+                this.channel = this.channelFilter[0].name;
+                this.bank_name = this.bankFilter[0].name;
+              })
             }
         }));
     });
