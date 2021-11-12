@@ -168,13 +168,11 @@
             getChannels(){
               this.channelFilter = this._channels.filter(channel=>channel.currency == this.currency);
               this.bankFilter = this._banks.filter(bank=>bank.currency == this.currency);
+              this.channel = this.channelFilter[0].name;
+              this.bank_name = this.bankFilter[0].name;
             },
             init(){
               this.getChannels();
-              this.$watch('currency', (value) => {
-                this.channel = this.channelFilter[0].name;
-                this.bank_name = this.bankFilter[0].name;
-              })
             }
         }));
     });
