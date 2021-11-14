@@ -3,15 +3,13 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class RoleOrPermissionMiddleware
 {
     public function handle($request, Closure $next, $roleOrPermission, $guard = null)
     {
-        $authGuard = Auth::guard($guard);
+        $authGuard = auth()->guard($guard);
         if ($authGuard->guest()) {
             throw UnauthorizedException::notLoggedIn();
         }

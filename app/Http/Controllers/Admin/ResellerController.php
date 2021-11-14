@@ -283,19 +283,19 @@ class ResellerController extends Controller
 
     /**
      * Make up agent pay in order
-     * @param \Dingo\Api\Http\Request
-     * @return \Dingo\Api\Http\JsonResponse
+     * @param \Dingo\Api\Http\Request $request
+     * @return json
      */
     public function makeUp(Request $request)
     {
         $m = $this->model::findOrFail($this->parameters('reseller'));
         $this->validate($request, [
-            'merchant_id' => 'required',
+            'merchant_id' => 'required|exists:merchants,id',
             'reseller_bank_card_id' => 'required',
             'method' => 'required',
-            'amount' => 'required|numeric'
+            'amount' => 'required|numeric',
+            'reference_id' => 'required'
         ]);
-        $merchant = Merchant::findOrFail($request->merchant_id);
         $reseller_bank_card = ResellerBankCard::where([
             'reseller_id' => $m->id,
             'id' => $request->reseller_bank_card_id,
@@ -312,7 +312,12 @@ class ResellerController extends Controller
             'amount' => $request->amount,
             'currency' => $m->currency,
             'status' => MerchantDeposit::STATUS['MAKEUP'],
-            'callback_url' => $merchant->callback_url,
+            'callback_url' => '',
+            'callback_status' => MerchantDeposit::CALLBACK_STATUS['FINISH'],
+            'extra' => [
+                'admin_id' => auth()->id(),
+                'reference_id' => $request->reference_id
+            ]
         ]);
 
         return $this->success();

@@ -203,6 +203,26 @@ class WithdrawalController extends Controller
      * <td>NETBANK</td>
      * <td>account_number,account_name,bank_name</td>
      * </tr>
+     * <tr>
+     * <td>BDT</td>
+     * <td>BKASH</td>
+     * <td>wallet_number</td>
+     * </tr>
+     * <tr>
+     * <td>BDT</td>
+     * <td>NAGAD</td>
+     * <td>wallet_number</td>
+     * </tr>
+     * <tr>
+     * <td>BDT</td>
+     * <td>ROCKET</td>
+     * <td>wallet_number</td>
+     * </tr>
+     * <tr>
+     * <td>BDT</td>
+     * <td>UPAY</td>
+     * <td>wallet_number</td>
+     * </tr>
      * </table>
      *
      * @authenticated
@@ -394,11 +414,8 @@ class WithdrawalController extends Controller
             case MerchantWithdrawal::STATUS['PENDING']:
                 $steps[] = ['label' => 'Confirm', 'status' => 0];
                 break;
-            case MerchantWithdrawal::STATUS['EXPIRED']:
-                $steps[] = ['label' => 'Confirm', 'status' => 0];
-                break;
             case MerchantWithdrawal::STATUS['APPROVED']:
-            case MerchantWithdrawal::STATUS['ENFORCED']:
+            case MerchantWithdrawal::STATUS['FINISHED']:
                 $steps[] = ['label' => 'Confirm', 'status' => 2];
                 break;
             case MerchantWithdrawal::STATUS['REJECTED']:

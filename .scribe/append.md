@@ -6,6 +6,7 @@
 |:--------|
 |VND      |
 |INR      |
+|BDT      |
 
 ## Payment Channel List
 
@@ -24,3 +25,7 @@
 |VND       |NETBANK    |2000  |50000 |
 |INR       |UPI        |2000  |50000 |
 |INR       |NETBANK    |2000  |50000 |
+|BDT       |BKASH      |500   |30000 |
+|BDT       |NAGAD      |500   |30000 |
+|BDT       |ROCKET     |500   |30000 |
+|BDT       |UPAY       |500   |30000 |

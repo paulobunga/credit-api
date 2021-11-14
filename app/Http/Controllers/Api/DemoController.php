@@ -10,6 +10,7 @@ use Dingo\Api\Http\Request;
 use App\Trait\SignValidator;
 use App\Models\Merchant;
 use App\Models\PaymentChannel;
+use App\Models\Bank;
 
 /**
  * Demo endpoint
@@ -135,8 +136,10 @@ class DemoController extends Controller
                             'methods' => $c->payment_methods,
                         ];
                     });
+                $banks = Bank::select('id', 'name', 'currency')->where('status', 1)->get();
+
                 $action = '/' . app('api.router')->current()->getPath();
-                return view('demos.payout', compact('merchant', 'currency', 'channels', 'action'));
+                return view('demos.payout', compact('merchant', 'currency', 'channels', 'banks', 'action'));
         }
         throw new \Exception('invalid request', 405);
     }

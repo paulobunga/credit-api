@@ -42,6 +42,38 @@ class BankSeeder extends Seeder
                     'attributes' => ['upi_id']
                 ],
             ],
+            'BKASH' => [
+                'BDT' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['wallet_number']
+                ],
+            ],
+            'NAGAD' => [
+                'BDT' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['wallet_number']
+                ],
+            ],
+            'ROCKET' => [
+                'BDT' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['wallet_number']
+                ],
+            ],
+            'UPAY' => [
+                'BDT' => [
+                    'methods' => [
+                        PaymentChannel::METHOD['QRCODE'],
+                    ],
+                    'attributes' => ['wallet_number']
+                ],
+            ],
         ];
         foreach ($channels as $name => $ch) {
             foreach ($ch as $currency => $s) {

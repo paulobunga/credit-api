@@ -27,18 +27,15 @@ class MerchantSeeder extends Seeder
             'status' => true,
         ]);
         $merchant->whiteList()->create([
-            'api' => ['172.28.0.1'],
-            'backend' => ['172.28.0.1']
+            'api' => ['172.19.0.1'],
+            'backend' => ['172.19.0.1']
         ]);
-        $merchant->credits()->create([
-            'currency' => 'INR',
-            'credit' => 0,
-            'transaction_fee' => 0.001
-        ]);
-        $merchant->credits()->create([
-            'currency' => 'VND',
-            'credit' => 0,
-            'transaction_fee' => 0.001
-        ]);
+        foreach ($c->currency as $currency => $setting) {
+            $merchant->credits()->create([
+                'currency' => $currency,
+                'credit' => 0,
+                'transaction_fee' => $setting['transaction_fee_percentage']
+            ]);
+        }
     }
 }

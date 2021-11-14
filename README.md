@@ -18,6 +18,8 @@ composer install
 
 php artisan key:generate
 
+php artisan jwt:secret
+
 php artisan migrate --seed
 ```
 
@@ -28,6 +30,15 @@ pm2 start queue.yml
 ```
 
 For more instructions, view [PM2](https://pm2.keymetrics.io/docs/usage/quick-start).
+
+## Generate Api Document
+
+```cmd
+php artisan scribe:generate
+```
+
+For more information, view [Scribe](https://scribe.knuckles.wtf/laravel/).
+
 ## License
 
 The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

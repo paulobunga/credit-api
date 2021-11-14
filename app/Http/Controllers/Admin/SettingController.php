@@ -19,7 +19,15 @@ class SettingController extends Controller
         $key = ucwords($key);
         return app("\App\Settings\\{$key}Setting");
     }
-
+    
+    /**
+     * Get setting list
+     *
+     * @param  mixed $request
+     * @method GET
+     *
+     * @return void
+     */
     public function index(Request $request)
     {
         if ($request->get('key', null)) {
@@ -37,7 +45,15 @@ class SettingController extends Controller
             ];
         }
     }
-
+    
+    /**
+     * update setting by key
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @method PUT
+     *
+     * @return json
+     */
     public function update(Request $request)
     {
         $rules = [
@@ -48,17 +64,6 @@ class SettingController extends Controller
             'agent' => [
                 'default_downline_slot' => 'required|numeric|gte:0',
                 'max_downline_slot' => 'required|numeric|gte:default_downline_slot',
-            ],
-            'commission' => [
-                'referrer_percentage' => 'required|numeric|gte:0',
-                'master_agent_percentage' => 'required|numeric|gte:0',
-                'agent_percentage' => 'required|numeric|gte:0',
-                'reseller_percentage' => 'required|numeric|gte:0',
-                'total_percentage' => 'required|numeric|min:' .
-                    $request->get('referrer_percentage', 0)
-                    + $request->get('master_agent_percentage', 0)
-                    + $request->get('agent_percentage', 0)
-                    + $request->get('reseller_percentage', 0)
             ],
             'currency' => [
                 'currency' => 'array',

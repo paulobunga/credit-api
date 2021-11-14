@@ -7,7 +7,7 @@ use App\Channels\PusherBeams\Exceptions\CouldNotCreateMessage;
 
 class PusherMessage
 {
-/**
+    /**
      * The device platform (iOS/Android).
      *
      * @var string
@@ -97,7 +97,7 @@ class PusherMessage
      */
     public function platform($platform)
     {
-        if (! in_array($platform, ['iOS', 'Android', 'web'])) {
+        if (!in_array($platform, ['iOS', 'Android', 'web'])) {
             throw CouldNotCreateMessage::invalidPlatformGiven($platform);
         }
 

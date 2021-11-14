@@ -15,9 +15,10 @@ class CheckDomain
      * @param string $domain
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, string $domain = null)
+    public function handle(Request $request, Closure $next, string $domains = null)
     {
-        if ($request->getHost() !== $domain) {
+        $domains = explode('|', $domains);
+        if (!in_array($request->getHost(), $domains)) {
             throw new \App\Exceptions\RouteNotFoundException();
         }
 

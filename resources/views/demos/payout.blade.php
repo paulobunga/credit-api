@@ -22,7 +22,7 @@
         </label>
         <select name="channel" x-model="channel"
             class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-            <template x-for="c in getChannels">
+            <template x-for="c in channelFilter">
                 <option x-bind:val="c.name" x-text="c.name"></option>
             </template>
         </select>
@@ -49,9 +49,11 @@
             <label class="block text-gray-700 text-sm font-bold mb-2" for="bank_name">
                 Bank name
             </label>
-            <input name="bank_name"
-                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                x-bind:disabled="!(currency=='VND' && channel=='NETBANK')" />
+            <select name="bank_name" x-model="bank_name" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+              <template x-for="b in bankFilter">
+                  <option x-bind:val="b.name" x-text="b.name"></option>
+              </template>
+            </select>
         </div>
     </div>
     <!-- INR NETBANK -->
@@ -92,6 +94,50 @@
                 x-bind:disabled="!(currency=='INR' && channel=='UPI')" />
         </div>
     </div>
+    <!-- BDT BKASH -->
+    <div x-show="currency=='BDT' && channel=='BKASH'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="wallet_number">
+                Wallet Number
+            </label>
+            <input name="wallet_number"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='BDT' && channel=='BKASH')" />
+        </div>
+    </div>
+    <!-- BDT NAGAD -->
+    <div x-show="currency=='BDT' && channel=='NAGAD'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="wallet_number">
+                Wallet Number
+            </label>
+            <input name="wallet_number"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='BDT' && channel=='NAGAD')" />
+        </div>
+    </div>
+    <!-- BDT ROCKET -->
+    <div x-show="currency=='BDT' && channel=='ROCKET'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="wallet_number">
+                Wallet Number
+            </label>
+            <input name="wallet_number"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='BDT' && channel=='ROCKET')" />
+        </div>
+    </div>
+    <!-- BDT UPAY -->
+    <div x-show="currency=='BDT' && channel=='UPAY'">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="wallet_number">
+                Wallet Number
+            </label>
+            <input name="wallet_number"
+                class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                x-bind:disabled="!(currency=='BDT' && channel=='UPAY')" />
+        </div>
+    </div>
     <div class="mb-6">
         <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grip-amount">
             Amount
@@ -114,14 +160,19 @@
         Alpine.data('channels', ()=>({
             currency: '{{ $channels[0]["currency"]??'' }}',
             channel: '{{ $channels[0]["name"]??'' }}',
+            bank_name: '{{ $banks[0]["name"]??'' }}',
             _channels: @json($channels),
+            _banks: @json($banks),
+            channelFilter: [],
+            bankFilter: [],
             getChannels(){
-                return this._channels.filter(channel=>channel.currency == this.currency);
+              this.channelFilter = this._channels.filter(channel=>channel.currency == this.currency);
+              this.bankFilter = this._banks.filter(bank=>bank.currency == this.currency);
+              this.channel = this.channelFilter[0].name;
+              this.bank_name = this.bankFilter[0].name;
             },
             init(){
-                this.$watch('currency', (value) => {
-                    this.channel = this.getChannels()[0].name;
-                })
+              this.getChannels();
             }
         }));
     });

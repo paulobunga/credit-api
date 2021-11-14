@@ -52,6 +52,18 @@ class ResellerBankCardSeeder extends Seeder
                             'qrcode' =>  'https://google.com.tw'
                         ];
                         break;
+                    case 'BKASH':
+                    case 'NAGAD':
+                    case 'UPAY':
+                        $attributes = [
+                            'wallet_number' => $this->faker->numerify('01#########')
+                        ];
+                        break;
+                    case 'ROCKET':
+                        $attributes = [
+                            'wallet_number' => $this->faker->numerify('01##########')
+                        ];
+                        break;
                     default:
                         $attributes = [];
                 }

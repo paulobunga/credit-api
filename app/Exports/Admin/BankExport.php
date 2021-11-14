@@ -20,6 +20,7 @@ class BankExport extends Base
         'id' => 'Bank id',
         'ident' => 'Bank ident',
         'name' => 'Bank name',
+        'currency' => 'Currency',
         'status' => 'status',
     ];
 
