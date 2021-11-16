@@ -439,4 +439,13 @@ class ExecuteSql extends Command
             }
         }
     }
+
+    protected function addDeviceUUID()
+    {
+        if (!Schema::hasColumn('devices', 'uuid')) {
+            Schema::table('devices', function (Blueprint $table) {
+                $table->uuid('uuid')->after('platform')->default('');
+            });
+        }
+    }
 }
