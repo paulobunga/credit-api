@@ -13,7 +13,7 @@ class BDT
     public function rules()
     {
         return [
-            'wallet_number' => 'required|regex:/^01\d{10}$/i',
+            'wallet_number' => 'required|regex:/^0\d{11}$/i',
         ];
     }
 }
