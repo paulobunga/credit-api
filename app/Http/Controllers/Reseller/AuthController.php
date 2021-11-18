@@ -20,8 +20,7 @@ class AuthController extends Controller
      *
      * @method POST
      * @param \Dingo\Api\Http\Request $request
-     *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @return json
      */
     public function login(Request $request)
     {
@@ -39,8 +38,7 @@ class AuthController extends Controller
      *
      * @method POST
      * @param \App\Settings\CurrencySetting $cs
-     *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @return json
      */
     public function setting(CurrencySetting $cs)
     {
@@ -265,6 +263,35 @@ class AuthController extends Controller
     public function channel(Request $request)
     {
         return Broadcast::auth($request);
+    }
+
+    /**
+     * Get token of beam service
+     *
+     * @method GET
+     * @param \Dingo\Api\Http\Request $request
+     *
+     * @return array
+     */
+    public function onesignal(Request $request)
+    {
+        $this->validate($request, [
+            'data' => 'required',
+            'platform' => 'required',
+        ]);
+
+        auth()->user()->devices()->updateOrCreate(
+            [
+                'platform' => $request->platform
+            ],
+            [
+                'logined_at' => Carbon::now(),
+                'uuid' => $request->data['userId'],
+                'token' => $request->data['pushToken']
+            ]
+        );
+
+        return $this->success();
     }
 
     /**
