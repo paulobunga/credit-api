@@ -65,12 +65,16 @@ class AutoSms extends Command
                 $this->info($ch->name . ' ' . json_encode($data));
                 foreach ($filtered_deposits as $d) {
                     if ($data['amount'] == $d->amount) {
-                        $match_deposits[] = $d;
+                        $match_deposits[] = [
+                            'deposit' => $d,
+                            'data' => $data
+                        ];
                     }
                 }
             }
             if (count($match_deposits) == 1) {
-                $deposit = $match_deposits[0];
+                $deposit = $match_deposits[0]['deposit'];
+                $data = $match_deposits[0]['data'];
                 $deposit->update([
                     'status' => MerchantDeposit::STATUS['APPROVED'],
                     'extra' => $deposit->extra + ['reference_id' => $data['reference_id']]
