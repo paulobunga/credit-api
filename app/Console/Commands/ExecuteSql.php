@@ -448,4 +448,34 @@ class ExecuteSql extends Command
             });
         }
     }
+
+    protected function addResellerSms()
+    {
+        if (!Schema::hasTable('reseller_sms')) {
+            Schema::create('reseller_sms', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('reseller_id');
+                $table->unsignedBigInteger('model_id')->default(0);
+                $table->string('model_name', 20)->default('');
+                $table->string('platform', 10);
+                $table->string('address', 30);
+                $table->string('body', 1024);
+                $table->unsignedTinyInteger('status')->default(0)->comment('0:Pending,1:Match,2:UnMatch');
+                $table->timestamp('sent_at');
+                $table->timestamp('received_at');
+                $table->timestamp('created_at')->useCurrent();
+            });
+        }
+        DB::beginTransaction();
+        try {
+            DB::statement("
+                Update resellers
+                SET payin = JSON_SET(payin, '$.auto_sms_approval', false)
+            ");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        DB::commit();
+    }
 }
