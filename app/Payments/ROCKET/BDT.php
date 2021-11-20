@@ -10,7 +10,7 @@ class BDT
         'wallet_number'
     ];
 
-    public $sms_rule = '/A\/C: (\d+)* Tk([\d,]+\.\d{2})* Comm:Tk([\d,]+\.\d{2})*; A\/C Balance: Tk([\d,]+\.\d{2})*.TxnId: (\w+)* Date:(\d{2}-\w{3}-\d{2} \d{2}:\d{2}:\d{2} \w{2})/';
+    public $sms_rule = '/A\/C: (\d+)* Tk([\d,]+\.\d{2})* Comm:Tk([\d,]+\.\d{2})*; A\/C Balance: Tk([\d,]+\.\d{2})*.TxnId: (\w+)*/';
 
     public function rules()
     {
@@ -28,7 +28,6 @@ class BDT
             'commission' => isset($matches[3]) ? str_replace(',', '', $matches[3]) : null,
             'balance' => isset($matches[4]) ? str_replace(',', '', $matches[4]) : null,
             'reference_id' => isset($matches[5]) ? $matches[5] : null,
-            'date' => isset($matches[6]) ? $matches[6] : null
         ];
     }
 }
