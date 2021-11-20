@@ -65,6 +65,7 @@ return [
                 'admin.*',
                 'reseller.*',
                 'merchant.*',
+                'web.*',
                 'api.deposits.pay',
                 'api.deposits.update',
                 'api.withdrawals.pay',
