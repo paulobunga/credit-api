@@ -132,7 +132,8 @@ class ReportDaily extends Command
                 COUNT(DISTINCT md.player_id) AS players,
                 COALESCE(SUM(CASE WHEN md.status IN (
                     {$this->deposit_status['APPROVED']},
-                    {$this->deposit_status['ENFORCED']}
+                    {$this->deposit_status['ENFORCED']},
+                    {$this->deposit_status['MAKEUP']}
                 ) THEN 1 END), 0) success,
                 COALESCE(SUM(CASE WHEN md.status IN (
                     {$this->deposit_status['REJECTED']},
@@ -418,14 +419,10 @@ class ReportDaily extends Command
                     {$this->withdrawal_status['CANCELED']}
                 ) THEN 1 END),0) AS decline,
                 SUM(CASE WHEN mw.status IN (
-                    {$this->withdrawal_status['REJECTED']},
-                    {$this->withdrawal_status['APPROVED']},
-                    {$this->withdrawal_status['CANCELED']}
+                    {$this->withdrawal_status['APPROVED']}
                 ) THEN ct.credit END) AS credit,
                 SUM(CASE WHEN mw.status IN (
-                    {$this->withdrawal_status['REJECTED']},
-                    {$this->withdrawal_status['APPROVED']},
-                    {$this->withdrawal_status['CANCELED']}
+                    {$this->withdrawal_status['APPROVED']}
                 ) THEN ct.transaction_fee END) AS transaction_fee,
                 SUM(mw.amount) AS total,
                 COUNT(DISTINCT mw.player_id) AS players,
