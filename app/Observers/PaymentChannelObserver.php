@@ -35,6 +35,16 @@ trait PaymentChannelObserver
     }
 
     /**
+     * check whether payment channel support SMS auto approval or not
+     *
+     * @return bool
+     */
+    public function isSupportSMS()
+    {
+        return method_exists($this->getReference(), 'extractSMS');
+    }
+
+    /**
      * Get data from SMS
      *
      * @param  string $sms
@@ -42,11 +52,10 @@ trait PaymentChannelObserver
      */
     public function extractSMS(string $sms)
     {
-        $this->reference = $this->getReference();
-        if (!method_exists($this->reference, 'extractSMS')) {
+        if (!$this->isSupportSMS) {
             return [];
         }
-        return $this->reference->extractSMS($sms);
+        return $this->getReference()->extractSMS($sms);
     }
 
     /**

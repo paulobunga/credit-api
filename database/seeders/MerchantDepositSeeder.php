@@ -2,12 +2,14 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Seeder;
 use App\Models\Merchant;
 use App\Models\Reseller;
 use App\Models\Transaction;
+use App\Models\ResellerSms;
 use App\Models\MerchantDeposit;
 use App\Models\ResellerBankCard;
 use App\Models\MerchantWithdrawal;
@@ -34,7 +36,7 @@ class MerchantDepositSeeder extends Seeder
                 $reseller_bank_card = ResellerBankCard::whereHas('reseller', function ($q) use ($credit) {
                     $q->where('currency', $credit->currency);
                 })->inRandomOrder()->first();
-                MerchantDeposit::create([
+                $d = MerchantDeposit::create([
                     'merchant_order_id' => $merchant->id == 1 ? '9798223690986' : $this->faker->isbn13,
                     'method' => Arr::random($reseller_bank_card->paymentChannel->payment_methods),
                     'amount' => 1000,
@@ -44,6 +46,19 @@ class MerchantDepositSeeder extends Seeder
                     'reseller_bank_card_id' => $reseller_bank_card->id,
                     'status' => MerchantDeposit::STATUS['APPROVED'],
                 ]);
+                if ($d->paymentChannel->isSupportSMS()) {
+                    ResellerSms::create([
+                        'reseller_id' => $reseller_bank_card->reseller_id,
+                        'model_id' => $d->id,
+                        'model_name' => 'merchant.deposit',
+                        'platform' => 'Android',
+                        'address' => $d->paymentChannel->payin->sms_addresses[0],
+                        'body' => __('sms.' . $d->paymentChannel->name, ['amount' => number_format($d->amount, 2)]),
+                        'status' => ResellerSms::STATUS['MATCH'],
+                        'sent_at' => Carbon::now(),
+                        'received_at' => Carbon::now(),
+                    ]);
+                }
                 $withdrawal = MerchantWithdrawal::create([
                     'merchant_order_id' => $merchant->id == 1 ? '9798223690986' : $this->faker->isbn13,
                     'merchant_id' => $merchant->id,

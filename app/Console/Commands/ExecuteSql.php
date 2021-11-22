@@ -478,4 +478,33 @@ class ExecuteSql extends Command
         }
         DB::commit();
     }
+
+    protected function addPaymentChannelPayInSmsAddresses()
+    {
+        $channels = [
+            'BKASH' => 'bKash',
+            'NAGAD' => 'NAGAD',
+            'ROCKET' => '16216',
+            'UPAY' => 'UPAY',
+        ];
+        DB::beginTransaction();
+        try {
+            DB::statement("
+                Update payment_channels
+                SET payin = JSON_SET(payin, '$.sms_addresses', JSON_ARRAY())
+            ");
+            foreach ($channels as $name => $address) {
+                $p = PaymentChannel::where('name', $name)->first();
+                if (!$p) {
+                    continue;
+                }
+                $p->payin->sms_addresses = [$address];
+                $p->save();
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        DB::commit();
+    }
 }
