@@ -45,7 +45,7 @@ class ReportDaily extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->db_timezone = DB::select('SELECT @@system_time_zone AS timezone;')[0]->timezone;
+        $this->db_timezone = env('DB_TIMEZONE');
     }
 
     /**
