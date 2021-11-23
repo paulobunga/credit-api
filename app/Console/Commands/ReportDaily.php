@@ -33,6 +33,10 @@ class ReportDaily extends Command
     protected $deposit_status = MerchantDeposit::STATUS;
 
     protected $withdrawal_status = MerchantWithdrawal::STATUS;
+
+    protected $db_timezone;
+
+    protected $timezone = '+08:00';
     /**
      * Create a new command instance.
      *
@@ -41,6 +45,7 @@ class ReportDaily extends Command
     public function __construct()
     {
         parent::__construct();
+        $this->db_timezone = DB::select('SELECT @@system_time_zone AS timezone;')[0]->timezone;
     }
 
     /**
@@ -63,7 +68,14 @@ class ReportDaily extends Command
         $this->calulateMerchants($start_datetime, $end_datetime);
     }
 
-    protected function calulateResellers($start_datetime, $end_datetime)
+    /**
+     * Generate agent daily report
+     *
+     * @param  string $start_datetime
+     * @param  string $end_datetime
+     * @return void
+     */
+    protected function calulateResellers(string $start_datetime, string $end_datetime)
     {
         $sql = "
         WITH daily_cashin_transactions AS (        
@@ -82,7 +94,8 @@ class ReportDaily extends Command
             WHERE 
                 t.user_type = 'reseller'
                 AND mht.model_type = 'merchant.deposit'
-                AND md.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
+                AND CONVERT_TZ(md.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'
             GROUP BY 
                 model_id, model_type, user_type, user_id, type, currency
         ),
@@ -154,7 +167,8 @@ class ReportDaily extends Command
                         COLUMNS(Value INT PATH '$')
                     ) AS agent
             ) AS r ON rbc.reseller_id = r.id
-            WHERE md.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
+            WHERE CONVERT_TZ(md.updated_at,'{$this->db_timezone}','{$this->timezone}')
+            BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
             GROUP BY reseller_id
         ),
         daily_cashin AS(
@@ -180,7 +194,8 @@ class ReportDaily extends Command
             WHERE 
                 t.user_type = 'reseller'
                 AND mht.model_type = 'merchant.withdrawal'
-                AND mw.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
+                AND CONVERT_TZ(mw.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'
             GROUP BY 
                 model_id, model_type, user_type, user_id, type, currency
         ),
@@ -249,7 +264,8 @@ class ReportDaily extends Command
                         COLUMNS(Value INT PATH '$')
                     ) AS agent
             ) AS r ON mw.reseller_id = r.id
-            WHERE mw.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
+            WHERE CONVERT_TZ(mw.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+            BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
             GROUP BY reseller_id
         ),
         daily_cashout AS(
@@ -302,7 +318,8 @@ class ReportDaily extends Command
                     'reseller.deposit',
                     'reseller.withdrawal'
                 )
-                AND created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
+                AND CONVERT_TZ(created_at,'{$this->db_timezone}','{$this->timezone}') 
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
             GROUP BY reseller_id
         ),
         daily_report AS (
@@ -364,7 +381,13 @@ class ReportDaily extends Command
         }
     }
 
-    protected function calulateMerchants($start_datetime, $end_datetime)
+    /**
+     * Generate merchant daily report
+     *
+     * @param  string $start_datetime
+     * @param  string $end_datetime
+     */
+    protected function calulateMerchants(string $start_datetime, string $end_datetime)
     {
         $sql = "
         WITH daily_payin_transaction AS (        
@@ -383,7 +406,8 @@ class ReportDaily extends Command
             WHERE 
                 t.user_type = 'merchant'
                 AND mht.model_type = 'merchant.deposit'
-                AND md.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
+                AND CONVERT_TZ(md.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'
             GROUP BY 
                 model_id, model_type, user_type, user_id, type, currency
         ),
@@ -415,7 +439,8 @@ class ReportDaily extends Command
                 md.currency
             FROM merchant_deposits AS md
             LEFT JOIN payin_transactions AS ct ON md.id = ct.model_id
-            WHERE md.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
+            WHERE CONVERT_TZ(md.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+            BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
             GROUP BY merchant_id, currency
         ),
         daily_payout_transactions AS (        
@@ -434,7 +459,8 @@ class ReportDaily extends Command
             WHERE 
                 t.user_type = 'merchant'
                 AND mht.model_type = 'merchant.withdrawal'
-                AND mw.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
+                AND CONVERT_TZ(mw.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'
             GROUP BY 
                 model_id, model_type, user_type, user_id, type, currency
         ),
@@ -472,7 +498,8 @@ class ReportDaily extends Command
                 mw.currency
             FROM merchant_withdrawals AS mw
             LEFT JOIN payout_transactions AS ct ON mw.id = ct.model_id
-            WHERE mw.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
+            WHERE CONVERT_TZ(mw.updated_at,'{$this->db_timezone}','{$this->timezone}')
+            BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
             GROUP BY merchant_id, currency
         ),
         daily_merchant AS(
@@ -494,7 +521,8 @@ class ReportDaily extends Command
                 AND model_type IN (
                     'merchant.settlement'
                 )
-                AND created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
+                AND CONVERT_TZ(created_at,'{$this->db_timezone}','{$this->timezone}')
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
             GROUP BY merchant_id, currency
         ),
         daily_report AS (
