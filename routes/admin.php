@@ -94,6 +94,12 @@ $api->group([
                 'uses' => "ReportController@merchant",
                 'as' => "report_merchants.index"
             ]);
+            
+            $api->resource('logs', 'LogController', ['only' => ['index', 'show']]);
+            $api->delete("/logs/{date}", [
+                'uses' => "LogController@destroy",
+                'as' => "logs.destroy"
+            ]);
         });
     });
 });

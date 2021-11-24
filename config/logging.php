@@ -37,7 +37,12 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily'],
+            'channels' => ['daily', 'system_log_to_db'],
+        ],
+
+        'system_log_to_db' => [
+            'driver' => 'custom',
+            'via' => App\Logging\SystemCustomLogger::class,
         ],
 
         'single' => [
