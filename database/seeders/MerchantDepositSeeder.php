@@ -86,6 +86,9 @@ class MerchantDepositSeeder extends Seeder
                     'callback_url' => app('api.url')->version(env('API_VERSION'))->route('api.demos.callback'),
                 ]);
                 $withdrawal->update([
+                    'status' => MerchantWithdrawal::STATUS['FINISHED']
+                ]);
+                $withdrawal->update([
                     'status' => MerchantWithdrawal::STATUS['APPROVED']
                 ]);
                 MerchantSettlement::create([
