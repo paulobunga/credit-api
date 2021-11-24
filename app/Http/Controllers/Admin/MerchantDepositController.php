@@ -89,6 +89,7 @@ class MerchantDepositController extends Controller
                 MerchantDeposit::STATUS['CANCELED'],
             ]),
             'reference_id' => 'required_if:status,' . MerchantDeposit::STATUS['ENFORCED'],
+            'reason' => 'required_if:status,' . MerchantDeposit::STATUS['CANCELED'],
         ]);
         if ($request->status == MerchantDeposit::STATUS['ENFORCED']) {
             $m->update([
@@ -102,7 +103,8 @@ class MerchantDepositController extends Controller
             $m->update([
                 'status' => $request->status,
                 'extra' => [
-                    'admin_id' => $request->admin_id
+                    'admin_id' => $request->admin_id,
+                    'reason' => $request->reason
                 ]
             ]);
         }
