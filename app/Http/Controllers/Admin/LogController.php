@@ -28,14 +28,14 @@ class LogController extends Controller
             $results[] = $this->model->setTable($table)->selectRaw("
               '{$table}' AS date, 
               COUNT(id) as total,
-              COALESCE(SUM(level_name='emergency'),0) AS emergency, 
-              COALESCE(SUM(level_name='alert'),0) as alert, 
-              COALESCE(SUM(level_name='critical'),0) AS critical, 
-              COALESCE(SUM(level_name='error'),0) AS error,
-              COALESCE(SUM(level_name='warning'),0) AS warning, 
-              COALESCE(SUM(level_name='notice'),0) AS notice,
-              COALESCE(SUM(level_name='info'),0) AS info, 
-              COALESCE(SUM(level_name='debug'),0) AS debug
+              COALESCE(SUM(level='emergency'),0) AS emergency, 
+              COALESCE(SUM(level='alert'),0) as alert, 
+              COALESCE(SUM(level='critical'),0) AS critical, 
+              COALESCE(SUM(level='error'),0) AS error,
+              COALESCE(SUM(level='warning'),0) AS warning, 
+              COALESCE(SUM(level='notice'),0) AS notice,
+              COALESCE(SUM(level='info'),0) AS info, 
+              COALESCE(SUM(level='debug'),0) AS debug
             ")->first();
         }
 
@@ -53,7 +53,7 @@ class LogController extends Controller
         ]);
         $logs = QueryBuilder::for($this->model->setTable($table)->newQuery())
             ->when($request->level != "total", function ($query) use ($request) {
-                $query->where('level_name', $request->level);
+                $query->where('level', $request->level);
             })
             ->when($request->get('queryStr', null), function ($query) use ($request) {
                 $query->where('message', 'like', '%' . $request->queryStr . '%');

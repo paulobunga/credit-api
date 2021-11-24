@@ -18,15 +18,11 @@ class Log extends Model
         'message',
         'channel',
         'level',
-        'level_name',
         'context',
-        'datetime',
-        'extra'
     ];
 
     protected $casts = [
         'context' => 'array',
-        'extra' => 'array',
         'created_at'  => 'datetime:Y-m-d H:i:s',
     ];
 
@@ -56,13 +52,10 @@ class Log extends Model
         }
         Schema::connection('log')->create($table, function (Blueprint $table) {
             $table->id();
-            $table->text('message')->nullable();
-            $table->string('channel')->nullable();
-            $table->integer('level')->default(0);
-            $table->string('level_name');
+            $table->text('message');
+            $table->string('channel', 10);
+            $table->string('level', 12);
             $table->longText('context')->nullable();
-            $table->string('datetime')->nullable();
-            $table->text('extra')->nullable();
             $table->datetime('created_at')->useCurrent();
         });
         return $this;

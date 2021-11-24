@@ -11,11 +11,10 @@ class LogTransformer extends TransformerAbstract
     {
         return [
             'id' => $m->id,
-            'message' => $m->message,
             'channel' => $m->channel,
-            'level' => $m->level_name,
+            'level' => $m->level,
+            'message' => $m->message,
             'context' => $m->context,
-            'extra' => $m->extra,
             'created_at' => $m->created_at
         ];
     }
