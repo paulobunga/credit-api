@@ -33,6 +33,10 @@ class ReportDaily extends Command
     protected $deposit_status = MerchantDeposit::STATUS;
 
     protected $withdrawal_status = MerchantWithdrawal::STATUS;
+
+    protected $db_timezone;
+
+    protected $timezone = '+08:00';
     /**
      * Create a new command instance.
      *
@@ -41,6 +45,7 @@ class ReportDaily extends Command
     public function __construct()
     {
         parent::__construct();
+        $this->db_timezone = env('DB_TIMEZONE');
     }
 
     /**
@@ -63,24 +68,34 @@ class ReportDaily extends Command
         $this->calulateMerchants($start_datetime, $end_datetime);
     }
 
-    protected function calulateResellers($start_datetime, $end_datetime)
+    /**
+     * Generate agent daily report
+     *
+     * @param  string $start_datetime
+     * @param  string $end_datetime
+     * @return void
+     */
+    protected function calulateResellers(string $start_datetime, string $end_datetime)
     {
         $sql = "
-        WITH daily_transaction AS (        
+        WITH daily_cashin_transactions AS (        
             SELECT
                 model_id,
                 model_type,
                 user_id,
                 type,
                 user_type,
-                SUM(amount) AS amount,
-                currency
+                SUM(t.amount) AS amount,
+                t.currency
             FROM
-                model_has_transactions AS mht 
+                merchant_deposits AS md
+            LEFT JOIN model_has_transactions AS mht ON md.id = mht.model_id 
             LEFT JOIN transactions AS t ON t.id = mht.transaction_id
             WHERE 
                 t.user_type = 'reseller'
-                AND t.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
+                AND mht.model_type = 'merchant.deposit'
+                AND CONVERT_TZ(md.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'
             GROUP BY 
                 model_id, model_type, user_type, user_id, type, currency
         ),
@@ -93,11 +108,11 @@ class ReportDaily extends Command
                 SELECT
                     *
                 FROM
-                    daily_transaction
-                WHERE type = {$this->type['SYSTEM_TOPUP_COMMISSION']} AND model_type = 'merchant.deposit'
+                    daily_cashin_transactions
+                WHERE type = {$this->type['SYSTEM_TOPUP_COMMISSION']}
                 UNION ALL 
                 SELECT
-                    dt.model_id,
+                    dct.model_id,
                     model_type,
                     r.reseller_id as user_id,
                     type,
@@ -105,7 +120,7 @@ class ReportDaily extends Command
                     amount,
                     currency
                 FROM
-                    daily_transaction AS dt 
+                    daily_cashin_transactions AS dct 
                 LEFT JOIN (
                     SELECT 
                         resellers.id,
@@ -117,9 +132,8 @@ class ReportDaily extends Command
                             '$[*]'
                             COLUMNS(Value INT PATH '$')
                         ) AS agent
-                    ) AS r ON dt.user_id = r.id 
-                    AND dt.type = {$this->type['SYSTEM_DEDUCT_CREDIT']}
-                    AND model_type = 'merchant.deposit'
+                    ) AS r ON dct.user_id = r.id 
+                    AND dct.type = {$this->type['SYSTEM_DEDUCT_CREDIT']}
             ) AS temp
             GROUP BY
                 user_id
@@ -132,7 +146,8 @@ class ReportDaily extends Command
                 COUNT(DISTINCT md.player_id) AS players,
                 COALESCE(SUM(CASE WHEN md.status IN (
                     {$this->deposit_status['APPROVED']},
-                    {$this->deposit_status['ENFORCED']}
+                    {$this->deposit_status['ENFORCED']},
+                    {$this->deposit_status['MAKEUP']}
                 ) THEN 1 END), 0) success,
                 COALESCE(SUM(CASE WHEN md.status IN (
                     {$this->deposit_status['REJECTED']},
@@ -152,7 +167,8 @@ class ReportDaily extends Command
                         COLUMNS(Value INT PATH '$')
                     ) AS agent
             ) AS r ON rbc.reseller_id = r.id
-            WHERE md.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
+            WHERE CONVERT_TZ(md.updated_at,'{$this->db_timezone}','{$this->timezone}')
+            BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
             GROUP BY reseller_id
         ),
         daily_cashin AS(
@@ -161,6 +177,27 @@ class ReportDaily extends Command
             FROM 
                 cashin_commissions LEFT JOIN cashin_transactions USING (reseller_id)
             ORDER BY reseller_id ASC
+        ),
+        daily_cashout_transactions AS (        
+            SELECT
+                model_id,
+                model_type,
+                user_id,
+                type,
+                user_type,
+                SUM(t.amount) AS amount,
+                t.currency
+            FROM
+                merchant_withdrawals AS mw
+            LEFT JOIN model_has_transactions AS mht ON mw.id = mht.model_id 
+            LEFT JOIN transactions AS t ON t.id = mht.transaction_id
+            WHERE 
+                t.user_type = 'reseller'
+                AND mht.model_type = 'merchant.withdrawal'
+                AND CONVERT_TZ(mw.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'
+            GROUP BY 
+                model_id, model_type, user_type, user_id, type, currency
         ),
         cashout_commissions AS ( 
             SELECT
@@ -171,11 +208,11 @@ class ReportDaily extends Command
                     SELECT
                         *
                     FROM
-                        daily_transaction
-                    WHERE type = {$this->type['SYSTEM_TOPUP_COMMISSION']} AND model_type = 'merchant.withdrawal'
+                        daily_cashout_transactions
+                    WHERE type = {$this->type['SYSTEM_TOPUP_COMMISSION']}
                     UNION ALL 
                     SELECT
-                        dt.model_id,
+                        dct.model_id,
                         model_type,
                         r.reseller_id as user_id,
                         type,
@@ -183,7 +220,7 @@ class ReportDaily extends Command
                         amount,
                         currency
                     FROM
-                        daily_transaction AS dt 
+                        daily_cashout_transactions AS dct 
                     LEFT JOIN (
                         SELECT 
                             resellers.id,
@@ -195,9 +232,8 @@ class ReportDaily extends Command
                                 '$[*]'
                                 COLUMNS(Value INT PATH '$')
                             ) AS agent
-                        ) AS r ON dt.user_id = r.id 
-                        AND dt.type = {$this->type['SYSTEM_TOPUP_CREDIT']}
-                        AND model_type = 'merchant.withdrawal'
+                        ) AS r ON dct.user_id = r.id 
+                        AND dct.type = {$this->type['SYSTEM_TOPUP_CREDIT']}
                 ) AS temp
             GROUP BY
                 user_id
@@ -228,7 +264,8 @@ class ReportDaily extends Command
                         COLUMNS(Value INT PATH '$')
                     ) AS agent
             ) AS r ON mw.reseller_id = r.id
-            WHERE mw.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
+            WHERE CONVERT_TZ(mw.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+            BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
             GROUP BY reseller_id
         ),
         daily_cashout AS(
@@ -264,7 +301,9 @@ class ReportDaily extends Command
                         WHEN type = {$this->type['ADMIN_TOPUP_COIN']} THEN amount
                     END
                 ) AS deposit_coin
-            FROM daily_transaction
+            FROM 
+                transactions AS t 
+                LEFT JOIN model_has_transactions AS mht ON t.id = mht.transaction_id
             WHERE 
                 type IN (
                     {$this->type['ADMIN_WITHDRAW_CREDIT']},
@@ -279,6 +318,8 @@ class ReportDaily extends Command
                     'reseller.deposit',
                     'reseller.withdrawal'
                 )
+                AND CONVERT_TZ(created_at,'{$this->db_timezone}','{$this->timezone}') 
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
             GROUP BY reseller_id
         ),
         daily_report AS (
@@ -340,24 +381,33 @@ class ReportDaily extends Command
         }
     }
 
-    protected function calulateMerchants($start_datetime, $end_datetime)
+    /**
+     * Generate merchant daily report
+     *
+     * @param  string $start_datetime
+     * @param  string $end_datetime
+     */
+    protected function calulateMerchants(string $start_datetime, string $end_datetime)
     {
         $sql = "
-        WITH daily_transaction AS (        
+        WITH daily_payin_transaction AS (        
             SELECT
                 model_id,
                 model_type,
                 user_id,
                 type,
                 user_type,
-                SUM(amount) AS amount,
-                currency
+                SUM(t.amount) AS amount,
+                t.currency
             FROM
-                model_has_transactions AS mht 
+                merchant_deposits AS md
+            LEFT JOIN model_has_transactions AS mht ON md.id = mht.model_id 
             LEFT JOIN transactions AS t ON t.id = mht.transaction_id
             WHERE 
                 t.user_type = 'merchant'
-                AND t.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'
+                AND mht.model_type = 'merchant.deposit'
+                AND CONVERT_TZ(md.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'
             GROUP BY 
                 model_id, model_type, user_type, user_id, type, currency
         ),
@@ -366,8 +416,7 @@ class ReportDaily extends Command
                 model_id,
                 SUM(CASE WHEN type = {$this->type['MERCHANT_TOPUP_CREDIT']} THEN amount END) AS credit,
                 SUM(CASE WHEN type = {$this->type['SYSTEM_TRANSACTION_FEE']} THEN amount END) AS transaction_fee
-            FROM daily_transaction
-            WHERE model_type = 'merchant.deposit'
+            FROM daily_payin_transaction
             GROUP BY model_id
         ),
         daily_payin AS(
@@ -390,8 +439,30 @@ class ReportDaily extends Command
                 md.currency
             FROM merchant_deposits AS md
             LEFT JOIN payin_transactions AS ct ON md.id = ct.model_id
-            WHERE md.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
+            WHERE CONVERT_TZ(md.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+            BETWEEN '{$start_datetime}' AND '{$end_datetime}' 
             GROUP BY merchant_id, currency
+        ),
+        daily_payout_transactions AS (        
+            SELECT
+                model_id,
+                model_type,
+                user_id,
+                type,
+                user_type,
+                SUM(t.amount) AS amount,
+                t.currency
+            FROM
+                merchant_withdrawals AS mw
+            LEFT JOIN model_has_transactions AS mht ON mw.id = mht.model_id 
+            LEFT JOIN transactions AS t ON t.id = mht.transaction_id
+            WHERE 
+                t.user_type = 'merchant'
+                AND mht.model_type = 'merchant.withdrawal'
+                AND CONVERT_TZ(mw.updated_at,'{$this->db_timezone}','{$this->timezone}') 
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'
+            GROUP BY 
+                model_id, model_type, user_type, user_id, type, currency
         ),
         payout_transactions AS (
             SELECT 
@@ -404,8 +475,7 @@ class ReportDaily extends Command
                     CASE WHEN type = {$this->type['SYSTEM_TRANSACTION_FEE']} THEN amount 
                     WHEN type = {$this->type['ROLLBACK_TRANSACTION_FEE']} THEN -amount END
                 ) AS transaction_fee
-            FROM daily_transaction
-            WHERE model_type = 'merchant.withdrawal'
+            FROM daily_payout_transactions
             GROUP BY model_id
         ),
         daily_payout AS(
@@ -418,21 +488,18 @@ class ReportDaily extends Command
                     {$this->withdrawal_status['CANCELED']}
                 ) THEN 1 END),0) AS decline,
                 SUM(CASE WHEN mw.status IN (
-                    {$this->withdrawal_status['REJECTED']},
-                    {$this->withdrawal_status['APPROVED']},
-                    {$this->withdrawal_status['CANCELED']}
+                    {$this->withdrawal_status['APPROVED']}
                 ) THEN ct.credit END) AS credit,
                 SUM(CASE WHEN mw.status IN (
-                    {$this->withdrawal_status['REJECTED']},
-                    {$this->withdrawal_status['APPROVED']},
-                    {$this->withdrawal_status['CANCELED']}
+                    {$this->withdrawal_status['APPROVED']}
                 ) THEN ct.transaction_fee END) AS transaction_fee,
                 SUM(mw.amount) AS total,
                 COUNT(DISTINCT mw.player_id) AS players,
                 mw.currency
             FROM merchant_withdrawals AS mw
             LEFT JOIN payout_transactions AS ct ON mw.id = ct.model_id
-            WHERE mw.created_at BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
+            WHERE CONVERT_TZ(mw.updated_at,'{$this->db_timezone}','{$this->timezone}')
+            BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
             GROUP BY merchant_id, currency
         ),
         daily_merchant AS(
@@ -444,7 +511,9 @@ class ReportDaily extends Command
                     END
                 ) AS withdrawal_credit,
                 currency
-            FROM daily_transaction
+            FROM
+                transactions AS t 
+            LEFT JOIN model_has_transactions AS mht ON t.id = mht.transaction_id
             WHERE 
                 type IN (
                     {$this->type['MERCHANT_SETTLE_CREDIT']}
@@ -452,6 +521,8 @@ class ReportDaily extends Command
                 AND model_type IN (
                     'merchant.settlement'
                 )
+                AND CONVERT_TZ(created_at,'{$this->db_timezone}','{$this->timezone}')
+                BETWEEN '{$start_datetime}' AND '{$end_datetime}'  
             GROUP BY merchant_id, currency
         ),
         daily_report AS (

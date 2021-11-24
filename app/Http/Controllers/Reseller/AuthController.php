@@ -20,8 +20,7 @@ class AuthController extends Controller
      *
      * @method POST
      * @param \Dingo\Api\Http\Request $request
-     *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @return json
      */
     public function login(Request $request)
     {
@@ -39,8 +38,7 @@ class AuthController extends Controller
      *
      * @method POST
      * @param \App\Settings\CurrencySetting $cs
-     *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @return json
      */
     public function setting(CurrencySetting $cs)
     {
@@ -89,7 +87,8 @@ class AuthController extends Controller
                     Reseller::LEVEL['RESELLER']
                 ),
                 'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
-                'status' => true
+                'status' => true,
+                'auto_sms_approval' => false
             ],
             'payout' => [
                 'commission_percentage' => $currency_setting->getCommissionPercentage(
@@ -268,13 +267,42 @@ class AuthController extends Controller
     }
 
     /**
+     * Get token of beam service
+     *
+     * @method GET
+     * @param \Dingo\Api\Http\Request $request
+     *
+     * @return array
+     */
+    public function onesignal(Request $request)
+    {
+        $this->validate($request, [
+            'data' => 'required',
+            'platform' => 'required',
+        ]);
+
+        auth()->user()->devices()->updateOrCreate(
+            [
+                'platform' => $request->platform
+            ],
+            [
+                'logined_at' => Carbon::now(),
+                'uuid' => $request->data['userId'],
+                'token' => $request->data['pushToken']
+            ]
+        );
+
+        return $this->success();
+    }
+
+    /**
      * Update pay setting
      *
      * @method POST
      * @param  \Dingo\Api\Http\Request $request
-     * @throws \Exception $e if ID is not matched
+     * @throws \Exception $e if type is not matched
      *
-     * @return \Dingo\Api\Http\Response
+     * @return json
      */
     public function pay(Request $request)
     {
@@ -282,11 +310,24 @@ class AuthController extends Controller
             'type' => 'required|in:' . implode(',', [
                 'payin',
                 'payout',
+                'auto_sms_approval'
             ]),
             'value' => 'boolean'
         ]);
-        auth()->user()->{$request->type}->status = $request->value;
-        auth()->user()->save();
+        switch ($request->type) {
+            case 'payin':
+                auth()->user()->payin->status = $request->value;
+                auth()->user()->save();
+                break;
+            case 'payout':
+                auth()->user()->payout->status = $request->value;
+                auth()->user()->save();
+                break;
+            case 'auto_sms_approval':
+                auth()->user()->payin->auto_sms_approval = $request->value;
+                auth()->user()->save();
+                break;
+        }
 
         return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }

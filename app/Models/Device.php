@@ -12,6 +12,7 @@ class Device extends Model
         'user_id',
         'user_type',
         'platform',
+        'uuid',
         'token',
         'logined_at',
     ];

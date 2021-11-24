@@ -29,6 +29,7 @@ class MerchantDepositExport extends Base
         'currency' => 'Currency',
         'status' => 'Status',
         'created_at' => 'Created time',
+        'updated_at' => 'Updated time',
     ];
 
     /**

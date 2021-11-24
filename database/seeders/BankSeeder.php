@@ -23,14 +23,20 @@ class BankSeeder extends Seeder
                     'methods' => [
                         PaymentChannel::METHOD['TEXT'],
                     ],
-                    'attributes' => ['account_number', 'account_name', 'ifsc_code']
+                    'attributes' => ['account_number', 'account_name', 'ifsc_code'],
+                    'payin' => [
+                        'sms_addresses' => []
+                    ]
                 ],
                 'VND' => [
                     'banks' => Bank::where('currency', 'VND')->limit(3)->pluck('id')->toArray(),
                     'methods' => [
                         PaymentChannel::METHOD['TEXT'],
                     ],
-                    'attributes' => ['account_number', 'account_name', 'bank_name']
+                    'attributes' => ['account_number', 'account_name', 'bank_name'],
+                    'payin' => [
+                        'sms_addresses' => []
+                    ]
                 ]
             ],
             'UPI' => [
@@ -39,7 +45,10 @@ class BankSeeder extends Seeder
                         PaymentChannel::METHOD['TEXT'],
                         PaymentChannel::METHOD['QRCODE'],
                     ],
-                    'attributes' => ['upi_id']
+                    'attributes' => ['upi_id'],
+                    'payin' => [
+                        'sms_addresses' => []
+                    ]
                 ],
             ],
             'BKASH' => [
@@ -47,7 +56,10 @@ class BankSeeder extends Seeder
                     'methods' => [
                         PaymentChannel::METHOD['QRCODE'],
                     ],
-                    'attributes' => ['wallet_number']
+                    'attributes' => ['wallet_number'],
+                    'payin' => [
+                        'sms_addresses' => ['bKash']
+                    ]
                 ],
             ],
             'NAGAD' => [
@@ -55,7 +67,10 @@ class BankSeeder extends Seeder
                     'methods' => [
                         PaymentChannel::METHOD['QRCODE'],
                     ],
-                    'attributes' => ['wallet_number']
+                    'attributes' => ['wallet_number'],
+                    'payin' => [
+                        'sms_addresses' => ['NAGAD']
+                    ]
                 ],
             ],
             'ROCKET' => [
@@ -63,7 +78,10 @@ class BankSeeder extends Seeder
                     'methods' => [
                         PaymentChannel::METHOD['QRCODE'],
                     ],
-                    'attributes' => ['wallet_number']
+                    'attributes' => ['wallet_number'],
+                    'payin' => [
+                        'sms_addresses' => ['16216']
+                    ]
                 ],
             ],
             'UPAY' => [
@@ -71,7 +89,10 @@ class BankSeeder extends Seeder
                     'methods' => [
                         PaymentChannel::METHOD['QRCODE'],
                     ],
-                    'attributes' => ['wallet_number']
+                    'attributes' => ['wallet_number'],
+                    'payin' => [
+                        'sms_addresses' => ['UPAY']
+                    ]
                 ],
             ],
         ];
@@ -86,7 +107,8 @@ class BankSeeder extends Seeder
                     'payin' => [
                         'status' => true,
                         'min' => 20,
-                        'max' => 50000
+                        'max' => 50000,
+                        'sms_addresses' => $s['payin']['sms_addresses']
                     ],
                     'payout' => [
                         'status' => true,

@@ -17,6 +17,10 @@
 |VND       |NETBANK    |TEXT        |500   |50000 |
 |INR       |UPI        |QRCODE,TEXT |500   |50000 |
 |INR       |NETBANK    |TEXT        |500   |50000 |
+|BDT       |BKASH      |QRCODE      |500   |30000 |
+|BDT       |NAGAD      |QRCODE      |500   |30000 |
+|BDT       |ROCKET     |QRCODE      |500   |30000 |
+|BDT       |UPAY       |QRCODE      |500   |30000 |
 
 ### PayOut
 

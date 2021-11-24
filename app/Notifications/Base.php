@@ -8,6 +8,8 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use NotificationChannels\OneSignal\OneSignalMessage;
+use App\Channels\Android\OneSignalAndroid as Android;
 use App\Channels\PusherBeams\PusherBeams;
 use App\Channels\PusherBeams\PusherMessage;
 
@@ -55,7 +57,8 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
         return [
             'database',
             'broadcast',
-            PusherBeams::class
+            PusherBeams::class,
+            Android::class,
         ];
     }
 
@@ -106,44 +109,21 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
             ->icon($data['icon'])
             ->link($data['link'])
             ->title($data['title'])
-            ->body($data['body'])
-            ->withAndroid($this->toAndroid($notifiable))
-            ->withIOS($this->toIos($notifiable));
-    }
-
-
-    /**
-     * Create pusher message of Android
-     *
-     * @param  mixed $notifiable
-     * @return \App\Channels\PusherBeams\PusherMessage
-     */
-    protected function toAndroid($notifiable)
-    {
-        $data = $this->toArray($notifiable);
-        return PusherMessage::create()
-            ->badge(1)
-            ->icon($data['icon'])
-            ->link($data['link'])
-            ->title($data['title'])
             ->body($data['body']);
     }
 
     /**
-     * Create pusher message of IOS
-     *
+     * Create onesignal message of Android
      * @param  mixed $notifiable
-     * @return \App\Channels\PusherBeams\PusherMessage
+     * @return \NotificationChannels\OneSignal\OneSignalMessage
      */
-    protected function toIos($notifiable)
+    public function toAndroid($notifiable)
     {
         $data = $this->toArray($notifiable);
-        return PusherMessage::create()
-            ->badge(1)
-            ->icon($data['icon'])
-            ->link($data['link'])
-            ->title($data['title'])
-            ->body($data['body']);
+        return OneSignalMessage::create()
+            ->setSubject($data['title'])
+            ->setBody($data['body'])
+            ->setData('url', str_replace('https://', 'gamepts://', $data['link']));
     }
 
     /**

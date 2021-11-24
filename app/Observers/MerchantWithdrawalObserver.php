@@ -32,10 +32,10 @@ trait MerchantWithdrawalObserver
 
     public function setStatusAttribute($value)
     {
-        $this->attributes['status'] = $value;
         if ($this->exists) {
             static::onStatusChangeEvent($value, $this);
         }
+        $this->attributes['status'] = $value;
     }
     /**
      * Handle the status "changed" event.
@@ -88,6 +88,20 @@ trait MerchantWithdrawalObserver
             MerchantWithdrawal::STATUS['REJECTED'],
             MerchantWithdrawal::STATUS['CANCELED'],
         ])) {
+            if (
+                $status == MerchantWithdrawal::STATUS['REJECTED'] &&
+                $m->status != MerchantWithdrawal::STATUS['PENDING']
+            ) {
+                throw new \Exception("Status is not allowed to update!");
+            } elseif (
+                $status == MerchantWithdrawal::STATUS['CANCELED']
+                && !in_array($m->status, [
+                    MerchantWithdrawal::STATUS['PENDING'],
+                    MerchantWithdrawal::STATUS['FINISHED'],
+                ])
+            ) {
+                throw new \Exception("Status is not allowed to update!");
+            }
             // rollback merchant credit
             $credit = $m->merchant->credits()->where('currency', $m->currency)->first();
             if (!$credit) {
@@ -124,6 +138,9 @@ trait MerchantWithdrawalObserver
             }
             DB::commit();
         } elseif ($status == MerchantWithdrawal::STATUS['APPROVED']) {
+            if ($m->status != MerchantWithdrawal::STATUS['FINISHED']) {
+                throw new \Exception('Status is not allowed to update!');
+            }
             DB::beginTransaction();
             try {
                 // reseller

@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\ImportFile::class,
         \App\Console\Commands\CheckCashIn::class,
         \App\Console\Commands\AutoApproval::class,
+        \App\Console\Commands\AutoSms::class,
     ];
 
     /**
@@ -45,9 +46,14 @@ class Kernel extends ConsoleKernel
             ->name('CheckCashIn')
             ->runInBackground()
             ->everyMinute();
-        # Auto approve orders
+        # Auto approve payout orders
         $schedule->command('auto:approval')
             ->name('AutoApproval')
+            ->runInBackground()
+            ->everyMinute();
+        # Auto approve payin orders via sms
+        $schedule->command('auto:sms')
+            ->name('AutoSMS')
             ->runInBackground()
             ->everyMinute();
     }

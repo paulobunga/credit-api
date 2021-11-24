@@ -23,15 +23,15 @@ class SettingController extends Controller
     /**
      * Get setting list
      *
-     * @param  mixed $request
+     * @param \Dingo\Api\Http\Request $request
      * @method GET
      *
-     * @return void
+     * @return json
      */
     public function index(Request $request)
     {
-        if ($request->get('key', null)) {
-            return ['data' => $this->getSetting($request->key)->toArray()];
+        if ($key = $request->get('key', null)) {
+            return ['data' => $this->getSetting($key)->toArray()];
         } else {
             $settings = $this->model::select('group')->distinct()->pluck('group')->map(function ($s) {
                 return [
