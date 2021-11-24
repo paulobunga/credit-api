@@ -63,7 +63,7 @@ class LogController extends Controller
           })
           -> when($request->get('queryStr', null), function($query) use($request) { 
               $query->where('message', 'like', '%'.$request->queryStr.'%');
-          })->paginate();
+          })->paginate($request->perPage);
 
         return $this->response->withPaginator($logs, $this->transformer);
     }
