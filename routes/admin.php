@@ -86,6 +86,8 @@ $api->group([
 
             $api->resource('reseller_withdrawals', 'ResellerWithdrawalController', ['only' => ['index', 'update']]);
 
+            $api->resource('reseller_sms', 'ResellerSmsController', ['only' => ['index']]);
+
             $api->get("/report/resellers", [
                 'uses' => "ReportController@reseller",
                 'as' => "report_resellers.index"
@@ -94,6 +96,8 @@ $api->group([
                 'uses' => "ReportController@merchant",
                 'as' => "report_merchants.index"
             ]);
+            
+            $api->resource('logs', 'LogController', ['only' => ['index', 'show', 'destroy']]);
         });
     });
 });

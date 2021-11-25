@@ -71,6 +71,19 @@ class CreateTableResellers extends Migration
             $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
         });
+        Schema::create('reseller_sms', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('reseller_id');
+            $table->unsignedBigInteger('model_id')->default(0);
+            $table->string('model_name', 20)->default('');
+            $table->string('platform', 10);
+            $table->string('address', 30);
+            $table->string('body', 1024);
+            $table->unsignedTinyInteger('status')->default(0)->comment('0:Pending,1:Match,2:UnMatch');
+            $table->timestamp('sent_at');
+            $table->timestamp('received_at');
+            $table->timestamp('created_at')->useCurrent();
+        });
     }
 
     /**
@@ -80,6 +93,7 @@ class CreateTableResellers extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('reseller_sms');
         Schema::dropIfExists('reseller_withdrawals');
         Schema::dropIfExists('reseller_deposits');
         Schema::dropIfExists('reseller_bank_cards');

@@ -44,7 +44,8 @@ class ResellerSeeder extends Seeder
                     'payin' => [
                         'commission_percentage' => $c->getCommissionPercentage($currency, $level),
                         'pending_limit' => $rs->getDefaultPendingLimit($level),
-                        'status' => true
+                        'status' => true,
+                        'auto_sms_approval'=> false
                     ],
                     'payout' => [
                         'commission_percentage' => $c->getCommissionPercentage($currency, $level),
@@ -77,7 +78,8 @@ class ResellerSeeder extends Seeder
             'payin' => [
                 'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['RESELLER']),
                 'pending_limit' => $rs->default_pending_limit,
-                'status' => true
+                'status' => true,
+                'auto_sms_approval'=> false
             ],
             'payout' => [
                 'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['RESELLER']),

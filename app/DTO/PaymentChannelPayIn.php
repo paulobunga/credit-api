@@ -8,5 +8,7 @@ final class PaymentChannelPayIn extends Base
 
     public int $max;
 
+    public array $sms_addresses;
+
     public bool $status;
 }

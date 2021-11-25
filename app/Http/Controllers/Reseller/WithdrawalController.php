@@ -44,10 +44,9 @@ class WithdrawalController extends Controller
                 'status',
                 'created_at',
             ])
-            ->where('reseller_id', auth()->id())
-            ->paginate($this->perPage);
+            ->where('reseller_id', auth()->id());
 
-        return $this->response->withPaginator($withdrawals, $this->transformer);
+        return $this->paginate($withdrawals, $this->transformer);
     }
 
     public function update(Request $request)

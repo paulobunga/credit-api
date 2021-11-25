@@ -105,7 +105,8 @@ class ResellerController extends Controller
                     $request->level
                 ),
                 'pending_limit' => $reseller_setting->getDefaultPendingLimit($request->level),
-                'status' => true
+                'status' => true,
+                'auto_sms_approval' => false
             ],
             'payout' => [
                 'commission_percentage' => $currency_setting->getCommissionPercentage(

@@ -19,9 +19,7 @@ trait PaymentChannelObserver
             throw new \Exception('Payment Channel currency is null', 405);
         }
 
-        if (!isset($this->reference)) {
-            $this->reference = $this->getReference();
-        }
+        $this->reference = $this->getReference();
 
         $request = Arr::only($request, $this->reference->attributes);
 
@@ -36,6 +34,35 @@ trait PaymentChannelObserver
         return $request;
     }
 
+    /**
+     * check whether payment channel support SMS auto approval or not
+     *
+     * @return bool
+     */
+    public function isSupportSMS()
+    {
+        return method_exists($this->getReference(), 'extractSMS');
+    }
+
+    /**
+     * Get data from SMS
+     *
+     * @param  string $sms
+     * @return array
+     */
+    public function extractSMS(string $sms)
+    {
+        if (!$this->isSupportSMS) {
+            return [];
+        }
+        return $this->getReference()->extractSMS($sms);
+    }
+
+    /**
+     * Get object reference by currency and name
+     *
+     * @return mixed
+     */
     public function getReference()
     {
         if ($this->reference) {

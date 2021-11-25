@@ -11,7 +11,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\ResellerBankCard;
 use App\Models\ResellerWithdrawal;
-use App\DTO\ResellerWithdrawalExtra;
 
 class SettlementController extends Controller
 {

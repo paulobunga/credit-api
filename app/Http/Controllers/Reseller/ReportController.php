@@ -34,10 +34,9 @@ class ReportController extends Controller
                 'amount',
                 'currency',
             ])
-            ->where('reseller_id', Auth::id())
-            ->paginate($this->perPage);
+            ->where('reseller_id', Auth::id());
 
-        return $this->response->withPaginator(
+        return $this->paginate(
             $reports,
             \App\Transformers\Reseller\ReportTransformer::class
         );
