@@ -17,7 +17,7 @@ class INR
         return [
             'account_name' => 'required',
             'account_number' => 'required',
-            'ifsc_code' => 'required',
+            'ifsc_code' => 'required|alpha_num||size:11',
         ];
     }
 }
