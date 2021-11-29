@@ -245,11 +245,11 @@ class AuthController extends Controller
 
         auth()->user()->devices()->updateOrCreate(
             [
-                'platform' => $request->platform
+                'platform' => $request->platform,
+                'uuid' => $request->data['userId']
             ],
             [
                 'logined_at' => Carbon::now(),
-                'uuid' => $request->data['userId'],
                 'token' => ''
             ]
         );
