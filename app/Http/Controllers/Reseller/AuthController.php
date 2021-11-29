@@ -214,44 +214,6 @@ class AuthController extends Controller
         return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }
 
-
-    /**
-     * Get token of beam service
-     *
-     * @method GET
-     * @param \Dingo\Api\Http\Request $request
-     *
-     * @return array
-     */
-    public function beam(Request $request)
-    {
-        $this->validate($request, [
-            'user_id' => 'required',
-            'platform' => 'required',
-        ]);
-        $user_id = Arr::last(explode('.', $request->user_id));
-        if ($user_id !=  auth()->id()) {
-            return response('Inconsistent request', 401);
-        }
-        $beam = new PushNotifications([
-            'secretKey' => config('broadcasting.connections.beams.secret_key'),
-            'instanceId' => config('broadcasting.connections.beams.instance_id'),
-        ]);
-
-        $token = $beam->generateToken('App.Models.Reseller.' . auth()->id());
-        auth()->user()->devices()->updateOrCreate(
-            [
-                'platform' => $request->platform
-            ],
-            [
-                'logined_at' => Carbon::now(),
-                'token' => $token['token']
-            ]
-        );
-
-        return response()->json($token);
-    }
-
     /**
      * Authenticate to private channel
      *
@@ -288,7 +250,7 @@ class AuthController extends Controller
             [
                 'logined_at' => Carbon::now(),
                 'uuid' => $request->data['userId'],
-                'token' => $request->data['pushToken']
+                'token' => ''
             ]
         );
 
