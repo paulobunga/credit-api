@@ -9,9 +9,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use NotificationChannels\OneSignal\OneSignalMessage;
+use App\Channels\Web\OneSignalWeb as Web;
 use App\Channels\Android\OneSignalAndroid as Android;
-use App\Channels\PusherBeams\PusherBeams;
-use App\Channels\PusherBeams\PusherMessage;
 
 abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
 {
@@ -57,7 +56,7 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
         return [
             'database',
             'broadcast',
-            PusherBeams::class,
+            Web::class,
             Android::class,
         ];
     }
@@ -94,22 +93,18 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
     }
 
     /**
-     * Notification message for IOS, Android and Web
-     *
+     * Create onesignal message of Web
      * @param  mixed $notifiable
-     * @return \App\Channels\PusherBeams\PusherMessage $msg
+     * @return \NotificationChannels\OneSignal\OneSignalMessage
      */
-    public function toPushNotification($notifiable)
+    public function toWeb($notifiable)
     {
         $data = $this->toArray($notifiable);
 
-        return PusherMessage::create()
-            ->web()
-            ->badge(1)
-            ->icon($data['icon'])
-            ->link($data['link'])
-            ->title($data['title'])
-            ->body($data['body']);
+        return OneSignalMessage::create()
+            ->setSubject($data['title'])
+            ->setBody($data['body'])
+            ->setUrl($data['link']);
     }
 
     /**
@@ -120,6 +115,7 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
     public function toAndroid($notifiable)
     {
         $data = $this->toArray($notifiable);
+    
         return OneSignalMessage::create()
             ->setSubject($data['title'])
             ->setBody($data['body'])
