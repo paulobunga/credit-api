@@ -13,11 +13,13 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Trait\HasJWTSubject;
 use App\DTO\ResellerPayIn;
 use App\DTO\ResellerPayOut;
+use App\Trait\UserTimezone;
 
 class Reseller extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable, HasJWTSubject;
     use Notifiable;
+    use UserTimezone;
 
     public $pushNotificationType = 'users';
 
@@ -113,4 +115,15 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     {
         $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;
     }
+
+    public function getCreatedAtAttribute($value) 
+    {    
+      return $this->convertTimezone($value);
+    }
+
+    public function getUpdatedAtAttribute($value) 
+    { 
+      return $this->convertTimezone($value);
+    }
+
 }

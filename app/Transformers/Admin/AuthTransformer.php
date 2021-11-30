@@ -22,6 +22,7 @@ class AuthTransformer extends TransformerAbstract
             'id' => $admin->id,
             'name' => $admin->name,
             'username' => $admin->username,
+            'timezone' => $admin->timezone,
             'status' => $admin->status,
             'access_token' => $this->token,
             'token_type' => 'bearer',

@@ -15,7 +15,7 @@ class LogTransformer extends TransformerAbstract
             'level' => $m->level,
             'message' => $m->message,
             'context' => $m->context,
-            'created_at' => $m->created_at
+            'created_at' => (string)$m->created_at
         ];
     }
 }

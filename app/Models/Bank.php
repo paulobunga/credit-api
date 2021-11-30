@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Trait\UserTimezone;
 
 /**
  * Model of bank
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Bank extends Model
 {
     use HasFactory;
+    use UserTimezone;
 
     protected $fillable = [
         'ident',
@@ -29,5 +31,15 @@ class Bank extends Model
     public function paymentChannels()
     {
         return $this->hasMany(PaymentChannel::class);
+    }
+
+    public function getCreatedAtAttribute($value) 
+    {    
+      return $this->convertTimezone($value);
+    }
+
+    public function getUpdatedAtAttribute($value) 
+    { 
+      return $this->convertTimezone($value);
     }
 }

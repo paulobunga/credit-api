@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Trait\UserTimezone;
 
 class Log extends Model
 {
+    use UserTimezone;
+
     public $timestamps = false;
 
     protected $connection = 'log';
@@ -74,5 +77,10 @@ class Log extends Model
     public function drop()
     {
         Schema::connection('log')->dropIfExists($this->table);
+    }
+
+    public function getCreatedAtAttribute($value) 
+    {    
+      return $this->convertTimezone($value);
     }
 }

@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use App\Observers\MerchantDepositObserver;
 use App\Models\Transaction;
 use App\Trait\SignValidator;
+use App\Trait\UserTimezone;
 
 class MerchantDeposit extends Model
 {
     use MerchantDepositObserver;
     use SignValidator;
+    use UserTimezone;
 
     protected $fillable = [
         'merchant_id',
@@ -133,5 +135,20 @@ class MerchantDeposit extends Model
     public function getCallbackStatusTextAttribute()
     {
         return array_keys(self::CALLBACK_STATUS)[$this->attributes['callback_status']];
+    }
+
+    public function getCreatedAtAttribute($value) 
+    {    
+      return $this->convertTimezone($value);
+    }
+
+    public function getUpdatedAtAttribute($value) 
+    { 
+      return $this->convertTimezone($value);
+    }
+
+    public function getNotifiedAtAttribute($value) 
+    { 
+      return $this->convertTimezone($value);
     }
 }

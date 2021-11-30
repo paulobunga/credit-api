@@ -17,6 +17,7 @@ $api->group([
         $api->post('/auth/logout', ['as' => 'auth.logout', 'uses' => 'AuthController@logout']);
         $api->post('/auth/refresh', ['as' => 'auth.refresh', 'uses' => 'AuthController@refresh']);
         $api->post('/auth/me', ['as' => 'auth.me', 'uses' => 'AuthController@me']);
+        $api->put('/auth/update', ['as' => 'auth.update', 'uses' => 'AuthController@update']);
 
         $api->group([
             'middleware' => [

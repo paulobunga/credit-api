@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use App\Observers\ResellerDepositObserver;
 use App\Models\Transaction;
 use App\DTO\ResellerDepositExtra;
+use App\Trait\UserTimezone;
 
 class ResellerDeposit extends Model
 {
     use ResellerDepositObserver;
+    use UserTimezone;
 
     protected $fillable = [
         'reseller_id',
@@ -67,5 +69,15 @@ class ResellerDeposit extends Model
     public function getStatusTextAttribute()
     {
         return array_keys(self::STATUS)[$this->attributes['status']];
+    }
+
+    public function getCreatedAtAttribute($value) 
+    { 
+      return $this->convertTimezone($value);
+    }
+
+    public function getUpdatedAtAttribute($value) 
+    { 
+      return $this->convertTimezone($value);
     }
 }

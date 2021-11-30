@@ -65,4 +65,24 @@ class AuthController extends Controller
     {
         return $this->response->item(auth()->user(), new AuthTransformer(auth()->refresh()));
     }
+
+    /**
+     * Update user information.
+     *
+     * @method PUT
+     * @param \Dingo\Api\Http\Request $request
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
+    public function update(Request $request)
+    {
+        $this->validate($request, [
+            'timezone' => "required",
+        ]);
+        auth()->user()->update([
+            'timezone' => $request->timezone,
+        ]);
+
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
+    }
 }
