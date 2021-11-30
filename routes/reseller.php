@@ -50,6 +50,5 @@ $api->group([
         $api->resource('sms', 'SmsController', ['only' => ['store']]);
         
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
-        $api->get("/reports/month", ['as' => 'reports.month', 'uses' => 'ReportController@month']);
     });
 });
