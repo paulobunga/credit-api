@@ -47,15 +47,4 @@ class ResellerActivateCode extends Model
     {
         return substr(explode('@', $this->attributes['code'])[0], 4);
     }
-
-    public function getExpiredAtAttribute($value) 
-    {    
-      return $this->convertTimezone($value);
-    }
-
-    public function getActivatedAtAttribute($value) 
-    { 
-      return $this->convertTimezone($value);
-    }
-
 }

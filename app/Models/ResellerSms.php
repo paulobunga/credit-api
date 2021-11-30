@@ -38,19 +38,4 @@ class ResellerSms extends Model
     {
         return $this->belongsTo(Reseller::class);
     }
-
-    public function getSentAtAttribute($value) 
-    {    
-        return $this->convertTimezone($value);
-    }
-
-    public function getReceivedAtAttribute($value) 
-    {    
-        return $this->convertTimezone($value);
-    }
-
-    public function getCreatedAtAttribute($value) 
-    {    
-        return $this->convertTimezone($value);
-    }
 }

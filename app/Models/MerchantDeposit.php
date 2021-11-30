@@ -136,19 +136,4 @@ class MerchantDeposit extends Model
     {
         return array_keys(self::CALLBACK_STATUS)[$this->attributes['callback_status']];
     }
-
-    public function getCreatedAtAttribute($value) 
-    {    
-      return $this->convertTimezone($value);
-    }
-
-    public function getUpdatedAtAttribute($value) 
-    { 
-      return $this->convertTimezone($value);
-    }
-
-    public function getNotifiedAtAttribute($value) 
-    { 
-      return $this->convertTimezone($value);
-    }
 }

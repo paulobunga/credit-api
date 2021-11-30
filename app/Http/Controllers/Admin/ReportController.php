@@ -9,9 +9,23 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use App\Transformers\Admin\ReportResellerTransformer;
 use App\Transformers\Admin\ReportMerchantTransformer;
+use App\Trait\UserTimezone;
 
 class ReportController extends Controller
-{
+{ 
+    use UserTimezone;
+
+    protected $db_timezone;
+
+    protected $user_timezone;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->db_timezone = env('DB_TIMEZONE');
+        $this->user_timezone = $this->userTimezoneOffset();
+    }
+    
     public function reseller()
     {
         $reports = QueryBuilder::for(\App\Models\ReportDailyReseller::class)
@@ -24,10 +38,10 @@ class ReportController extends Controller
                 AllowedFilter::partial('name', 'resellers.name'),
                 AllowedFilter::callback(
                     'date_between',
-                    fn ($query, $v) => $query->where([
-                        ['report_daily_resellers.start_at', '>=', $v[0]],
-                        ['report_daily_resellers.end_at', '<=', $v[1]],
-                    ])
+                    fn ($query, $v) => $query->whereRaw("
+                      CONVERT_TZ(report_daily_resellers.start_at, '{$this->db_timezone}', '{$this->user_timezone}') >= ? 
+                      AND CONVERT_TZ(report_daily_resellers.end_at, '{$this->db_timezone}', '{$this->user_timezone}') <= ?
+                    ", $v)
                 ),
             ])
             ->allowedSorts([
@@ -57,10 +71,10 @@ class ReportController extends Controller
                 AllowedFilter::partial('name', 'merchants.name'),
                 AllowedFilter::callback(
                     'date_between',
-                    fn ($query, $v) => $query->where([
-                        ['report_daily_merchants.start_at', '>=', $v[0]],
-                        ['report_daily_merchants.end_at', '<=', $v[1]],
-                    ])
+                    fn ($query, $v) => $query->whereRaw("
+                      CONVERT_TZ(report_daily_merchants.start_at, '{$this->db_timezone}', '{$this->user_timezone}') >= ? AND 
+                      CONVERT_TZ(report_daily_merchants.end_at, '{$this->db_timezone}', '{$this->user_timezone}') <= ?
+                    ", $v)
                 ),
             ])
             ->allowedSorts([

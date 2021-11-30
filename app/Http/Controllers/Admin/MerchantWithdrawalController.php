@@ -9,12 +9,26 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Http\Controllers\Controller;
 use App\Models\MerchantWithdrawal;
+use App\Trait\UserTimezone;
 
 class MerchantWithdrawalController extends Controller
 {
+    use UserTimezone;
+
     protected $model = MerchantWithdrawal::class;
 
     protected $transformer = \App\Transformers\Admin\MerchantWithdrawalTransformer::class;
+
+    protected $db_timezone;
+    
+    protected $user_timezone;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->db_timezone = env('DB_TIMEZONE');
+        $this->user_timezone = $this->userTimezoneOffset();
+    }
 
     public function index(Request $request)
     {
@@ -39,11 +53,11 @@ class MerchantWithdrawalController extends Controller
                 AllowedFilter::exact('status', 'merchant_withdrawals.status'),
                 AllowedFilter::callback(
                     'created_at_between',
-                    fn ($query, $v) => $query->whereBetween('merchant_withdrawals.created_at', $v)
+                    fn ($query, $v) => $query->whereRaw("CONVERT_TZ(merchant_withdrawals.created_at, '{$this->db_timezone}', '{$this->user_timezone}') BETWEEN ? AND ?", $v)
                 ),
                 AllowedFilter::callback(
                     'updated_at_between',
-                    fn ($query, $v) => $query->whereBetween('merchant_withdrawals.updated_at', $v)
+                    fn ($query, $v) => $query->whereRaw("CONVERT_TZ(merchant_withdrawals.updated_at, '{$this->db_timezone}', '{$this->user_timezone}') BETWEEN ? AND ?", $v)
                 ),
             ])
             ->allowedSorts([
