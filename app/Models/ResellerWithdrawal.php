@@ -76,14 +76,4 @@ class ResellerWithdrawal extends Model
     {
         return array_keys(self::STATUS)[$this->attributes['status']];
     }
-
-    public function getCreatedAtAttribute($value) 
-    {    
-      return $this->convertTimezone($value);
-    }
-
-    public function getUpdatedAtAttribute($value) 
-    { 
-      return $this->convertTimezone($value);
-    }
 }

@@ -507,4 +507,13 @@ class ExecuteSql extends Command
         }
         DB::commit();
     }
+
+    protected function addAdminTimezone()
+    {
+        if (!Schema::hasColumn('admins', 'timezone')) {
+            Schema::table('admins', function (Blueprint $table) {
+                $table->string('timezone', 60)->after('status')->default(env('APP_TIMEZONE'));
+            });
+        }
+    }
 }

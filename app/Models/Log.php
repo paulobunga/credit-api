@@ -78,9 +78,4 @@ class Log extends Model
     {
         Schema::connection('log')->dropIfExists($this->table);
     }
-
-    public function getCreatedAtAttribute($value) 
-    {    
-      return $this->convertTimezone($value);
-    }
 }

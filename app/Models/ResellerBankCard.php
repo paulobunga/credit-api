@@ -51,15 +51,4 @@ class ResellerBankCard extends Model
         $attributes = json_decode($this->attributes['attributes'], true);
         return $attributes[$reference->primary] ?? '--';
     }
-
-    public function getCreatedAtAttribute($value) 
-    {    
-      return $this->convertTimezone($value);
-    }
-
-    public function getUpdatedAtAttribute($value) 
-    { 
-      return $this->convertTimezone($value);
-    }
-
 }

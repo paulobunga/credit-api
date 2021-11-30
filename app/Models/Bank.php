@@ -31,15 +31,5 @@ class Bank extends Model
     public function paymentChannels()
     {
         return $this->hasMany(PaymentChannel::class);
-    }
-
-    public function getCreatedAtAttribute($value) 
-    {    
-      return $this->convertTimezone($value);
-    }
-
-    public function getUpdatedAtAttribute($value) 
-    { 
-      return $this->convertTimezone($value);
-    }
+    } 
 }

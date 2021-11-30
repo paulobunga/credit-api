@@ -31,10 +31,4 @@ class ReportDailyMerchant extends Model
     {
         return $this->belongsTo(Merchant::class);
     }
-
-    public function getCreatedAtAttribute($value) 
-    {    
-      return $this->convertTimezone($value);
-    }
-
 }

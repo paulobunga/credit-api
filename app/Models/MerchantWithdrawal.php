@@ -116,19 +116,4 @@ class MerchantWithdrawal extends Model
             Carbon::now()->addMinutes(1)
         );
     }
-
-    public function getCreatedAtAttribute($value) 
-    {    
-      return $this->convertTimezone($value);
-    }
-
-    public function getUpdatedAtAttribute($value) 
-    { 
-      return $this->convertTimezone($value);
-    }
-
-    public function getNotifiedAtAttribute($value) 
-    { 
-      return $this->convertTimezone($value);
-    }
 }

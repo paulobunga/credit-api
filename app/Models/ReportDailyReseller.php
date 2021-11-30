@@ -30,10 +30,4 @@ class ReportDailyReseller extends Model
     {
         return $this->belongsTo(Reseller::class);
     }
-
-    public function getCreatedAtAttribute($value) 
-    {    
-      return $this->convertTimezone($value);
-    }
-
 }
