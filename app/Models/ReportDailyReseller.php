@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Trait\UserTimezone;
 
 class ReportDailyReseller extends Model
 {
+    use UserTimezone;
+
     public $timestamps = false;
     
     protected $fillable = [
@@ -27,4 +30,10 @@ class ReportDailyReseller extends Model
     {
         return $this->belongsTo(Reseller::class);
     }
+
+    public function getCreatedAtAttribute($value) 
+    {    
+      return $this->convertTimezone($value);
+    }
+
 }

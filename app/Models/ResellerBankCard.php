@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Observers\ResellerBankCardObserver;
+use App\Trait\UserTimezone;
 
 class ResellerBankCard extends Model
 {
     use ResellerBankCardObserver;
-    
+    use UserTimezone;
+
     protected $fillable = [
         'reseller_id',
         'payment_channel_id',
@@ -49,4 +51,15 @@ class ResellerBankCard extends Model
         $attributes = json_decode($this->attributes['attributes'], true);
         return $attributes[$reference->primary] ?? '--';
     }
+
+    public function getCreatedAtAttribute($value) 
+    {    
+      return $this->convertTimezone($value);
+    }
+
+    public function getUpdatedAtAttribute($value) 
+    { 
+      return $this->convertTimezone($value);
+    }
+
 }

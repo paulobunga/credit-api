@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use App\Trait\SignValidator;
 use App\Observers\MerchantWithdrawalObserver;
+use App\Trait\UserTimezone;
 
 class MerchantWithdrawal extends Model
 {
     use MerchantWithdrawalObserver;
     use SignValidator;
+    use UserTimezone;
 
     protected $fillable = [
         'merchant_id',
@@ -113,5 +115,20 @@ class MerchantWithdrawal extends Model
             'withdrawals/' . $this->attributes['order_id'],
             Carbon::now()->addMinutes(1)
         );
+    }
+
+    public function getCreatedAtAttribute($value) 
+    {    
+      return $this->convertTimezone($value);
+    }
+
+    public function getUpdatedAtAttribute($value) 
+    { 
+      return $this->convertTimezone($value);
+    }
+
+    public function getNotifiedAtAttribute($value) 
+    { 
+      return $this->convertTimezone($value);
     }
 }

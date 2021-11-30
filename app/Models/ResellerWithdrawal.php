@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use App\Observers\ResellerWithdrawalObserver;
 use App\Models\Transaction;
 use App\DTO\ResellerWithdrawalExtra;
+use App\Trait\UserTimezone;
 
 class ResellerWithdrawal extends Model
 {
     use ResellerWithdrawalObserver;
+    use UserTimezone;
 
     protected $fillable = [
         'reseller_id',
@@ -73,5 +75,15 @@ class ResellerWithdrawal extends Model
     public function getStatusTextAttribute()
     {
         return array_keys(self::STATUS)[$this->attributes['status']];
+    }
+
+    public function getCreatedAtAttribute($value) 
+    {    
+      return $this->convertTimezone($value);
+    }
+
+    public function getUpdatedAtAttribute($value) 
+    { 
+      return $this->convertTimezone($value);
     }
 }

@@ -27,6 +27,7 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
         'username',
         'password',
         'status',
+        'timezone'
     ];
 
     protected $hidden = [

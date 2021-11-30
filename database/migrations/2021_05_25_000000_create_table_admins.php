@@ -20,6 +20,7 @@ class CreateTableAdmins extends Migration
             $table->string('username')->unique()->index();
             $table->string('password', 60);
             $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
+            $table->string('timezone', 60)->default(env('APP_TIMEZONE'));
             $table->timestamps();
         });
 

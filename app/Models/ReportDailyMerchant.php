@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Trait\UserTimezone;
 
 class ReportDailyMerchant extends Model
 {
+    use UserTimezone;
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -28,4 +31,10 @@ class ReportDailyMerchant extends Model
     {
         return $this->belongsTo(Merchant::class);
     }
+
+    public function getCreatedAtAttribute($value) 
+    {    
+      return $this->convertTimezone($value);
+    }
+
 }
