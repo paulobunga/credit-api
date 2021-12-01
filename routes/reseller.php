@@ -31,7 +31,7 @@ $api->group([
 
         $api->resource('banks', 'BankController', ['only' => ['index']]);
         
-        $api->resource('bankcards', 'BankCardController');
+        $api->resource('bankcards', 'BankCardController', ['only' => ['index']]);
         $api->put("/bankcards/status/{bankcard}", [
             'as' => 'bankcards.status', 'uses' => 'BankCardController@status'
         ]);

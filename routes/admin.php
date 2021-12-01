@@ -79,9 +79,7 @@ $api->group([
                 'as' => 'resellers.makeUp', 'uses' => 'ResellerController@makeUp'
             ]);
 
-            $api->resource('reseller_bank_cards', 'ResellerBankCardController', [
-                'only' => ['index', 'update', 'destroy']
-            ]);
+            $api->resource('reseller_bank_cards', 'ResellerBankCardController', ['except' => ['show']]);
 
             $api->resource('reseller_deposits', 'ResellerDepositController', ['only' => ['index', 'update']]);
 
