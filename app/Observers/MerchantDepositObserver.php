@@ -28,10 +28,10 @@ trait MerchantDepositObserver
 
     public function setStatusAttribute($value)
     {
-        $this->attributes['status'] = $value;
         if ($this->exists) {
             static::onStatusChangeEvent($value, $this);
         }
+        $this->attributes['status'] = $value;
     }
     /**
      * Handle the status "changed" event.
@@ -46,7 +46,7 @@ trait MerchantDepositObserver
             MerchantDeposit::STATUS['ENFORCED'],
             MerchantDeposit::STATUS['MAKEUP'],
         ])) {
-            if ($m->reseller->credit < $m->amount) {
+            if ($m->reseller->credit < $m->amount && $status != MerchantDeposit::STATUS['ENFORCED']) {
                 throw new \Exception('Amount exceed credit of agent', 405);
             }
             // merchant add credit and deduct transaction fee
