@@ -7,7 +7,7 @@ use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\ResellerSms;
-use App\Filters\Admin\ResellerSmsCreatedAtBetweenFilter;
+use App\Filters\DateFilter;
 
 class ResellerSmsController extends Controller
 {
@@ -36,7 +36,7 @@ class ResellerSmsController extends Controller
             ->allowedFilters([
                 AllowedFilter::partial('name', 'resellers.name'),
                 AllowedFilter::exact('status'),
-                AllowedFilter::custom('created_at_between', new ResellerSmsCreatedAtBetweenFilter),
+                AllowedFilter::custom('created_at_between', new DateFilter('reseller_sms')),
             ])
             ->allowedSorts([
                 'id',

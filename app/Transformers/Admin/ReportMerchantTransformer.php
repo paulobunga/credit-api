@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Transformers\Admin;
 
 use Illuminate\Database\Eloquent\Model;
@@ -11,8 +12,8 @@ class ReportMerchantTransformer extends TransformerAbstract
         return [
             'id' => $m->id,
             'merchant' => $m->merchant->name,
-            'start_at' => $m->start_at,
-            'end_at' => $m->end_at,
+            'start_at' => (string) $m->start_at,
+            'end_at' => (string)$m->end_at,
             'turnover' => $m->turnover,
             'credit' => $m->credit,
             'transaction_fee' => $m->transaction_fee,

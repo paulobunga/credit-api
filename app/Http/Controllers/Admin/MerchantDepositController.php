@@ -9,8 +9,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use App\Models\MerchantDeposit;
 use App\Http\Controllers\Controller;
-use App\Filters\Admin\MerchantDepositCreatedAtBetweenFilter;
-use App\Filters\Admin\MerchantDepositUpdatedAtBetweenFilter;
+use App\Filters\DateFilter;
 
 class MerchantDepositController extends Controller
 {
@@ -45,8 +44,8 @@ class MerchantDepositController extends Controller
                 AllowedFilter::partial('merchant_name', 'merchants.name'),
                 AllowedFilter::partial('reseller_name', 'resellers.name'),
                 AllowedFilter::exact('status', 'merchant_deposits.status'),
-                AllowedFilter::custom('created_at_between', new MerchantDepositCreatedAtBetweenFilter),
-                AllowedFilter::custom('updated_at_between', new MerchantDepositUpdatedAtBetweenFilter),
+                AllowedFilter::custom('created_at_between', new DateFilter('merchant_deposits')),
+                AllowedFilter::custom('updated_at_between', new DateFilter('merchant_deposits')),
             ])
             ->allowedSorts([
                 AllowedSort::field('id', 'merchant_deposits.id'),

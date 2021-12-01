@@ -12,8 +12,8 @@ class ReportResellerTransformer extends TransformerAbstract
         return [
             'id' => $m->id,
             'name' => $m->reseller->name,
-            'start_at' => $m->start_at,
-            'end_at' => $m->end_at,
+            'start_at' => (string)$m->start_at,
+            'end_at' => (string)$m->end_at,
             'turnover' => $m->turnover,
             'credit' => $m->credit,
             'coin' => $m->coin,

@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
+use App\Http\Controllers\Controller;
 use App\Transformers\Admin\ReportResellerTransformer;
 use App\Transformers\Admin\ReportMerchantTransformer;
-use App\Filters\Admin\ReportResellerDateBetweenFilter;
-use App\Filters\Admin\ReportMerchantDateBetweenFilter;
+use App\Filters\DateFilter;
 
 class ReportController extends Controller
-{ 
+{
     public function reseller()
     {
         $reports = QueryBuilder::for(\App\Models\ReportDailyReseller::class)
@@ -24,7 +22,7 @@ class ReportController extends Controller
             ->select('report_daily_resellers.*', 'resellers.name AS name')
             ->allowedFilters([
                 AllowedFilter::partial('name', 'resellers.name'),
-                AllowedFilter::custom('date_between', new ReportResellerDateBetweenFilter),
+                AllowedFilter::custom('date_between', new DateFilter('report_daily_resellers')),
             ])
             ->allowedSorts([
                 'id',
@@ -51,7 +49,7 @@ class ReportController extends Controller
             ->select('report_daily_merchants.*', 'merchants.name AS name')
             ->allowedFilters([
                 AllowedFilter::partial('name', 'merchants.name'),
-                AllowedFilter::custom('date_between', new ReportMerchantDateBetweenFilter),
+                AllowedFilter::custom('date_between', new DateFilter('report_daily_merchants')),
             ])
             ->allowedSorts([
                 'id',
