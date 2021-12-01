@@ -22,7 +22,7 @@
         </label>
         <select name="channel" x-model="channel"
             class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-            <template x-for="c in channelFilter">
+            <template x-for="c in getChannels()">
                 <option x-bind:val="c.name" x-text="c.name"></option>
             </template>
         </select>
@@ -50,7 +50,7 @@
                 Bank name
             </label>
             <select name="bank_name" x-model="bank_name" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-              <template x-for="b in bankFilter">
+              <template x-for="b in getBanks()">
                   <option x-bind:val="b.name" x-text="b.name"></option>
               </template>
             </select>
@@ -163,16 +163,19 @@
             bank_name: '{{ $banks[0]["name"]??'' }}',
             _channels: @json($channels),
             _banks: @json($banks),
-            channelFilter: [],
-            bankFilter: [],
             getChannels(){
-              this.channelFilter = this._channels.filter(channel=>channel.currency == this.currency);
-              this.bankFilter = this._banks.filter(bank=>bank.currency == this.currency);
-              this.channel = this.channelFilter[0].name;
-              this.bank_name = this.bankFilter[0].name;
+              return this._channels.filter(channel=>channel.currency == this.currency);
+            },
+            getBanks(){
+                return this._banks.filter(bank=>bank.currency == this.currency);
             },
             init(){
-              this.getChannels();
+              this.$watch('currency', (value) => {
+                  this.channel = this.getChannels()[0].name;
+              })
+              this.$watch('bank_name', (value) => {
+                  this.bank_name = this.getBanks()[0].name;
+              })
             }
         }));
     });
