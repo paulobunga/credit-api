@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Transformers\Reseller;
 
 use Illuminate\Database\Eloquent\Model;
@@ -10,8 +11,8 @@ class ReportTransformer extends TransformerAbstract
     {
         return [
             'id' => $report->id,
-            'start_at' => $report->start_at,
-            'end_at' => $report->end_at,
+            'start_at' => (string)$report->start_at,
+            'end_at' => (string)$report->end_at,
             'turnover' => $report->turnover,
             'credit' => $report->credit,
             'coin' => $report->coin,

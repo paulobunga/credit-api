@@ -35,7 +35,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('report:daily')
             ->name('ReportDaily')
             ->runInBackground()
-            ->dailyAt('02:00');
+            ->everyTenMinutes();
         # Activate code check
         $schedule->command('activate:check')
             ->name('ActivateCheck')

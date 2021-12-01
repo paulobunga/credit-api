@@ -57,7 +57,7 @@ class ReportDaily extends Command
     {
         try {
             $date = $this->argument('date') ?
-                Carbon::parse($this->argument('date'))->toDateString() : date('Y-m-d', strtotime('-1 day'));
+                Carbon::parse($this->argument('date'))->toDateString() : date('Y-m-d', strtotime('-1 minutes'));
         } catch (InvalidArgumentException $e) {
             $this->error('invalid argument date');
             return;
