@@ -271,8 +271,10 @@ class DepositController extends Controller
                 r.id AS reseller_id,
                 rbc.id AS reseller_bank_card_id,
                 pc.NAME AS channel,
+                r.credit AS credit,
                 r.currency AS currency,
                 COUNT(md.id) AS pending,
+                COALESCE(SUM(md.amount),0) AS pending_amount,
                 SUM(
                     CASE
                         WHEN md.amount = {$request->amount} THEN 1
@@ -299,7 +301,8 @@ class DepositController extends Controller
             reseller_pending AS (
             SELECT
                 reseller_id,
-                SUM(pending) AS total_pending 
+                SUM(pending_amount) AS total_pending_amount,
+                SUM(pending) AS total_pending
                 FROM
                     reseller_channels
                 GROUP BY
@@ -310,7 +313,8 @@ class DepositController extends Controller
             FROM
                 reseller_channels
                 JOIN reseller_pending USING ( reseller_id ) 
-            WHERE total_pending < pending_limit 
+            WHERE total_pending < pending_limit
+                AND total_pending_amount + {$request->amount} <= credit
                 AND channel = '{$request->channel}' 
                 AND same_amount = 0";
         // dd($sql);
