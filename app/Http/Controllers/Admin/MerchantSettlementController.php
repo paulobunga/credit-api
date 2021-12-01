@@ -4,17 +4,22 @@ namespace App\Http\Controllers\Admin;
 
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Illuminate\Support\Facades\DB;
 use Dingo\Api\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Filters\Admin\MerchantSettlementCreatedAtBetweenFilter;
+use App\Filters\DateFilter;
 
 class MerchantSettlementController extends Controller
 {
     protected $model = \App\Models\MerchantSettlement::class;
 
     protected $transformer = \App\Transformers\Admin\MerchantSettlementTransformer::class;
-
+    
+    /**
+     * Get list of merchant settlement
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @return json
+     */
     public function index(Request $request)
     {
         $merchant_settlements = QueryBuilder::for($this->model)
@@ -26,7 +31,7 @@ class MerchantSettlementController extends Controller
             ->allowedFilters([
                 AllowedFilter::partial('name', 'merchants.name'),
                 AllowedFilter::exact('status'),
-                AllowedFilter::custom('created_at_between', new MerchantSettlementCreatedAtBetweenFilter),
+                AllowedFilter::custom('created_at_between', new DateFilter('merchant_settlements')),
             ])
             ->allowedSorts([
                 'id',

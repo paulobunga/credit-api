@@ -2,22 +2,26 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Http\Controllers\Controller;
 use App\Models\MerchantWithdrawal;
-use App\Filters\Admin\MerchantWithdrawalCreatedAtBetweenFilter;
-use App\Filters\Admin\MerchantWithdrawalUpdatedAtBetweenFilter;
+use App\Filters\DateFilter;
 
 class MerchantWithdrawalController extends Controller
 {
     protected $model = MerchantWithdrawal::class;
 
     protected $transformer = \App\Transformers\Admin\MerchantWithdrawalTransformer::class;
-
+    
+    /**
+     * Get list of merchant withdrawals
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @return json
+     */
     public function index(Request $request)
     {
         $merchant_withdrawals = QueryBuilder::for($this->model)
@@ -39,8 +43,8 @@ class MerchantWithdrawalController extends Controller
                 AllowedFilter::partial('merchant_name', 'merchants.name'),
                 AllowedFilter::partial('reseller_name', 'resellers.name'),
                 AllowedFilter::exact('status', 'merchant_withdrawals.status'),
-                AllowedFilter::custom('created_at_between', new MerchantWithdrawalCreatedAtBetweenFilter),
-                AllowedFilter::custom('updated_at_between', new MerchantWithdrawalUpdatedAtBetweenFilter),
+                AllowedFilter::custom('created_at_between', new DateFilter('merchant_withdrawals')),
+                AllowedFilter::custom('updated_at_between', new DateFilter('merchant_withdrawals')),
             ])
             ->allowedSorts([
                 'id',

@@ -7,7 +7,7 @@ use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\ResellerDeposit;
-use App\Filters\Admin\ResellerDepositCreatedAtBetweenFilter;
+use App\Filters\DateFilter;
 
 class ResellerDepositController extends Controller
 {
@@ -33,7 +33,7 @@ class ResellerDepositController extends Controller
             ->allowedFilters([
                 AllowedFilter::partial('name', 'resellers.name'),
                 AllowedFilter::exact('status'),
-                AllowedFilter::custom('created_at_between', new ResellerDepositCreatedAtBetweenFilter),
+                AllowedFilter::custom('created_at_between', new DateFilter('reseller_deposits')),
             ])
             ->allowedSorts([
                 'id',

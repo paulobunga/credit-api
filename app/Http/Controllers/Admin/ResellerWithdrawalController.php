@@ -7,7 +7,7 @@ use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\ResellerWithdrawal;
-use App\Filters\Admin\ResellerWithdrawalCreatedAtBetweenFilter;
+use App\Filters\DateFilter;
 
 class ResellerWithdrawalController extends Controller
 {
@@ -33,7 +33,7 @@ class ResellerWithdrawalController extends Controller
             ->allowedFilters([
                 AllowedFilter::partial('name', 'resellers.name'),
                 AllowedFilter::exact('status'),
-                AllowedFilter::custom('created_at_between', new ResellerWithdrawalCreatedAtBetweenFilter),
+                AllowedFilter::custom('created_at_between', new DateFilter('reseller_withdrawals')),
             ])
             ->allowedSorts([
                 'id',

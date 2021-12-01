@@ -24,6 +24,8 @@ class ReportDailyMerchant extends Model
 
     protected $casts = [
         'extra' => 'array',
+        'start_at'  => 'datetime:Y-m-d H:i:s',
+        'end_at'  => 'datetime:Y-m-d H:i:s',
         'created_at'  => 'datetime:Y-m-d H:i:s',
     ];
     
