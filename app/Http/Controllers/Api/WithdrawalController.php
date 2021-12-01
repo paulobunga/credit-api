@@ -429,7 +429,7 @@ class WithdrawalController extends Controller
             'channel' => $channel,
             'attributes' => $withdrawal->attributes,
             'steps' => $steps,
-            'amount' => number_format($withdrawal->amount) ? $channel->currency == 'BDT' : number_format($withdrawal->amount, 2, '.', ''),
+            'amount' => number_format($withdrawal->amount, 2, '.', ''),
         ]);
     }
 }
