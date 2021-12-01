@@ -73,14 +73,23 @@ class MerchantWithdrawalController extends Controller
             ]),
             'reason' => 'required_if:status,' . MerchantWithdrawal::STATUS['CANCELED'],
         ]);
-        $merchant_withdrawal->update([
-            'status' => $request->status,
-            'extra' => [
-                'admin_id' => $request->admin_id,
-                'reason' => $request->reason
-            ]
-        ]);
-
+        if ($request->status == MerchantWithdrawal::STATUS['CANCELED']) {
+            $merchant_withdrawal->update([
+                'status' => $request->status,
+                'extra' => [
+                    'admin_id' => $request->admin_id,
+                    'reason' => $request->reason
+                ]
+            ]);
+        } else {
+            $merchant_withdrawal->update([
+                'status' => $request->status,
+                'extra' => [
+                    'admin_id' => $request->admin_id
+                ]
+            ]);
+        }
+        
         return $this->response->item($merchant_withdrawal, $this->transformer);
     }
 
