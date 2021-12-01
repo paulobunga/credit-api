@@ -7,26 +7,13 @@ use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\ResellerWithdrawal;
-use App\Trait\UserTimezone;
+use App\Filters\Admin\ResellerWithdrawalCreatedAtBetweenFilter;
 
 class ResellerWithdrawalController extends Controller
 {
-    use UserTimezone;
-
     protected $model = ResellerWithdrawal::class;
 
     protected $transformer = \App\Transformers\Admin\ResellerWithdrawalTransformer::class;
-
-    protected $db_timezone;
-
-    protected $user_timezone;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->db_timezone = env('DB_TIMEZONE');
-        $this->user_timezone = $this->userTimezoneOffset();
-    }
 
     public function index(Request $request)
     {
@@ -46,10 +33,7 @@ class ResellerWithdrawalController extends Controller
             ->allowedFilters([
                 AllowedFilter::partial('name', 'resellers.name'),
                 AllowedFilter::exact('status'),
-                AllowedFilter::callback(
-                    'created_at_between',
-                    fn ($query, $v) => $query->whereRaw("CONVERT_TZ(reseller_withdrawals.created_at, '{$this->db_timezone}', '{$this->user_timezone}') BETWEEN ? AND ?", $v)
-                ),
+                AllowedFilter::custom('created_at_between', new ResellerWithdrawalCreatedAtBetweenFilter),
             ])
             ->allowedSorts([
                 'id',
