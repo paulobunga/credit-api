@@ -9,26 +9,14 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use App\Models\MerchantDeposit;
 use App\Http\Controllers\Controller;
-use App\Trait\UserTimezone;
+use App\Filters\Admin\MerchantDepositCreatedAtBetweenFilter;
+use App\Filters\Admin\MerchantDepositUpdatedAtBetweenFilter;
 
 class MerchantDepositController extends Controller
 {
-    use UserTimezone;
-
     protected $model = MerchantDeposit::class;
 
     protected $transformer = \App\Transformers\Admin\MerchantDepositTransformer::class;
-
-    protected $db_timezone;
-
-    protected $user_timezone;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->db_timezone = env('DB_TIMEZONE');
-        $this->user_timezone = $this->userTimezoneOffset();
-    }
 
     /**
      * Get Merchant Deposit lists
@@ -57,14 +45,8 @@ class MerchantDepositController extends Controller
                 AllowedFilter::partial('merchant_name', 'merchants.name'),
                 AllowedFilter::partial('reseller_name', 'resellers.name'),
                 AllowedFilter::exact('status', 'merchant_deposits.status'),
-                AllowedFilter::callback(
-                    'created_at_between',
-                    fn ($query, $v) => $query->whereRaw("CONVERT_TZ(merchant_deposits.created_at, '{$this->db_timezone}', '{$this->user_timezone}') BETWEEN ? AND ?", $v)
-                ),
-                AllowedFilter::callback(
-                    'updated_at_between',
-                    fn ($query, $v) => $query->whereRaw("CONVERT_TZ(merchant_deposits.updated_at, '{$this->db_timezone}', '{$this->user_timezone}') BETWEEN ? AND ?", $v)
-                ),
+                AllowedFilter::custom('created_at_between', new MerchantDepositCreatedAtBetweenFilter),
+                AllowedFilter::custom('updated_at_between', new MerchantDepositUpdatedAtBetweenFilter),
             ])
             ->allowedSorts([
                 AllowedSort::field('id', 'merchant_deposits.id'),
