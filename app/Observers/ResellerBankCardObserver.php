@@ -19,6 +19,12 @@ trait ResellerBankCardObserver
                     ])->first();
                 }
                 break;
+            case 'BKASH':
+            case 'NAGAD':
+            case 'ROCKET':
+            case 'UPAY':
+                $bankcard = static::where('attributes->wallet_number', $attributes['wallet_number'])->first();
+                break;
         }
         if ($bankcard && $bankcard->id != $ignore) {
             throw new \Exception('Bankcard is existed!');
