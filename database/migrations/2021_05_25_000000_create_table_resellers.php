@@ -30,6 +30,7 @@ class CreateTableResellers extends Migration
             $table->json('payout')->default(new Expression('(JSON_OBJECT())'));
             $table->unsignedInteger('downline_slot')->default(0);
             $table->tinyInteger('status')->default(0)->comment('0:inactive,1:active,2:disabled');
+            $table->tinyInteger('online')->default(0)->comment('0:offline,1:online');
             $table->string('password', 60);
             $table->timestamps();
         });

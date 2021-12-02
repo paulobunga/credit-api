@@ -516,4 +516,13 @@ class ExecuteSql extends Command
             });
         }
     }
+
+    protected function addResellerOnline()
+    {
+        if (!Schema::hasColumn('resellers', 'online')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->tinyInteger('online')->after('status')->default(0)->comment('0:offline,1:online');
+            });
+        }
+    }
 }
