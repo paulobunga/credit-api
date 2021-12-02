@@ -270,21 +270,11 @@ class AuthController extends Controller
     {
         $this->validate($request, [
             'type' => 'required|in:' . implode(',', [
-                'payin',
-                'payout',
                 'auto_sms_approval'
             ]),
             'value' => 'boolean'
         ]);
         switch ($request->type) {
-            case 'payin':
-                auth()->user()->payin->status = $request->value;
-                auth()->user()->save();
-                break;
-            case 'payout':
-                auth()->user()->payout->status = $request->value;
-                auth()->user()->save();
-                break;
             case 'auto_sms_approval':
                 auth()->user()->payin->auto_sms_approval = $request->value;
                 auth()->user()->save();
