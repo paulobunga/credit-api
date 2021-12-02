@@ -6,7 +6,6 @@ use Illuminate\Support\Str;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
-use App\Models\Merchant;
 use App\Models\Reseller;
 use App\Models\ResellerBankCard;
 use App\Models\ResellerDeposit;
@@ -25,9 +24,10 @@ class ResellerController extends Controller
     protected $transformer = \App\Transformers\Admin\ResellerTransformer::class;
 
     /**
-     * Get agent lists
-     * @param \Dingo\Api\Http\Request
-     * @return \Dingo\Api\Http\JsonResponse
+     * Get agent list
+     * @param \Dingo\Api\Http\Request $request
+     * @method GET
+     * @return json
      */
     public function index(Request $request)
     {
