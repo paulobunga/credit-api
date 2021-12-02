@@ -12,6 +12,7 @@ use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 use App\Models\MerchantDeposit;
 use App\Models\Transaction;
+use App\Filters\JsonColumnFilter;
 use App\Http\Controllers\Controller;
 
 /**
@@ -37,7 +38,9 @@ class ResellerController extends Controller
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('level'),
                 AllowedFilter::exact('currency'),
-                AllowedFilter::exact('status')
+                AllowedFilter::exact('status'),
+                AllowedFilter::custom('payin_status', new JsonColumnFilter('payin->status')),
+                AllowedFilter::custom('payout_status', new JsonColumnFilter('payout->status')),
             ])
             ->allowedSorts([
                 'id',
