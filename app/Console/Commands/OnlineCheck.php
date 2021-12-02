@@ -37,22 +37,15 @@ class OnlineCheck extends Command
      * @return mixed
      */
     public function handle()
-    {   
-        Reseller::where('online', 1)->update(['online' => '0']);
-        $pusher = new \Pusher\Pusher(
-          env('PUSHER_APP_KEY'),
-          env('PUSHER_APP_SECRET'),
-          env('PUSHER_APP_ID'),
-          ['cluster' => env('PUSHER_APP_CLUSTER')]
-        );
-        $channels = $pusher->getChannels()->channels;
-        if(!empty($channels)){
-          foreach ($channels as $channel => $v) {
-            if(strpos($channel, 'Reseller') !== false) {
-              $arr = explode('.', $channel);
-              Reseller::where('id', end($arr))->update(['online' => '1']);
+    {
+        $channels = app('pusher')->getChannels()->channels;
+        $reseller_ids = [];
+        foreach ($channels as $channel => $_) {
+            if (preg_match('/private-App.Models.Reseller.(\d+)/', $channel, $id)) {
+                $reseller_ids[] = $id[1];
             }
-          }
         }
+        Reseller::whereIn('id', $reseller_ids)->update(['online' => 1]);
+        Reseller::whereNotIn('id', $reseller_ids)->update(['online' => 0]);
     }
 }
