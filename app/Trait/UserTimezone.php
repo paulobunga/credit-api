@@ -7,14 +7,15 @@ use Carbon\Carbon;
 trait UserTimezone
 {
 
-    protected function convertToUserTimezone(?string $dateTime)
+    protected function convertToUserTimezone(?string $dateTime, string $from = null)
     {
         if (empty($dateTime)) {
             return $dateTime;
         }
+        $from = $from ?? env('APP_TIMEZONE');
         $user_timezone = auth()->user()->timezone ?? env('APP_TIMEZONE');
 
-        return Carbon::parse($dateTime)->timezone($user_timezone);
+        return Carbon::parse($dateTime, $from)->timezone($user_timezone);
     }
 
     public function getCreatedAtAttribute($value)
@@ -54,11 +55,11 @@ trait UserTimezone
 
     public function getStartAtAttribute($value)
     {
-        return $this->convertToUserTimezone($value);
+        return $this->convertToUserTimezone($value, '+08:00');
     }
 
     public function getEndAtAttribute($value)
     {
-        return $this->convertToUserTimezone($value);
+        return $this->convertToUserTimezone($value, '+08:00');
     }
 }

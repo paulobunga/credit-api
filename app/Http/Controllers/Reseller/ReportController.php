@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Reseller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use App\Filters\DateFilter;
 use App\Models\ReportDailyReseller;
 use App\Http\Controllers\Controller;
 
@@ -23,13 +24,7 @@ class ReportController extends Controller
     {
         $reports = QueryBuilder::for($this->model)
             ->allowedFilters([
-                AllowedFilter::callback(
-                    'date_between',
-                    fn ($query, $v) => $query->where([
-                        ['start_at', '>=', $v[0]],
-                        ['end_at', '<=', $v[1]],
-                    ])
-                ),
+                AllowedFilter::custom('date_between', new DateFilter('report_daily_resellers')),
             ])
             ->allowedSorts([
                 'id',
