@@ -14,7 +14,13 @@ class PaymentChannelController extends Controller
     protected $model = \App\Models\PaymentChannel::class;
 
     protected $transformer = \App\Transformers\Admin\PaymentChannelTransformer::class;
-
+    
+    /**
+     * Get payment channel list
+     *
+     * @param \Dingo\Api\Http\Request $request
+     * @return json
+     */
     public function index(Request $request)
     {
         $admins = QueryBuilder::for($this->model)
@@ -29,10 +35,9 @@ class PaymentChannelController extends Controller
                 'id',
                 'name',
                 'currency',
-            ])
-            ->paginate($this->perPage);
+            ]);
 
-        return $this->response->withPaginator($admins, $this->transformer);
+        return $this->paginate($admins, $this->transformer);
     }
 
     public function store(Request $request)

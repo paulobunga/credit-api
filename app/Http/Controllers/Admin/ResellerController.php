@@ -6,13 +6,13 @@ use Illuminate\Support\Str;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
-use App\Models\Merchant;
 use App\Models\Reseller;
 use App\Models\ResellerBankCard;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 use App\Models\MerchantDeposit;
 use App\Models\Transaction;
+use App\Filters\JsonColumnFilter;
 use App\Http\Controllers\Controller;
 
 /**
@@ -25,9 +25,10 @@ class ResellerController extends Controller
     protected $transformer = \App\Transformers\Admin\ResellerTransformer::class;
 
     /**
-     * Get agent lists
-     * @param \Dingo\Api\Http\Request
-     * @return \Dingo\Api\Http\JsonResponse
+     * Get agent list
+     * @param \Dingo\Api\Http\Request $request
+     * @method GET
+     * @return json
      */
     public function index(Request $request)
     {
@@ -37,7 +38,9 @@ class ResellerController extends Controller
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('level'),
                 AllowedFilter::exact('currency'),
-                AllowedFilter::exact('status')
+                AllowedFilter::exact('status'),
+                AllowedFilter::custom('payin_status', new JsonColumnFilter('payin->status')),
+                AllowedFilter::custom('payout_status', new JsonColumnFilter('payout->status')),
             ])
             ->allowedSorts([
                 'id',

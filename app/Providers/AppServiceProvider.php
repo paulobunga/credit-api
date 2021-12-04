@@ -27,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
                 config('view.compiled')
             );
         });
+        $this->app->singleton('pusher', function () {
+            return app('Illuminate\Broadcasting\BroadcastManager')->driver('pusher')->getPusher();
+        });
         // register custom morph type
         Relation::morphMap([
             'admin' => 'App\Models\Admin',

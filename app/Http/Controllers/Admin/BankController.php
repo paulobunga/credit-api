@@ -19,9 +19,10 @@ class BankController extends Controller
     protected $transformer = \App\Transformers\Admin\BankTransformer::class;
 
     /**
-     * Get bank lists
-     * @param \Dingo\Api\Http\Request $request HTTP request
-     * @return \Dingo\Api\Http\JsonResponse
+     * Get bank list
+     * @param \Dingo\Api\Http\Request $request
+     * @method GET
+     * @return json
      */
     public function index(Request $request)
     {

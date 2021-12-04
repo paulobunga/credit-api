@@ -43,11 +43,11 @@ class DateFilter implements Filter
                 return $query->whereRaw(
                     "CONVERT_TZ(
                         {$this->table}.start_at, 
-                        '{$timezone}',
+                        '+08:00',
                         '{$user_timezone}') >= ? 
                     AND CONVERT_TZ(
                         {$this->table}.end_at,
-                        '{$timezone}',
+                        '+08:00',
                         '{$user_timezone}') <= ?",
                     $value
                 );
