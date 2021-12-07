@@ -33,6 +33,11 @@ class ResellerController extends Controller
     public function index(Request $request)
     {
         $m = QueryBuilder::for($this->model)
+            ->with([
+                'online'
+            ])
+            ->leftJoin('reseller_onlines', 'reseller_onlines.reseller_id', '=', 'resellers.id')
+            ->selectRaw('resellers.*, COALESCE(reseller_onlines.status, 0) AS online_status, reseller_onlines.last_seen_at')
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),

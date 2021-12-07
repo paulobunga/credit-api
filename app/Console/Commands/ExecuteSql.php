@@ -518,15 +518,25 @@ class ExecuteSql extends Command
     }
 
     protected function addResellerOnline()
-    {
+    {   
         if (!Schema::hasColumn('resellers', 'online')) {
             Schema::table('resellers', function (Blueprint $table) {
-                $table->tinyInteger('online')->after('status')->default(0)->comment('0:offline,1:online');
+                $table->dropColumn('online');
             });
         }
         if (!Schema::hasColumn('resellers', 'last_seen')) {
             Schema::table('resellers', function (Blueprint $table) {
-                $table->timestamp('last_seen')->after('password')->nullable();
+                $table->dropColumn('last_seen');
+            });
+        }
+
+        if (!Schema::hasTable('reseller_online')) {
+            Schema::create('reseller_online', function (Blueprint $table) {
+              $table->id();
+              $table->unsignedBigInteger('reseller_id');
+              $table->tinyInteger('status')->default(0)->comment('0:offline,1:online');
+              $table->timestamp('last_seen_at')->nullable();
+              $table->timestamp('created_at')->useCurrent();
             });
         }
     }

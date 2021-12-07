@@ -30,9 +30,7 @@ class CreateTableResellers extends Migration
             $table->json('payout')->default(new Expression('(JSON_OBJECT())'));
             $table->unsignedInteger('downline_slot')->default(0);
             $table->tinyInteger('status')->default(0)->comment('0:inactive,1:active,2:disabled');
-            $table->tinyInteger('online')->default(0)->comment('0:offline,1:online');
             $table->string('password', 60);
-            $table->timestamp('last_seen')->nullable();
             $table->timestamps();
         });
 
@@ -86,6 +84,13 @@ class CreateTableResellers extends Migration
             $table->timestamp('received_at');
             $table->timestamp('created_at')->useCurrent();
         });
+        Schema::create('reseller_onlines', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('reseller_id');
+            $table->tinyInteger('status')->default(0)->comment('0:offline,1:online');
+            $table->timestamp('last_seen_at')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+        });
     }
 
     /**
@@ -94,7 +99,8 @@ class CreateTableResellers extends Migration
      * @return void
      */
     public function down()
-    {
+    {   
+        Schema::dropIfExists('reseller_onlines');
         Schema::dropIfExists('reseller_sms');
         Schema::dropIfExists('reseller_withdrawals');
         Schema::dropIfExists('reseller_deposits');

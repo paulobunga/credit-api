@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\Reseller;
+use App\Models\ResellerOnline;
 use Carbon\Carbon;
 
 class OnlineCheck extends Command
@@ -46,7 +46,22 @@ class OnlineCheck extends Command
                 $reseller_ids[] = $id[1];
             }
         }
-        Reseller::where('online', 1)->whereNotIn('id', $reseller_ids)->update(['online' => 0, 'last_seen' => Carbon::now()]);
-        Reseller::whereIn('id', $reseller_ids)->update(['online' => 1, 'last_seen' => NULL]);
+        
+        ResellerOnline::where('status', 1)
+        -> whereNotIn('reseller_id', $reseller_ids)
+        -> update([
+          'status' => 0, 
+          'last_seen_at' => Carbon::now()
+        ]);
+        
+        foreach ($reseller_ids as $id) {
+          ResellerOnline::updateOrCreate([
+            'reseller_id' => $id,
+          ],[
+            'reseller_id' => $id,
+            'status' => 1, 
+            'last_seen_at' => NULL
+          ]);
+        }
     }
 }
