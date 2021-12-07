@@ -13,8 +13,7 @@ class ResellerOnline  extends Model
 
     protected $fillable = [
         'reseller_id',
-        'status',
-        'last_seen_at',
+        'status'
     ];
 
     protected $casts = [

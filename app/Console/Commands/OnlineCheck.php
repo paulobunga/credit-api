@@ -20,7 +20,7 @@ class OnlineCheck extends Command
      *
      * @var string
      */
-    protected $description = 'Check Reseller and Merchant is online';
+    protected $description = 'Check Reseller is online';
 
     /**
      * Create a new command instance.
@@ -46,22 +46,7 @@ class OnlineCheck extends Command
                 $reseller_ids[] = $id[1];
             }
         }
-        
-        ResellerOnline::where('status', 1)
-        -> whereNotIn('reseller_id', $reseller_ids)
-        -> update([
-          'status' => 0, 
-          'last_seen_at' => Carbon::now()
-        ]);
-        
-        foreach ($reseller_ids as $id) {
-          ResellerOnline::updateOrCreate([
-            'reseller_id' => $id,
-          ],[
-            'reseller_id' => $id,
-            'status' => 1, 
-            'last_seen_at' => NULL
-          ]);
-        }
+        ResellerOnline::whereIn('reseller_id', $reseller_ids)->update(['status' => 1]);
+        ResellerOnline::whereNotIn('reseller_id', $reseller_ids)->update(['status' => 0]);
     }
 }

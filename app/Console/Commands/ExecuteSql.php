@@ -15,6 +15,7 @@ use App\Models\Reseller;
 use App\Models\PaymentChannel;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
+use App\Models\ResellerOnline;
 
 class ExecuteSql extends Command
 {
@@ -519,17 +520,6 @@ class ExecuteSql extends Command
 
     protected function addResellerOnline()
     {   
-        if (!Schema::hasColumn('resellers', 'online')) {
-            Schema::table('resellers', function (Blueprint $table) {
-                $table->dropColumn('online');
-            });
-        }
-        if (!Schema::hasColumn('resellers', 'last_seen')) {
-            Schema::table('resellers', function (Blueprint $table) {
-                $table->dropColumn('last_seen');
-            });
-        }
-
         if (!Schema::hasTable('reseller_online')) {
             Schema::create('reseller_online', function (Blueprint $table) {
               $table->id();
@@ -537,6 +527,24 @@ class ExecuteSql extends Command
               $table->tinyInteger('status')->default(0)->comment('0:offline,1:online');
               $table->timestamp('last_seen_at')->nullable();
               $table->timestamp('created_at')->useCurrent();
+            });
+        }
+
+        foreach (Reseller::all() as $r) {
+          ResellerOnline::create([
+            'reseller_id' => $r->id,
+            'status' => 0
+          ]);
+        }
+
+        if (Schema::hasColumn('resellers', 'online')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->dropColumn(['online']);
+            });
+        }
+        if (Schema::hasColumn('resellers', 'last_seen')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->dropColumn(['last_seen']);
             });
         }
     }

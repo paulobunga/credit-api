@@ -12,6 +12,7 @@ use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 use App\Models\MerchantDeposit;
 use App\Models\Transaction;
+use App\Models\ResellerOnline;
 use App\Filters\JsonColumnFilter;
 use App\Http\Controllers\Controller;
 
@@ -33,11 +34,6 @@ class ResellerController extends Controller
     public function index(Request $request)
     {
         $m = QueryBuilder::for($this->model)
-            ->with([
-                'online'
-            ])
-            ->leftJoin('reseller_onlines', 'reseller_onlines.reseller_id', '=', 'resellers.id')
-            ->selectRaw('resellers.*, COALESCE(reseller_onlines.status, 0) AS online_status, reseller_onlines.last_seen_at')
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),
@@ -129,6 +125,11 @@ class ResellerController extends Controller
             'status' => ($request->level == Reseller::LEVEL['RESELLER']) ?
                 Reseller::STATUS['INACTIVE'] :
                 Reseller::STATUS['ACTIVE'],
+        ]);
+        
+        ResellerOnline::create([
+          'reseller_id' => $reseller['id'],
+          'status' => 1,
         ]);
 
         return $this->response->item($reseller, $this->transformer);

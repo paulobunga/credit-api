@@ -88,7 +88,7 @@ class CreateTableResellers extends Migration
             $table->id();
             $table->unsignedBigInteger('reseller_id');
             $table->tinyInteger('status')->default(0)->comment('0:offline,1:online');
-            $table->timestamp('last_seen_at')->nullable();
+            $table->timestamp('last_seen_at')->useCurrent()->useCurrentOnUpdate();
             $table->timestamp('created_at')->useCurrent();
         });
     }
