@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Query\Expression;
-use App\Models\Reseller;
 
 class CreateTableResellers extends Migration
 {
@@ -84,13 +83,6 @@ class CreateTableResellers extends Migration
             $table->timestamp('received_at');
             $table->timestamp('created_at')->useCurrent();
         });
-        Schema::create('reseller_onlines', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('reseller_id');
-            $table->tinyInteger('status')->default(0)->comment('0:offline,1:online');
-            $table->timestamp('last_seen_at')->useCurrent()->useCurrentOnUpdate();
-            $table->timestamp('created_at')->useCurrent();
-        });
     }
 
     /**
@@ -100,7 +92,6 @@ class CreateTableResellers extends Migration
      */
     public function down()
     {   
-        Schema::dropIfExists('reseller_onlines');
         Schema::dropIfExists('reseller_sms');
         Schema::dropIfExists('reseller_withdrawals');
         Schema::dropIfExists('reseller_deposits');

@@ -519,33 +519,36 @@ class ExecuteSql extends Command
     }
 
     protected function addResellerOnline()
-    {   
-        if (!Schema::hasTable('reseller_onlines')) {
-            Schema::create('reseller_onlines', function (Blueprint $table) {
-              $table->id();
-              $table->unsignedBigInteger('reseller_id');
-              $table->tinyInteger('status')->default(0)->comment('0:offline,1:online');
-              $table->timestamp('last_seen_at')->useCurrent()->useCurrentOnUpdate();
-              $table->timestamp('created_at')->useCurrent();
+    {
+        if (!Schema::hasColumn('resellers', 'online')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->tinyInteger('online')->after('status')->default(0)->comment('0:offline,1:online');
             });
         }
+    }
 
-        foreach (Reseller::all() as $r) {
-          ResellerOnline::create([
-            'reseller_id' => $r->id,
-            'status' => 0
-          ]);
+    protected function addOnlineTable()
+    {
+        if (!Schema::hasTable('onlines')) {
+            Schema::create('onlines', function (Blueprint $table) {
+                $table->id();
+                $table->morphs('user');
+                $table->tinyInteger('status')->default(0)->comment('0:offline,1:online');
+                $table->timestamp('last_seen_at')->nullable();
+            });
         }
-
         if (Schema::hasColumn('resellers', 'online')) {
             Schema::table('resellers', function (Blueprint $table) {
-                $table->dropColumn(['online']);
+                $table->dropColumn('online');
             });
         }
-        if (Schema::hasColumn('resellers', 'last_seen')) {
-            Schema::table('resellers', function (Blueprint $table) {
-                $table->dropColumn(['last_seen']);
-            });
+        if (Schema::hasTable('onlines')) {
+            foreach (Reseller::all() as $r) {
+                $r->online()->firstOrCreate(
+                    ['user_id' => $r->id],
+                    ['status' => 0]
+                );
+            }
         }
     }
 }

@@ -14,12 +14,16 @@ use App\Trait\HasJWTSubject;
 use App\DTO\ResellerPayIn;
 use App\DTO\ResellerPayOut;
 use App\Trait\UserTimezone;
+use App\Trait\HasOnline;
+use App\Observers\ResellerObserver;
 
 class Reseller extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable, HasJWTSubject;
     use Notifiable;
     use UserTimezone;
+    use HasOnline;
+    use ResellerObserver;
 
     public $pushNotificationType = 'users';
 
@@ -88,11 +92,6 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     public function devices()
     {
         return $this->morphMany(Device::class, 'user');
-    }
-
-    public function online()
-    {
-        return $this->hasOne(ResellerOnline::class);
     }
 
     public function getWithdrawalCreditAttribute()

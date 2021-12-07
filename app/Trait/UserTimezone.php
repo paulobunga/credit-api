@@ -63,7 +63,7 @@ trait UserTimezone
         return $this->convertToUserTimezone($value, '+08:00');
     }
 
-    public function getLastSeenAttribute($value)
+    public function getLastSeenAtAttribute($value)
     {
         return $this->convertToUserTimezone($value);
     }
