@@ -33,6 +33,9 @@ class ResellerController extends Controller
     public function index(Request $request)
     {
         $m = QueryBuilder::for($this->model)
+            ->with([
+                'online'
+            ])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),

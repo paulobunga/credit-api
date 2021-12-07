@@ -15,6 +15,7 @@ use App\Models\Reseller;
 use App\Models\PaymentChannel;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
+use App\Models\ResellerOnline;
 
 class ExecuteSql extends Command
 {
@@ -523,6 +524,31 @@ class ExecuteSql extends Command
             Schema::table('resellers', function (Blueprint $table) {
                 $table->tinyInteger('online')->after('status')->default(0)->comment('0:offline,1:online');
             });
+        }
+    }
+
+    protected function addOnlineTable()
+    {
+        if (!Schema::hasTable('onlines')) {
+            Schema::create('onlines', function (Blueprint $table) {
+                $table->id();
+                $table->morphs('user');
+                $table->tinyInteger('status')->default(0)->comment('0:offline,1:online');
+                $table->timestamp('last_seen_at')->nullable();
+            });
+        }
+        if (Schema::hasColumn('resellers', 'online')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->dropColumn('online');
+            });
+        }
+        if (Schema::hasTable('onlines')) {
+            foreach (Reseller::all() as $r) {
+                $r->online()->firstOrCreate(
+                    ['user_id' => $r->id],
+                    ['status' => 0]
+                );
+            }
         }
     }
 }

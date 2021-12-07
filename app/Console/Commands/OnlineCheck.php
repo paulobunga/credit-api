@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\Online;
 use App\Models\Reseller;
+use Carbon\Carbon;
 
 class OnlineCheck extends Command
 {
@@ -19,7 +21,7 @@ class OnlineCheck extends Command
      *
      * @var string
      */
-    protected $description = 'Check Reseller and Merchant is online';
+    protected $description = 'Check Reseller is online';
 
     /**
      * Create a new command instance.
@@ -39,13 +41,28 @@ class OnlineCheck extends Command
     public function handle()
     {
         $channels = app('pusher')->getChannels()->channels;
-        $reseller_ids = [];
-        foreach ($channels as $channel => $_) {
-            if (preg_match('/private-App.Models.Reseller.(\d+)/', $channel, $id)) {
-                $reseller_ids[] = $id[1];
+        $reseller_ids = [
+            'online' => [],
+            'offline' => [],
+        ];
+        $resellers = Reseller::with('online')->get();
+        foreach ($resellers as $r) {
+            $online = isset($channels["private-App.Models.Reseller.{$r->id}"]);
+            if ($online) {
+                $reseller_ids['online'][] = $r->id;
+            } elseif ($r->online->status) {
+                $reseller_ids['offline'][] = $r->id;
             }
         }
-        Reseller::whereIn('id', $reseller_ids)->update(['online' => 1]);
-        Reseller::whereNotIn('id', $reseller_ids)->update(['online' => 0]);
+        // massive update
+        Online::where('user_type', 'reseller')
+            ->whereIn('user_id', $reseller_ids['online'])
+            ->update([
+                'status' => 1,
+                'last_seen_at' => Carbon::now()
+            ]);
+        Online::where('user_type', 'reseller')
+            ->whereIn('user_id', $reseller_ids['offline'])
+            ->update(['status' => 0]);
     }
 }

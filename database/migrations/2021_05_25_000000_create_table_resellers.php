@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Query\Expression;
-use App\Models\Reseller;
 
 class CreateTableResellers extends Migration
 {
@@ -30,7 +29,6 @@ class CreateTableResellers extends Migration
             $table->json('payout')->default(new Expression('(JSON_OBJECT())'));
             $table->unsignedInteger('downline_slot')->default(0);
             $table->tinyInteger('status')->default(0)->comment('0:inactive,1:active,2:disabled');
-            $table->tinyInteger('online')->default(0)->comment('0:offline,1:online');
             $table->string('password', 60);
             $table->timestamps();
         });
@@ -93,7 +91,7 @@ class CreateTableResellers extends Migration
      * @return void
      */
     public function down()
-    {
+    {   
         Schema::dropIfExists('reseller_sms');
         Schema::dropIfExists('reseller_withdrawals');
         Schema::dropIfExists('reseller_deposits');
