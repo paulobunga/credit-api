@@ -23,6 +23,7 @@ class ResellerTransformer extends TransformerAbstract
             'downline_slot' => $m->downline_slot,
             'status' => $m->status,
             'online' => $m->online,
+            'last_seen' => (string)$m->last_seen,
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Reseller;
+use Carbon\Carbon;
 
 class OnlineCheck extends Command
 {
@@ -45,7 +46,7 @@ class OnlineCheck extends Command
                 $reseller_ids[] = $id[1];
             }
         }
-        Reseller::whereIn('id', $reseller_ids)->update(['online' => 1]);
-        Reseller::whereNotIn('id', $reseller_ids)->update(['online' => 0]);
+        Reseller::where('online', 1)->whereNotIn('id', $reseller_ids)->update(['online' => 0, 'last_seen' => Carbon::now()]);
+        Reseller::whereIn('id', $reseller_ids)->update(['online' => 1, 'last_seen' => NULL]);
     }
 }

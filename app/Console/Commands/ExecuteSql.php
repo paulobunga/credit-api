@@ -524,5 +524,10 @@ class ExecuteSql extends Command
                 $table->tinyInteger('online')->after('status')->default(0)->comment('0:offline,1:online');
             });
         }
+        if (!Schema::hasColumn('resellers', 'last_seen')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->timestamp('last_seen')->after('password')->nullable();
+            });
+        }
     }
 }

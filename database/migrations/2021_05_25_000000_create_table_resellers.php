@@ -32,6 +32,7 @@ class CreateTableResellers extends Migration
             $table->tinyInteger('status')->default(0)->comment('0:inactive,1:active,2:disabled');
             $table->tinyInteger('online')->default(0)->comment('0:offline,1:online');
             $table->string('password', 60);
+            $table->timestamp('last_seen')->nullable();
             $table->timestamps();
         });
 
