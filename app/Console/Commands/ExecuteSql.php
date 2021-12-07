@@ -520,12 +520,12 @@ class ExecuteSql extends Command
 
     protected function addResellerOnline()
     {   
-        if (!Schema::hasTable('reseller_online')) {
-            Schema::create('reseller_online', function (Blueprint $table) {
+        if (!Schema::hasTable('reseller_onlines')) {
+            Schema::create('reseller_onlines', function (Blueprint $table) {
               $table->id();
               $table->unsignedBigInteger('reseller_id');
               $table->tinyInteger('status')->default(0)->comment('0:offline,1:online');
-              $table->timestamp('last_seen_at')->nullable();
+              $table->timestamp('last_seen_at')->useCurrent()->useCurrentOnUpdate();
               $table->timestamp('created_at')->useCurrent();
             });
         }
