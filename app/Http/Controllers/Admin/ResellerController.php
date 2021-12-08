@@ -42,6 +42,7 @@ class ResellerController extends Controller
                 AllowedFilter::exact('level'),
                 AllowedFilter::exact('currency'),
                 AllowedFilter::exact('status'),
+                AllowedFilter::partial('online_status', 'online.status'),
                 AllowedFilter::custom('payin_status', new JsonColumnFilter('payin->status')),
                 AllowedFilter::custom('payout_status', new JsonColumnFilter('payout->status')),
             ])
