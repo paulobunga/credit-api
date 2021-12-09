@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\MerchantDeposit;
+use App\Filters\DateFilter;
 
 class DepositController extends Controller
 {
@@ -56,10 +57,7 @@ class DepositController extends Controller
                         }
                     }
                 ),
-                AllowedFilter::callback(
-                    'created_at_between',
-                    fn ($query, $v) => $query->whereBetween('merchant_deposits.created_at', $v)
-                ),
+                AllowedFilter::custom('created_at_between', new DateFilter('merchant_deposits')),
             ])
             ->allowedSorts([
                 'id',

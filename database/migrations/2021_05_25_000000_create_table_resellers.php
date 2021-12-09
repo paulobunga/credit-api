@@ -30,6 +30,7 @@ class CreateTableResellers extends Migration
             $table->unsignedInteger('downline_slot')->default(0);
             $table->tinyInteger('status')->default(0)->comment('0:inactive,1:active,2:disabled');
             $table->string('password', 60);
+            $table->string('timezone', 60)->nullable();
             $table->timestamps();
         });
 

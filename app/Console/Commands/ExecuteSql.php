@@ -16,6 +16,7 @@ use App\Models\PaymentChannel;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 use App\Models\ResellerOnline;
+use App\Models\Setting;
 
 class ExecuteSql extends Command
 {
@@ -548,6 +549,21 @@ class ExecuteSql extends Command
                     ['user_id' => $r->id],
                     ['status' => 0]
                 );
+            }
+        }
+    }
+
+    protected function addResellerTimezone()
+    {
+        if (!Schema::hasColumn('resellers', 'timezone')) {
+            Schema::table('resellers', function (Blueprint $table) {
+              $table->string('timezone', 60)->nullable();
+            });
+        }
+        if (Schema::hasColumn('resellers', 'timezone')) {
+            foreach (Reseller::all() as $r) {
+                $r->timezone = Setting::CURRENCY_TIMEZONE[$r->currency];
+                $r->save();
             }
         }
     }

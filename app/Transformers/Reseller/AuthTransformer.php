@@ -32,6 +32,7 @@ class AuthTransformer extends TransformerAbstract
             'access_token' => $this->token,
             'token_type' => 'bearer',
             'expires_in' => Auth::factory()->getTTL() * 60,
+            'timezone' => $reseller->timezone,
         ];
     }
 }
