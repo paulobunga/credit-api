@@ -347,4 +347,13 @@ class ResellerController extends Controller
 
         return $this->response->item($m, $this->transformer);
     }
+
+    public function restore(Request $request)
+    {
+        $m = $this->model::findOrFail($this->parameters('reseller'));
+        $m->status = Reseller::STATUS['ACTIVE'];
+        $m->save();
+
+        return $this->response->item($m, $this->transformer);
+    }
 }
