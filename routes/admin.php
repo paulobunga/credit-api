@@ -52,9 +52,6 @@ $api->group([
             $api->put("/merchant_deposits/resend/{merchant_deposit}", [
                 'as' => 'merchant_deposits.resend', 'uses' => 'MerchantDepositController@resend'
             ]);
-            $api->put("/merchant_deposits/edit_amount/{merchant_deposit}", [
-                'as' => 'merchant_deposits.edit_amount', 'uses' => 'MerchantDepositController@editAmount'
-            ]);
 
             $api->resource('merchant_withdrawals', 'MerchantWithdrawalController', ['only' => ['index', 'update']]);
             $api->put("/merchant_withdrawals/resend/{merchant_withdrawal}", [
