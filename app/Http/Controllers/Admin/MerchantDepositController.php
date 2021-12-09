@@ -10,6 +10,7 @@ use Spatie\QueryBuilder\AllowedSort;
 use App\Models\MerchantDeposit;
 use App\Http\Controllers\Controller;
 use App\Filters\DateFilter;
+use App\Models\PaymentChannel;
 
 class MerchantDepositController extends Controller
 {
@@ -129,6 +130,40 @@ class MerchantDepositController extends Controller
             new \App\Transformers\Api\DepositTransformer,
             $m->merchant->api_key
         )));
+
+        return $this->response->item($m, $this->transformer);
+    }
+
+    public function editAmount(Request $request)
+    {
+        $m = $this->model::findOrFail($this->parameters('merchant_deposit'));
+        if (!in_array($m->status, [
+            MerchantDeposit::STATUS['PENDING'],
+            MerchantDeposit::STATUS['EXPIRED'],
+        ])) {
+            throw new \Exception('Status is not allowed to update', 401);
+        }
+
+        $this->validate($request, [
+            'amount' => 'required|numeric',
+        ]);
+
+        $channel = PaymentChannel::where([
+            'payin->status' => true,
+            'currency' => $m->currency,
+            'name' => $m->paymentChannel->name
+        ])->firstOrFail();
+        
+        if ($request->amount < $channel->payin->min || $request->amount > $channel->payin->max) {
+            throw new \Exception(
+                "Amount is not in range[{$channel->payin->min}, {$channel->payin->max}]!",
+                405
+            );
+        }
+
+        $m->update([
+            'amount' => $request->amount,
+        ]);
 
         return $this->response->item($m, $this->transformer);
     }
