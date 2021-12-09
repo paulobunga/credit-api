@@ -47,7 +47,7 @@ $api->group([
 
         $api->resource('settlements', 'SettlementController', ['only' => ['index', 'store']]);
 
-        $api->resource('sms', 'SmsController', ['only' => ['store']]);
+        $api->resource('sms', 'SmsController', ['only' => ['index', 'store']]);
         
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
     });

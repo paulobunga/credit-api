@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Reseller;
 
 use Dingo\Api\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 use App\Http\Controllers\Controller;
 use App\Models\ResellerSms;
 
@@ -12,6 +14,26 @@ class SmsController extends Controller
 
     protected $transformer = \App\Transformers\Reseller\SmsTransformer::class;
 
+    /**
+     * Get SMS list
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @return json
+     */
+    public function index(Request $request)
+    {
+        $m = QueryBuilder::for($this->model)
+            ->allowedFilters([
+                'id',
+                AllowedFilter::exact('status'),
+            ])
+            ->allowedSorts([
+                'id',
+                'status',
+            ]);
+
+        return $this->paginate($m, $this->transformer);
+    }
 
     /**
      * Store sms.
