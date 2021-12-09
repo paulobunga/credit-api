@@ -330,4 +330,21 @@ class ResellerController extends Controller
 
         return $this->success();
     }
+
+    public function toggleStatus(Request $request)
+    {
+        $m = $this->model::findOrFail($this->parameters('reseller'));
+        $this->validate($request, [
+            'status_type' => 'required|in:payin,payout',
+            'status' => 'required|boolean',
+        ]);
+        if($request->status_type == "payin"){
+          $m->payin->status = $request->status;
+        }else{
+          $m->payout->status = $request->status;
+        }
+        $m->save();
+
+        return $this->response->item($m, $this->transformer);
+    }
 }
