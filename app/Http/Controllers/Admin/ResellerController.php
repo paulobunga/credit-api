@@ -335,23 +335,16 @@ class ResellerController extends Controller
     {
         $m = $this->model::findOrFail($this->parameters('reseller'));
         $this->validate($request, [
-            'status_type' => 'required|in:payin,payout',
+            'status_type' => 'required|in:payin,payout,status',
             'status' => 'required|boolean',
         ]);
-        if($request->status_type == "payin"){
-          $m->payin->status = $request->status;
-        }else{
-          $m->payout->status = $request->status;
+        if ($request->status_type == "payin") {
+            $m->payin->status = $request->status;
+        } elseif ($request->status_type == "payout") {
+            $m->payout->status = $request->status;
+        } else {
+            $m->status = $request->status? Reseller::STATUS['ACTIVE'] : Reseller::STATUS['DISABLED'];
         }
-        $m->save();
-
-        return $this->response->item($m, $this->transformer);
-    }
-
-    public function restore(Request $request)
-    {
-        $m = $this->model::findOrFail($this->parameters('reseller'));
-        $m->status = Reseller::STATUS['ACTIVE'];
         $m->save();
 
         return $this->response->item($m, $this->transformer);
