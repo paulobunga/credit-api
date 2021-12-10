@@ -22,7 +22,8 @@ class EventServiceProvider extends ServiceProvider
                 'message'       => $msg->message,
                 'channel'       => Log::getName(),
                 'level'         => $msg->level,
-                'context'       => json_encode($msg->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                'context'       => json_encode($msg->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
+                'url'           => request()->fullUrl(),
             ]);
         });
     }
