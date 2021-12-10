@@ -557,12 +557,19 @@ class ExecuteSql extends Command
     {
         if (!Schema::hasColumn('resellers', 'timezone')) {
             Schema::table('resellers', function (Blueprint $table) {
-              $table->string('timezone', 60)->nullable();
+                $table->string('timezone', 60)->nullable()->after('password');
             });
         }
         if (Schema::hasColumn('resellers', 'timezone')) {
             foreach (Reseller::all() as $r) {
-                $r->timezone = Setting::CURRENCY_TIMEZONE[$r->currency];
+                if ($r->timezone) {
+                    continue;
+                }
+                $r->timezone = [
+                    'BDT' => 'Asia/Dhaka',
+                    'INR' => 'Asia/Kolkata',
+                    'VND' => 'Asia/Ho_Chi_Minh',
+                ][strtoupper($r->currency)] ?? env('APP_TIMEZONE');
                 $r->save();
             }
         }

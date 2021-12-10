@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Reseller;
 
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
-use Pusher\PushNotifications\PushNotifications;
 use App\Http\Controllers\Controller as Controller;
 use App\Transformers\Reseller\AuthTransformer;
 use App\Models\Reseller;
 use App\Models\ResellerActivateCode;
 use App\Settings\CurrencySetting;
-use App\Models\Setting;
 
 class AuthController extends Controller
 {
@@ -102,7 +99,6 @@ class AuthController extends Controller
             ],
             'downline_slot' => $agent_setting->getDefaultDownLineSlot(Reseller::LEVEL['RESELLER']),
             'status' =>  Reseller::STATUS['INACTIVE'],
-            'timezone' => Setting::CURRENCY_TIMEZONE[strtoupper($request->currency)],
         ]);
 
         return $this->success();

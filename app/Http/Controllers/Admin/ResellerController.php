@@ -14,7 +14,6 @@ use App\Models\MerchantDeposit;
 use App\Models\Transaction;
 use App\Filters\JsonColumnFilter;
 use App\Http\Controllers\Controller;
-use App\Models\Setting;
 
 /**
  * Reseller Endpoint
@@ -129,7 +128,6 @@ class ResellerController extends Controller
             'status' => ($request->level == Reseller::LEVEL['RESELLER']) ?
                 Reseller::STATUS['INACTIVE'] :
                 Reseller::STATUS['ACTIVE'],
-            'timezone' => Setting::CURRENCY_TIMEZONE[$currency],
         ]);
 
         return $this->response->item($reseller, $this->transformer);
