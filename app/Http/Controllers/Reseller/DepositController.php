@@ -19,8 +19,9 @@ class DepositController extends Controller
 
     /**
      * Get Merchant Deposit lists
-     *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @param \Dingo\Api\Http\Request $request
+     * @method GET
+     * @return json
      */
     public function index(Request $request)
     {
