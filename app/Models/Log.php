@@ -22,7 +22,6 @@ class Log extends Model
         'channel',
         'level',
         'context',
-        'url',
     ];
 
     protected $casts = [
@@ -56,7 +55,6 @@ class Log extends Model
         }
         Schema::connection('log')->create($table, function (Blueprint $table) {
             $table->id();
-            $table->string('url', 200)->nullable();
             $table->text('message');
             $table->string('channel', 10);
             $table->string('level', 12);

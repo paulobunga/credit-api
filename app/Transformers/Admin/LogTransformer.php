@@ -13,7 +13,6 @@ class LogTransformer extends TransformerAbstract
             'id' => $m->id,
             'channel' => $m->channel,
             'level' => $m->level,
-            'url' => $m->url,
             'message' => $m->message,
             'context' => $m->context,
             'created_at' => (string)$m->created_at
