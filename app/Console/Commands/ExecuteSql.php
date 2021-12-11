@@ -574,4 +574,18 @@ class ExecuteSql extends Command
             }
         }
     }
+
+    protected function addSMSTrxIdAndSimNum()
+    {
+        if (!Schema::hasColumn('reseller_sms', 'trx_id')) {
+            Schema::table('reseller_sms', function (Blueprint $table) {
+                $table->string('trx_id', 20)->default('')->after('address');
+            });
+        }
+        if (!Schema::hasColumn('reseller_sms', 'sim_num')) {
+            Schema::table('reseller_sms', function (Blueprint $table) {
+                $table->string('sim_num', 20)->default('')->after('trx_id');
+            });
+        }
+    }
 }

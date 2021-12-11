@@ -22,12 +22,13 @@ class BDT
     public function extractSMS(string $sms)
     {
         preg_match($this->sms_rule, $sms, $matches, PREG_UNMATCHED_AS_NULL);
+
         return [
             'amount' => isset($matches[2]) ? str_replace(',', '', $matches[2]) : null,
             'payer' => isset($matches[1]) ? $matches[1] : null,
             'commission' => isset($matches[3]) ? str_replace(',', '', $matches[3]) : null,
             'balance' => isset($matches[4]) ? str_replace(',', '', $matches[4]) : null,
-            'reference_id' => isset($matches[5]) ? $matches[5] : null,
+            'trx_id' => isset($matches[5]) ? $matches[5] : null,
         ];
     }
 }
