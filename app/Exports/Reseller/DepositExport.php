@@ -24,7 +24,8 @@ class DepositExport extends Base
         'amount' => 'Amount',
         'status' => 'Status',
         'extra' => 'Extra',
-        'created_at' => 'created_at'
+        'created_at' => 'Create Time',
+        'updated_at' => 'Update Time'
     ];
 
      /**
