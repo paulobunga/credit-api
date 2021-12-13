@@ -42,6 +42,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         'payout',
         'downline_slot',
         'status',
+        'timezone',
     ];
 
     protected $hidden = [

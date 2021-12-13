@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Trait\UserTimezone;
 
 class Transaction extends Model
 {
     public $timestamps = false;
+    use UserTimezone;
 
     protected $fillable = [
         'user_id',
@@ -16,6 +18,10 @@ class Transaction extends Model
         'before',
         'after',
         'currency',
+    ];
+
+    protected $casts = [
+        'created_at'  => 'datetime:Y-m-d H:i:s',
     ];
 
     public const TYPE = [

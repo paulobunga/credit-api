@@ -30,16 +30,16 @@ $api->group([
         $api->resource('activate_codes', 'ActivateCodeController', ['only' => ['index', 'store']]);
 
         $api->resource('banks', 'BankController', ['only' => ['index']]);
-        
+
         $api->resource('bankcards', 'BankCardController', ['only' => ['index']]);
         $api->put("/bankcards/status/{bankcard}", [
             'as' => 'bankcards.status', 'uses' => 'BankCardController@status'
         ]);
-        
+
         $api->resource('deposits', 'DepositController', ['only' => ['index', 'update']]);
 
         $api->resource('payment_channels', 'PaymentChannelController', ['only' => ['index']]);
-        
+
         $api->resource('withdrawals', 'WithdrawalController', ['only' => ['index', 'update']]);
         $api->get("/withdrawals/slip/{withdrawal}", [
             'as' => 'withdrawals.slip', 'uses' => 'WithdrawalController@slip'
@@ -47,8 +47,9 @@ $api->group([
 
         $api->resource('settlements', 'SettlementController', ['only' => ['index', 'store']]);
 
-        $api->resource('sms', 'SmsController', ['only' => ['store']]);
-        
+        $api->resource('sms', 'SmsController', ['only' => ['index', 'store']]);
+        $api->get('/sms/inbox', ['as' => 'sms.inbox', 'uses' => 'SmsController@inbox']);
+
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
     });
 });

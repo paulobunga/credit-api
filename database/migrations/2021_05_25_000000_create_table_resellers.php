@@ -30,6 +30,7 @@ class CreateTableResellers extends Migration
             $table->unsignedInteger('downline_slot')->default(0);
             $table->tinyInteger('status')->default(0)->comment('0:inactive,1:active,2:disabled');
             $table->string('password', 60);
+            $table->string('timezone', 60)->nullable();
             $table->timestamps();
         });
 
@@ -77,6 +78,8 @@ class CreateTableResellers extends Migration
             $table->string('model_name', 20)->default('');
             $table->string('platform', 10);
             $table->string('address', 30);
+            $table->string('trx_id', 20)->default('');
+            $table->string('sim_num', 20)->default('');
             $table->string('body', 1024);
             $table->unsignedTinyInteger('status')->default(0)->comment('0:Pending,1:Match,2:UnMatch');
             $table->timestamp('sent_at');

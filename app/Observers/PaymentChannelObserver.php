@@ -45,20 +45,6 @@ trait PaymentChannelObserver
     }
 
     /**
-     * Get data from SMS
-     *
-     * @param  string $sms
-     * @return array
-     */
-    public function extractSMS(string $sms)
-    {
-        if (!$this->isSupportSMS) {
-            return [];
-        }
-        return $this->getReference()->extractSMS($sms);
-    }
-
-    /**
      * Get object reference by currency and name
      *
      * @return mixed

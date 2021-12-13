@@ -23,7 +23,7 @@ class TransactionTransformer extends TransformerAbstract
             'amount' => $m->amount,
             'before' => $m->before,
             'after' => $m->after,
-            'created_at' => $m->created_at,
+            'created_at' => (string)$m->created_at,
         ];
     }
 }

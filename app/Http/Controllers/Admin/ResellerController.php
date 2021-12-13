@@ -42,6 +42,7 @@ class ResellerController extends Controller
                 AllowedFilter::exact('level'),
                 AllowedFilter::exact('currency'),
                 AllowedFilter::exact('status'),
+                AllowedFilter::exact('online_status', 'online.status'),
                 AllowedFilter::custom('payin_status', new JsonColumnFilter('payin->status')),
                 AllowedFilter::custom('payout_status', new JsonColumnFilter('payout->status')),
             ])
@@ -328,5 +329,24 @@ class ResellerController extends Controller
         ]);
 
         return $this->success();
+    }
+
+    public function toggleStatus(Request $request)
+    {
+        $m = $this->model::findOrFail($this->parameters('reseller'));
+        $this->validate($request, [
+            'status_type' => 'required|in:payin,payout,status',
+            'status' => 'required|boolean',
+        ]);
+        if ($request->status_type == "payin") {
+            $m->payin->status = $request->status;
+        } elseif ($request->status_type == "payout") {
+            $m->payout->status = $request->status;
+        } else {
+            $m->status = $request->status? Reseller::STATUS['ACTIVE'] : Reseller::STATUS['DISABLED'];
+        }
+        $m->save();
+
+        return $this->response->item($m, $this->transformer);
     }
 }

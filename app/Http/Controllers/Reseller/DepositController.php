@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\MerchantDeposit;
+use App\Filters\DateFilter;
 
 class DepositController extends Controller
 {
@@ -18,8 +19,9 @@ class DepositController extends Controller
 
     /**
      * Get Merchant Deposit lists
-     *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @param \Dingo\Api\Http\Request $request
+     * @method GET
+     * @return json
      */
     public function index(Request $request)
     {
@@ -56,10 +58,7 @@ class DepositController extends Controller
                         }
                     }
                 ),
-                AllowedFilter::callback(
-                    'created_at_between',
-                    fn ($query, $v) => $query->whereBetween('merchant_deposits.created_at', $v)
-                ),
+                AllowedFilter::custom('created_at_between', new DateFilter('merchant_deposits')),
             ])
             ->allowedSorts([
                 'id',

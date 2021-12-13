@@ -78,6 +78,9 @@ $api->group([
             $api->put("/resellers/make_up/{reseller}", [
                 'as' => 'resellers.makeUp', 'uses' => 'ResellerController@makeUp'
             ]);
+            $api->put("/resellers/toggle_status/{reseller}", [
+                'as' => 'resellers.toggle_status', 'uses' => 'ResellerController@toggleStatus'
+            ]);
 
             $api->resource('reseller_bank_cards', 'ResellerBankCardController', ['except' => ['show']]);
 

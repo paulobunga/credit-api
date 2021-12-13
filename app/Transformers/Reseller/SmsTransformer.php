@@ -11,6 +11,8 @@ class SmsTransformer extends TransformerAbstract
     {
         return [
             'id' => $m->id,
+            'trx_id' => $m->trx_id,
+            'sim_num' => $m->sim_num,
             'address' => $m->address,
             'body' => $m->body,
             'status' => $m->status,

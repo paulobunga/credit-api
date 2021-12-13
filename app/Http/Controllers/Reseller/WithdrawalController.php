@@ -9,6 +9,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Http\Controllers\Controller;
 use App\Models\MerchantWithdrawal;
+use App\Filters\DateFilter;
 
 class WithdrawalController extends Controller
 {
@@ -32,10 +33,7 @@ class WithdrawalController extends Controller
                         }
                     }
                 ),
-                AllowedFilter::callback(
-                    'created_at_between',
-                    fn ($query, $v) => $query->whereBetween('created_at', $v)
-                ),
+                AllowedFilter::custom('created_at_between', new DateFilter('merchant_withdrawals')),
             ])
             ->allowedSorts([
                 'id',

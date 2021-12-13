@@ -31,5 +31,5 @@ class Bank extends Model
     public function paymentChannels()
     {
         return $this->hasMany(PaymentChannel::class);
-    } 
+    }
 }

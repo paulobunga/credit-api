@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Reseller;
 
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
-use Pusher\PushNotifications\PushNotifications;
 use App\Http\Controllers\Controller as Controller;
 use App\Transformers\Reseller\AuthTransformer;
 use App\Models\Reseller;
@@ -100,7 +98,7 @@ class AuthController extends Controller
                 'daily_amount_limit' => 50000,
             ],
             'downline_slot' => $agent_setting->getDefaultDownLineSlot(Reseller::LEVEL['RESELLER']),
-            'status' =>  Reseller::STATUS['INACTIVE']
+            'status' =>  Reseller::STATUS['INACTIVE'],
         ]);
 
         return $this->success();
@@ -161,6 +159,7 @@ class AuthController extends Controller
             'username' => "required|unique:resellers,username," . auth()->id(),
             'phone' => 'required',
             'payout_daily_amount_limit' => 'required|numeric|min:1',
+            'timezone' => 'required',
         ]);
         auth()->user()->update([
             'name' => $request->name,
@@ -168,7 +167,8 @@ class AuthController extends Controller
             'phone' => $request->phone,
             'payout' => auth()->user()->payout->clone(
                 daily_amount_limit: $request->payout_daily_amount_limit
-            )
+            ),
+            'timezone' => $request->timezone,
         ]);
 
         return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));

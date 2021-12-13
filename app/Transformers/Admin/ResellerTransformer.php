@@ -24,6 +24,7 @@ class ResellerTransformer extends TransformerAbstract
             'status' => $m->status,
             'online_status' => $m->online->status,
             'last_seen_at' => (string)$m->online->last_seen_at,
+            'timezone' => $m->timezone,
         ];
     }
 }

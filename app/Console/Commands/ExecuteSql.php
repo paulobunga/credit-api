@@ -16,6 +16,7 @@ use App\Models\PaymentChannel;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 use App\Models\ResellerOnline;
+use App\Models\Setting;
 
 class ExecuteSql extends Command
 {
@@ -549,6 +550,42 @@ class ExecuteSql extends Command
                     ['status' => 0]
                 );
             }
+        }
+    }
+
+    protected function addResellerTimezone()
+    {
+        if (!Schema::hasColumn('resellers', 'timezone')) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->string('timezone', 60)->nullable()->after('password');
+            });
+        }
+        if (Schema::hasColumn('resellers', 'timezone')) {
+            foreach (Reseller::all() as $r) {
+                if ($r->timezone) {
+                    continue;
+                }
+                $r->timezone = [
+                    'BDT' => 'Asia/Dhaka',
+                    'INR' => 'Asia/Kolkata',
+                    'VND' => 'Asia/Ho_Chi_Minh',
+                ][strtoupper($r->currency)] ?? env('APP_TIMEZONE');
+                $r->save();
+            }
+        }
+    }
+
+    protected function addSMSTrxIdAndSimNum()
+    {
+        if (!Schema::hasColumn('reseller_sms', 'trx_id')) {
+            Schema::table('reseller_sms', function (Blueprint $table) {
+                $table->string('trx_id', 20)->default('')->after('address');
+            });
+        }
+        if (!Schema::hasColumn('reseller_sms', 'sim_num')) {
+            Schema::table('reseller_sms', function (Blueprint $table) {
+                $table->string('sim_num', 20)->default('')->after('trx_id');
+            });
         }
     }
 }

@@ -47,13 +47,19 @@ class MerchantDepositSeeder extends Seeder
                     'status' => MerchantDeposit::STATUS['APPROVED'],
                 ]);
                 if ($d->paymentChannel->isSupportSMS()) {
+                    $trx_id = $this->faker->regexify('[a-zA-Z0-9]{10}');
                     ResellerSms::create([
                         'reseller_id' => $reseller_bank_card->reseller_id,
                         'model_id' => $d->id,
                         'model_name' => 'merchant.deposit',
                         'platform' => 'Android',
                         'address' => $d->paymentChannel->payin->sms_addresses[0],
-                        'body' => __('sms.' . $d->paymentChannel->name, ['amount' => number_format($d->amount, 2)]),
+                        'trx_id' => $trx_id ,
+                        'sim_num' => $reseller_bank_card->attributes['wallet_number'],
+                        'body' => __('sms.' . $d->paymentChannel->name, [
+                            'amount' => number_format($d->amount, 2),
+                            'trx_id' => $trx_id,
+                        ]),
                         'status' => ResellerSms::STATUS['MATCH'],
                         'sent_at' => Carbon::now(),
                         'received_at' => Carbon::now(),
