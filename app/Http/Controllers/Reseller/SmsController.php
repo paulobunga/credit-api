@@ -93,11 +93,18 @@ class SmsController extends Controller
 
         ]);
 
-        if (!$data['trx_id']) {
-            throw new \Exception('invalid SMS format');
+        if (!isset($data['trx_id']) || !$data['trx_id']) {
+            throw new \Exception('invalid SMS!');
         }
 
-        $m = null;
+        $m = ResellerSms::where([
+            'reseller_id' => auth()->id(),
+            'trx_id' => $data['trx_id'],
+        ])->first();
+        if ($m) {
+            throw new \Exception('Trx id is exist!');
+        }
+
         if ($deposit = $data['match']) {
             $deposit->update([
                 'status' => MerchantDeposit::STATUS['APPROVED'],
