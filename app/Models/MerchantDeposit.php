@@ -7,12 +7,14 @@ use App\Observers\MerchantDepositObserver;
 use App\Models\Transaction;
 use App\Trait\SignValidator;
 use App\Trait\UserTimezone;
+use App\Trait\HasNumFormat;
 
 class MerchantDeposit extends Model
 {
     use MerchantDepositObserver;
     use SignValidator;
     use UserTimezone;
+    use HasNumFormat;
 
     protected $fillable = [
         'merchant_id',

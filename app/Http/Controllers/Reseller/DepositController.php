@@ -26,6 +26,10 @@ class DepositController extends Controller
     public function index(Request $request)
     {
         $deposits = QueryBuilder::for($this->model)
+            ->with([
+                'transactions',
+                'reseller',
+            ])
             ->join(
                 'reseller_bank_cards',
                 'merchant_deposits.reseller_bank_card_id',

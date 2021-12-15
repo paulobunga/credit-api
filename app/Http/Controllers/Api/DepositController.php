@@ -409,7 +409,7 @@ class DepositController extends Controller
             'channel' => $channel,
             'attributes' => $deposit->resellerBankCard->attributes,
             'steps' => $steps,
-            'amount' => number_format($deposit->amount, 2, '.', ''),
+            'amount' => $deposit->amount,
         ]);
     }
 }

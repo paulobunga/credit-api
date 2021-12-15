@@ -20,6 +20,10 @@ class WithdrawalController extends Controller
     public function index(Request $request)
     {
         $withdrawals = QueryBuilder::for($this->model)
+            ->with([
+                'transactions',
+                'reseller',
+            ])
             ->allowedFilters([
                 AllowedFilter::partial('merchant_order_id'),
                 AllowedFilter::partial('amount'),

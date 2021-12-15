@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
-use App\Trait\SignValidator;
 use App\Observers\MerchantWithdrawalObserver;
+use App\Trait\SignValidator;
 use App\Trait\UserTimezone;
+use App\Trait\HasNumFormat;
 
 class MerchantWithdrawal extends Model
 {
     use MerchantWithdrawalObserver;
     use SignValidator;
     use UserTimezone;
+    use HasNumFormat;
 
     protected $fillable = [
         'merchant_id',

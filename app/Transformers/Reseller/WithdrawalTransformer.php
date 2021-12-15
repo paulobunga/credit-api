@@ -20,6 +20,7 @@ class WithdrawalTransformer extends TransformerAbstract
             'channel' => $m->paymentChannel->name,
             'attributes' => $m->attributes,
             'amount' => $m->amount,
+            'earn' => $m->earn,
             'status' => (int) $m->status,
             'extra' => $m->extra,
             'created_at' => (string)$m->created_at
