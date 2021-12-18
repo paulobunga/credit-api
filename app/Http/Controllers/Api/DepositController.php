@@ -266,13 +266,7 @@ class DepositController extends Controller
             );
         }
 
-        $sql = "WITH reseller_pending_same_amount AS (
-                SELECT rbc.reseller_id
-                FROM merchant_deposits as md
-                JOIN reseller_bank_cards AS rbc ON rbc.id = md.reseller_bank_card_id
-                WHERE md.amount = {$request->amount} AND md.status = :md_same_amount_status
-            ),
-            reseller_channels AS (
+        $sql = "WITH reseller_channels AS (
             SELECT
                 r.id AS reseller_id,
                 rbc.id AS reseller_bank_card_id,
@@ -302,22 +296,19 @@ class DepositController extends Controller
                 AND rbc.STATUS = :rbc_status
                 AND pc.payin->>'$.status' = :pc_status
                 AND pc.currency = '{$request->currency}'
-                AND r.id NOT IN (
-                    SELECT reseller_id
-                    FROM reseller_pending_same_amount
-                )
                 GROUP BY rbc.id
             ),
             reseller_pending AS (
             SELECT
                 reseller_id,
                 SUM(pending_amount) AS total_pending_amount,
-                SUM(pending) AS total_pending
+                SUM(pending) AS total_pending,
+                SUM(same_amount) AS total_same_amount
                 FROM
                     reseller_channels
                 GROUP BY
                     reseller_id 
-                ) 
+            ) 
             SELECT
                 * 
             FROM
@@ -326,7 +317,7 @@ class DepositController extends Controller
             WHERE total_pending < pending_limit
                 AND total_pending_amount + {$request->amount} <= credit
                 AND channel = '{$request->channel}' 
-                AND same_amount = 0";
+                AND total_same_amount = 0";
         // dd($sql);
         $reseller_bank_cards = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
@@ -334,7 +325,6 @@ class DepositController extends Controller
             'r_level' => Reseller::LEVEL['RESELLER'],
             'pc_status' => PaymentChannel::STATUS['ACTIVE'],
             'md_status' => MerchantDeposit::STATUS['PENDING'],
-            'md_same_amount_status' => MerchantDeposit::STATUS['PENDING'],
             'rbc_status' => ResellerBankCard::STATUS['ACTIVE'],
         ]);
         // dd($reseller_bank_cards);
