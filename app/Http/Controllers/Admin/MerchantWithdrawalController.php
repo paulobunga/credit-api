@@ -7,6 +7,7 @@ use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Http\Controllers\Controller;
+use App\Models\Reseller;
 use App\Models\MerchantWithdrawal;
 use App\Filters\DateFilter;
 
@@ -15,11 +16,12 @@ class MerchantWithdrawalController extends Controller
     protected $model = MerchantWithdrawal::class;
 
     protected $transformer = \App\Transformers\Admin\MerchantWithdrawalTransformer::class;
-    
+
     /**
      * Get list of merchant withdrawals
      *
      * @param  \Dingo\Api\Http\Request $request
+     * @method GET
      * @return json
      */
     public function index(Request $request)
@@ -62,6 +64,13 @@ class MerchantWithdrawalController extends Controller
         return $this->paginate($merchant_withdrawals, $this->transformer);
     }
 
+    /**
+     * Update merchant withdrawal by id
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @method PUT
+     * @return void
+     */
     public function update(Request $request)
     {
         $merchant_withdrawal = $this->model::findOrFail($this->parameters('merchant_withdrawal'));
@@ -89,14 +98,14 @@ class MerchantWithdrawalController extends Controller
                 ]
             ]);
         }
-        
+
         return $this->response->item($merchant_withdrawal, $this->transformer);
     }
 
     /**
      * Resend callback to merchant
-     *
-     * @return \Dingo\Api\Http\Response $response
+     * @method PUT
+     * @return json
      */
     public function resend()
     {
@@ -123,8 +132,7 @@ class MerchantWithdrawalController extends Controller
      * Get slip url of withdrawal
      *
      * @method GET
-     *
-     * @return array
+     * @return json
      */
     public function slip()
     {
@@ -143,5 +151,40 @@ class MerchantWithdrawalController extends Controller
                 'url' => $withdrawal->slipUrl
             ]
         ]);
+    }
+
+    /**
+     * Transfer merchant withdrawal to another agent
+     * @method PUT
+     * @return json
+     */
+    public function transfer(Request $request)
+    {
+        $m = $this->model::where([
+            'id' => $this->parameters('merchant_withdrawal'),
+        ])->firstOrFail();
+        $this->validate($request, [
+            'reseller_id' => 'required|numeric',
+        ]);
+        $transfer_to = Reseller::findOrFail($request->reseller_id);
+        if ($transfer_to->status != Reseller::STATUS['ACTIVE']) {
+            throw new \Exception('Agent status is not active');
+        }
+        if (!$transfer_to->payout->status) {
+            throw new \Exception('Agent payout status is not active');
+        }
+        $transfer_from = Reseller::findOrFail($m->reseller->id);
+        $m->update([
+            'reseller_id' => $request->reseller_id,
+            'extra' => array_merge($m->extra, [
+                'transfer_from_reseller_id' => $transfer_from->id,
+                'transfer_by_admin_id' => auth()->id(),
+            ]),
+        ]);
+        // send notification
+        $transfer_from->notify(new \App\Notifications\WithdrawalTransfer($m));
+        $transfer_to->notify(new \App\Notifications\WithdrawalPending($m));
+
+        return $this->response->item($m, $this->transformer);
     }
 }

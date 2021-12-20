@@ -60,6 +60,9 @@ $api->group([
             $api->get("/merchant_withdrawals/slip/{merchant_withdrawal}", [
                 'as' => 'merchant_withdrawals.slip', 'uses' => 'MerchantWithdrawalController@slip'
             ]);
+            $api->put("/merchant_withdrawals/transfer/{merchant_withdrawal}", [
+                'as' => 'merchant_withdrawals.transfer', 'uses' => 'MerchantWithdrawalController@transfer'
+            ]);
 
             $api->resource('merchant_settlements', 'MerchantSettlementController', ['only' => ['index']]);
 
