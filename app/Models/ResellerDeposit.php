@@ -7,11 +7,13 @@ use App\Observers\ResellerDepositObserver;
 use App\Models\Transaction;
 use App\DTO\ResellerDepositExtra;
 use App\Trait\UserTimezone;
+use App\Trait\HasNumFormat;
 
 class ResellerDeposit extends Model
 {
     use ResellerDepositObserver;
     use UserTimezone;
+    use HasNumFormat;
 
     protected $fillable = [
         'reseller_id',

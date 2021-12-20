@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Observers\MerchantSettlementObserver;
 use App\Trait\UserTimezone;
+use App\Trait\HasNumFormat;
 
 class MerchantSettlement extends Model
 {
     use MerchantSettlementObserver;
     use UserTimezone;
+    use HasNumFormat;
 
     protected $fillable = [
         'merchant_id',

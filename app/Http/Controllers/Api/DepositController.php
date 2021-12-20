@@ -302,12 +302,13 @@ class DepositController extends Controller
             SELECT
                 reseller_id,
                 SUM(pending_amount) AS total_pending_amount,
-                SUM(pending) AS total_pending
+                SUM(pending) AS total_pending,
+                SUM(same_amount) AS total_same_amount
                 FROM
                     reseller_channels
                 GROUP BY
                     reseller_id 
-                ) 
+            ) 
             SELECT
                 * 
             FROM
@@ -316,7 +317,7 @@ class DepositController extends Controller
             WHERE total_pending < pending_limit
                 AND total_pending_amount + {$request->amount} <= credit
                 AND channel = '{$request->channel}' 
-                AND same_amount = 0";
+                AND total_same_amount = 0";
         // dd($sql);
         $reseller_bank_cards = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
@@ -409,7 +410,7 @@ class DepositController extends Controller
             'channel' => $channel,
             'attributes' => $deposit->resellerBankCard->attributes,
             'steps' => $steps,
-            'amount' => number_format($deposit->amount, 2, '.', ''),
+            'amount' => $deposit->amount,
         ]);
     }
 }

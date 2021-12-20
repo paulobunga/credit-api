@@ -57,7 +57,7 @@ class MerchantDepositSeeder extends Seeder
                         'trx_id' => $trx_id ,
                         'sim_num' => $reseller_bank_card->attributes['wallet_number'],
                         'body' => __('sms.' . $d->paymentChannel->name, [
-                            'amount' => number_format($d->amount, 2),
+                            'amount' => $d->amount,
                             'trx_id' => $trx_id,
                         ]),
                         'status' => ResellerSms::STATUS['MATCH'],

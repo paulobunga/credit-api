@@ -3,15 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Observers\ResellerWithdrawalObserver;
 use App\Models\Transaction;
 use App\DTO\ResellerWithdrawalExtra;
+use App\Observers\ResellerWithdrawalObserver;
 use App\Trait\UserTimezone;
+use App\Trait\HasNumFormat;
 
 class ResellerWithdrawal extends Model
 {
     use ResellerWithdrawalObserver;
     use UserTimezone;
+    use HasNumFormat;
 
     protected $fillable = [
         'reseller_id',

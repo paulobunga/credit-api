@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\MerchantDeposit;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -15,8 +16,6 @@ use App\Models\Reseller;
 use App\Models\PaymentChannel;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
-use App\Models\ResellerOnline;
-use App\Models\Setting;
 
 class ExecuteSql extends Command
 {
