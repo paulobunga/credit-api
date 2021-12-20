@@ -12,6 +12,7 @@ use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 use App\Models\MerchantDeposit;
 use App\Models\Transaction;
+use App\Filters\ExcludeFilter;
 use App\Filters\JsonColumnFilter;
 use App\Http\Controllers\Controller;
 
@@ -45,6 +46,7 @@ class ResellerController extends Controller
                 AllowedFilter::exact('online_status', 'online.status'),
                 AllowedFilter::custom('payin_status', new JsonColumnFilter('payin->status')),
                 AllowedFilter::custom('payout_status', new JsonColumnFilter('payout->status')),
+                AllowedFilter::custom('exclude_names', new ExcludeFilter('name')),
             ])
             ->allowedSorts([
                 'id',
