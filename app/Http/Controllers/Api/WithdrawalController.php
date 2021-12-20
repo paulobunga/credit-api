@@ -312,21 +312,19 @@ class WithdrawalController extends Controller
             );
         }
         $attributes = $channel->validate($request->all());
-
+        $attributes_json = json_encode($attributes);
         $sql = "WITH reseller_reject_payout AS (
                 SELECT
-                mw.reseller_id
+                    mw.reseller_id
                 FROM
                     merchant_withdrawals AS mw
                 WHERE
                     mw.status = :mw_status_reject
                     AND mw.amount = {$request->amount}
+                    AND mw.currency = '{$request->currency}'
                     AND mw.updated_at BETWEEN :mw_reject_start AND :mw_reject_end
-                    ";
-        foreach ($attributes as $atk => $atv) {
-            $sql .= "AND mw.attributes->>'$." . $atk . "' = '" . $atv . "'\n";
-        }
-        $sql .= "),
+                    AND JSON_CONTAINS(mw.attributes, '$attributes_json')
+                ),
                 reseller_channels AS (
                 SELECT
                     r.id AS id,
