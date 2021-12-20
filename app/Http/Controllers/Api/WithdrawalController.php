@@ -313,7 +313,21 @@ class WithdrawalController extends Controller
         }
         $attributes = $channel->validate($request->all());
 
-        $sql = "WITH reseller_channels AS (
+        $sql = "WITH reseller_reject_payout AS (
+                SELECT
+                mw.reseller_id
+                FROM
+                    merchant_withdrawals AS mw
+                WHERE
+                    mw.status = :mw_status_reject
+                    AND mw.amount = {$request->amount}
+                    AND mw.updated_at BETWEEN :mw_reject_start AND :mw_reject_end
+                    ";
+        foreach ($attributes as $atk => $atv) {
+            $sql .= "AND mw.attributes->>'$." . $atk . "' = '" . $atv . "'\n";
+        }
+        $sql .= "),
+                reseller_channels AS (
                 SELECT
                     r.id AS id,
                     r.currency AS currency,
@@ -334,7 +348,13 @@ class WithdrawalController extends Controller
                     AND r.STATUS = :r_status
                     AND r.payout->>'$.status' = :r_payout_status
                     AND r.LEVEL = :r_level
-                    GROUP BY r.id
+                    AND r.id NOT IN (
+                        SELECT
+                            reseller_id
+                        FROM
+                            reseller_reject_payout
+                    )
+                GROUP BY r.id
                 ),
                 reseller_daily AS (
                 SELECT 
@@ -357,6 +377,7 @@ class WithdrawalController extends Controller
                     AND daily_amount + {$request->amount} <= daily_amount_limit
                 ORDER BY payout ASC, payin DESC";
         // dd($sql);
+
         $resellers = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
             'r_level' => Reseller::LEVEL['RESELLER'],
@@ -370,8 +391,12 @@ class WithdrawalController extends Controller
             'mw_daily_status_1' => MerchantWithdrawal::STATUS['APPROVED'],
             'mw_daily_start' => Carbon::now()->startOfDay(),
             'mw_daily_end' => Carbon::now()->endOfDay(),
+            'mw_status_reject' => MerchantWithdrawal::STATUS['REJECTED'],
+            'mw_reject_start' => Carbon::now()->subHours(24),
+            'mw_reject_end' => Carbon::now()
         ]);
         // dd($resellers);
+
         if (empty($resellers)) {
             throw new \Exception('Channel is unavailable!', 404);
         }
