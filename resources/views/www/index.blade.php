@@ -264,7 +264,7 @@
 
                 <p class="text-blue-400 font-bold pb-8 lg:pb-6 text-center md:text-left fade-in">Download our app:</p>
                 <div class="flex w-full justify-center md:justify-start pb-24 lg:pb-0 fade-in">
-                    <a href="#">
+                    <a href="/android/gamepts.apk">
                         <img class="shadow rounded-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:shadow-lg" src="{{ asset('img/play_store.svg') }}" alt="">
                     </a>
                 </div>
