@@ -8,7 +8,6 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Broadcast;
-use Pusher\PushNotifications\PushNotifications;
 use App\Http\Controllers\Controller as Controller;
 use App\Transformers\Merchant\AuthTransformer;
 use App\Models\MerchantWhiteList;
@@ -113,41 +112,6 @@ class AuthController extends Controller
         );
 
         return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
-    }
-
-    /**
-     * Authenticate beam notification
-     *
-     * @param  mixed $request
-     * @return void
-     */
-    public function beam(Request $request)
-    {
-        $this->validate($request, [
-            'user_id' => 'required',
-            'platform' => 'required',
-        ]);
-        $user_id = Arr::last(explode('.', $request->user_id));
-        if ($user_id !=  auth()->id()) {
-            return response('Inconsistent request', 401);
-        }
-        $beam = new PushNotifications([
-            'secretKey' => config('broadcasting.connections.beams.secret_key'),
-            'instanceId' => config('broadcasting.connections.beams.instance_id'),
-        ]);
-
-        $token = $beam->generateToken('App.Models.Merchant.' . auth()->id());
-        auth()->user()->devices()->updateOrCreate(
-            [
-                'platform' => $request->platform
-            ],
-            [
-                'logined_at' => Carbon::now(),
-                'token' => $token['token']
-            ]
-        );
-
-        return response()->json($token);
     }
 
     /**

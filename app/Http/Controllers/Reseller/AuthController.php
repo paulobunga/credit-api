@@ -229,7 +229,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Get token of beam service
+     * Get token of onesignal service
      *
      * @method GET
      * @param \Dingo\Api\Http\Request $request
