@@ -9,8 +9,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use NotificationChannels\OneSignal\OneSignalMessage;
-use App\Channels\Web\OneSignalWeb as Web;
-use App\Channels\Android\OneSignalAndroid as Android;
+use App\Channels\Reseller\Web\OneSignalWeb as ResellerWeb;
+use App\Channels\Reseller\Android\OneSignalAndroid as ResellerAndroid;
+use App\Channels\Merchant\Web\OneSignalWeb as MerchantWeb;
+
 
 abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
 {
@@ -56,8 +58,9 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
         return [
             'database',
             'broadcast',
-            Web::class,
-            Android::class,
+            ResellerWeb::class,
+            ResellerAndroid::class,
+            MerchantWeb::class
         ];
     }
 
@@ -97,7 +100,7 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
      * @param  mixed $notifiable
      * @return \NotificationChannels\OneSignal\OneSignalMessage
      */
-    public function toWeb($notifiable)
+    public function toResellerWeb($notifiable)
     {
         $data = $this->toArray($notifiable);
 
@@ -112,7 +115,7 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
      * @param  mixed $notifiable
      * @return \NotificationChannels\OneSignal\OneSignalMessage
      */
-    public function toAndroid($notifiable)
+    public function toResellerAndroid($notifiable)
     {
         $data = $this->toArray($notifiable);
     
@@ -120,6 +123,21 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
             ->setSubject($data['title'])
             ->setBody($data['body'])
             ->setData('url', str_replace('https://', 'gamepts://', $data['link']));
+    }
+
+    /**
+     * Create onesignal message of Web
+     * @param  mixed $notifiable
+     * @return \NotificationChannels\OneSignal\OneSignalMessage
+     */
+    public function toMerchantWeb($notifiable)
+    {
+        $data = $this->toArray($notifiable);
+
+        return OneSignalMessage::create()
+            ->setSubject($data['title'])
+            ->setBody($data['body'])
+            ->setUrl($data['link']);
     }
 
     /**

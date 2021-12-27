@@ -125,4 +125,34 @@ class AuthController extends Controller
     {
         return Broadcast::auth($request);
     }
+    
+    /**
+     * Get Token of onesignal service
+     *
+     * @method POST
+     * 
+     * @param  \Dingo\Api\Http\Request $request
+     * 
+     * @return array
+     */
+    public function onesignal(Request $request)
+    {
+        $this->validate($request, [
+            'data' => 'required',
+            'platform' => 'required'
+        ]);
+
+        auth()->user()->devices()->updateOrCreate(
+            [
+                'platform' => $request->platform,
+                'uuid' => $request->data['userId']
+            ],
+            [
+                'logined_at' => Carbon::now(),
+                'token' => ''
+            ]
+        );
+
+        return $this->success();
+    }
 }

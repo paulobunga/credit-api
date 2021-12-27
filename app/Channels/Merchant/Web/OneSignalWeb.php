@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Channels\Web;
+namespace App\Channels\Merchant\Web;
 
 use Berkayk\OneSignal\OneSignalClient;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 use NotificationChannels\OneSignal\Exceptions\CouldNotSendNotification;
 use NotificationChannels\OneSignal\OneSignalChannel;
 
@@ -12,8 +13,8 @@ class OneSignalWeb extends OneSignalChannel
     public function __construct()
     {
         $client = new OneSignalClient(
-            env("ONESIGNAL_APP_ID"),
-            env("ONESIGNAL_REST_API_KEY"),
+            env("ONESIGNAL_MERCHANT_APP_ID"),
+            env("ONESIGNAL_MERCHANT_REST_API_KEY"),
             ''
         );
         parent::__construct($client);
@@ -54,7 +55,7 @@ class OneSignalWeb extends OneSignalChannel
      */
     protected function payload($notifiable, $notification, $targeting)
     {
-        $payload = $notification->toWeb($notifiable)->toArray();
+        $payload = $notification->toMerchantWeb($notifiable)->toArray();
 
         if ($this->isTargetingEmail($targeting)) {
             $payload['filters'] = collect([['field' => 'email', 'value' => $targeting['email']]]);

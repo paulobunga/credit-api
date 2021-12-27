@@ -231,7 +231,7 @@ class AuthController extends Controller
     /**
      * Get token of onesignal service
      *
-     * @method GET
+     * @method POST
      * @param \Dingo\Api\Http\Request $request
      *
      * @return array

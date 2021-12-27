@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Channels\Android;
+namespace App\Channels\Reseller\Android;
 
 use Berkayk\OneSignal\OneSignalClient;
 use Illuminate\Notifications\Notification;
@@ -12,8 +12,8 @@ class OneSignalAndroid extends OneSignalChannel
     public function __construct()
     {
         $client = new OneSignalClient(
-            env("ONESIGNAL_ANDROID_APP_ID"),
-            env("ONESIGNAL_ANDROID__REST_API_KEY"),
+            env("ONESIGNAL_RESELLER_ANDROID_APP_ID"),
+            env("ONESIGNAL_RESELLER_ANDROID__REST_API_KEY"),
             ''
         );
         parent::__construct($client);
@@ -55,7 +55,7 @@ class OneSignalAndroid extends OneSignalChannel
      */
     protected function payload($notifiable, $notification, $targeting)
     {
-        $payload = $notification->toAndroid($notifiable)->toArray();
+        $payload = $notification->toResellerAndroid($notifiable)->toArray();
 
         if ($this->isTargetingEmail($targeting)) {
             $payload['filters'] = collect([['field' => 'email', 'value' => $targeting['email']]]);
