@@ -1,24 +1,41 @@
 <?php
 
-namespace App\Channels\Reseller\Android;
+namespace App\Channels;
 
 use Berkayk\OneSignal\OneSignalClient;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\OneSignal\Exceptions\CouldNotSendNotification;
-use NotificationChannels\OneSignal\OneSignalChannel;
 
-class OneSignalAndroid extends OneSignalChannel
+class OneSignal
 {
+    protected $reseller_client;
+    protected $merchant_client;
+
     public function __construct()
     {
-        $client = new OneSignalClient(
-            env("ONESIGNAL_RESELLER_ANDROID_APP_ID"),
-            env("ONESIGNAL_RESELLER_ANDROID__REST_API_KEY"),
+        $this->merchant_client = new OneSignalClient(
+            env("ONESIGNAL_MERCHANT_APP_ID"),
+            env("ONESIGNAL_MERCHANT_REST_API_KEY"),
             ''
         );
-        parent::__construct($client);
+        $this->reseller_client = new OneSignalClient(
+            env("ONESIGNAL_RESELLER_APP_ID"),
+            env("ONESIGNAL_RESELLER_REST_API_KEY"),
+            ''
+        );
     }
 
+    protected function getOneSignalClient($name)
+    {
+        switch ($name) {
+            case 'reseller':
+                return $this->reseller_client;
+            case 'merchant':
+                return $this->merchant_client;
+            default:
+                return null;
+        }
+    }
     /**
      * Send the given notification.
      *
@@ -30,17 +47,28 @@ class OneSignalAndroid extends OneSignalChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        if (!$userIds = $notifiable->devices()->where('platform', 'Android')->pluck('uuid')->toArray()) {
+        $devices = $notifiable->devices()->get()->groupBy('platform');
+        if ($devices->isEmpty()) {
             return;
         }
-
-        /** @var ResponseInterface $response */
-        $response = $this->oneSignal->sendNotificationCustom(
-            $this->payload($notifiable, $notification, $userIds)
-        );
-
-        if ($response->getStatusCode() !== 200) {
-            throw CouldNotSendNotification::serviceRespondedWithAnError($response);
+        $client = $this->getOneSignalClient($notifiable->getMorphClass());
+        if (!$client) {
+            return;
+        }
+        foreach ($devices as $platform => $dvs) {
+            $response = $client->sendNotificationCustom(
+                $this->payload(
+                    $notifiable,
+                    $notification,
+                    [
+                        'platform' => $platform,
+                        'include_player_ids' => $dvs->pluck('uuid')->toArray()
+                    ]
+                )
+            );
+            if ($response->getStatusCode() !== 200) {
+                throw CouldNotSendNotification::serviceRespondedWithAnError($response);
+            }
         }
 
         return $response;
@@ -55,7 +83,8 @@ class OneSignalAndroid extends OneSignalChannel
      */
     protected function payload($notifiable, $notification, $targeting)
     {
-        $payload = $notification->toResellerAndroid($notifiable)->toArray();
+        $method = 'to' . ucfirst($targeting['platform']);
+        $payload = $notification->$method($notifiable)->toArray();
 
         if ($this->isTargetingEmail($targeting)) {
             $payload['filters'] = collect([['field' => 'email', 'value' => $targeting['email']]]);
@@ -74,7 +103,7 @@ class OneSignalAndroid extends OneSignalChannel
         } elseif ($this->isTargetingExternalUserIds($targeting)) {
             $payload['include_external_user_ids'] = collect($targeting['include_external_user_ids']);
         } else {
-            $payload['include_player_ids'] = collect($targeting);
+            $payload['include_player_ids'] = collect($targeting['include_player_ids']);
         }
 
         return $payload;
