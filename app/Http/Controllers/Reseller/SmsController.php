@@ -62,6 +62,7 @@ class SmsController extends Controller
                         'id' => $v->id,
                         'address' => $v->address,
                         'trx_id' => $v->trx_id,
+                        'status' => $v->status
                     ];
                 })
             ]
@@ -138,5 +139,79 @@ class SmsController extends Controller
         }
 
         return $this->response->item($m, $this->transformer);
+    }
+
+    /**
+     * Massive store sms.
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @return json
+     */
+    public function upsert(Request $request)
+    {
+        $this->validate($request, [
+            'data' => 'required|array',
+        ]);
+        $response = $request->get('data', []);
+        foreach ($response as $k => $sms) {
+            $data = ResellerSms::match([
+                'reseller_id' => auth()->id(),
+                'currency' => auth()->user()->currency,
+                'body' => $sms['body'],
+                'address' =>  $sms['address'],
+            ]);
+
+            if (!isset($data['trx_id']) || !$data['trx_id']) {
+                $response[$k]['status'] = ResellerSms::STATUS['PENDING'];
+                $response[$k]['message'] = 'invalid SMS!';
+                continue;
+            }
+            $m = ResellerSms::where([
+                'reseller_id' => auth()->id(),
+                'trx_id' => $data['trx_id'],
+            ])->first();
+            if ($m) {
+                $response[$k]['status'] = ResellerSms::STATUS['PENDING'];
+                $response[$k]['message'] = 'Trx id is exist!';
+                continue;
+            }
+            if ($deposit = $data['match']) {
+                $deposit->update([
+                    'status' => MerchantDeposit::STATUS['APPROVED'],
+                    'extra' => $deposit->extra + ['reference_id' => $data['trx_id']]
+                ]);
+                $m = $this->model::create([
+                    'reseller_id' => auth()->id(),
+                    'platform' => $sms['platform'],
+                    'body' => $sms['body'],
+                    'address' =>  $sms['address'],
+                    'trx_id' => $data['trx_id'],
+                    'sim_num' => $sms['sim_num'],
+                    'model_id' => $deposit->id,
+                    'model_name' => 'merchant.deposit',
+                    'status' => ResellerSms::STATUS['MATCH'],
+                    'sent_at' => ($sms['date_sent'] / 1000),
+                    'received_at' => ($sms['date'] / 1000),
+                ]);
+                $response[$k]['status'] = ResellerSms::STATUS['MATCH'];
+            } else {
+                $m = $this->model::create([
+                    'reseller_id' => auth()->id(),
+                    'platform' => $sms['platform'],
+                    'body' => $sms['body'],
+                    'address' =>  $sms['address'],
+                    'trx_id' => $data['trx_id'],
+                    'sim_num' => $sms['sim_num'],
+                    'status' => ResellerSms::STATUS['UNMATCH'],
+                    'sent_at' => ($sms['date_sent'] / 1000),
+                    'received_at' => ($sms['date'] / 1000),
+                ]);
+                $response[$k]['status'] = ResellerSms::STATUS['UNMATCH'];
+            }
+        }
+
+        return [
+            'data' => $response
+        ];
     }
 }
