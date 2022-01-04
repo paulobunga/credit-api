@@ -171,7 +171,7 @@ class SmsController extends Controller
                 'trx_id' => $data['trx_id'],
             ])->first();
             if ($m) {
-                $response[$k]['status'] = ResellerSms::STATUS['PENDING'];
+                $response[$k]['status'] = $m->status;
                 $response[$k]['message'] = 'Trx id is exist!';
                 continue;
             }

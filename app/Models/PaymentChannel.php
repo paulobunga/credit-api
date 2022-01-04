@@ -15,6 +15,11 @@ class PaymentChannel extends Model
 
     public $timestamps = false;
 
+    protected $appends = [
+        'sms_rule',
+        'sms_map',
+    ];
+
     protected $fillable = [
         'name',
         'banks',
@@ -50,5 +55,15 @@ class PaymentChannel extends Model
     public function getPaymentMethodsAttribute()
     {
         return array_map(fn ($v) => array_search($v, self::METHOD), explode(',', $this->attributes['payment_methods']));
+    }
+
+    public function getSmsRuleAttribute()
+    {
+        return $this->isSupportSMS() ? $this->getReference()->sms_rule : null;
+    }
+
+    public function getSmsMapAttribute()
+    {
+        return $this->isSupportSMS() ? $this->getReference()->sms_map : null;
     }
 }

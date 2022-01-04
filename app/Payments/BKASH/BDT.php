@@ -12,6 +12,14 @@ class BDT
 
     public $sms_rule = '/Tk ([\d,]+\.\d{2})* from (\d+)*.+Tk ([\d,]+\.\d{2})*. Balance Tk ([\d,]+\.\d{2})*. TrxID (\w+)*/';
 
+    public $sms_map = [
+        'amount' => 1,
+        'payer' => 2,
+        'commission' => 3,
+        'balance' => 4,
+        'trx_id' => 5,
+    ];
+
     public function rules()
     {
         return [
