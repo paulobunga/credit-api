@@ -52,5 +52,6 @@ $api->group([
         $api->post('/sms/upsert', ['as' => 'sms.upsert', 'uses' => 'SmsController@upsert']);
 
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
+        $api->get('/reports/bankcards/summary', 'ReportController@summaryBankCards');
     });
 });
