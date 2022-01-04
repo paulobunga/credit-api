@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\Transaction;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
@@ -51,23 +52,17 @@ class ReportController extends Controller
      */
     public function summaryBankCards(Request $request)
     {
-        $date_filter = "";
+        $timezone = env('APP_TIMEZONE');
+        $user_timezone = auth()->user()->timezone ?? env('APP_TIMEZONE');
 
         if ($request->has('filter') && !empty($request->filter['date_between'])) {
-            $timezone = env('APP_TIMEZONE');
-            $user_timezone = auth()->user()->timezone ?? env('APP_TIMEZONE');
-
             $date_range = explode(',', $request->filter['date_between']);
             $start_date = trim($date_range[0]);
             $end_date = trim($date_range[1]);
 
-            $date_filter = "
-                AND CONVERT_TZ(
-                    md.created_at,
-                    \"{$timezone}\",
-                    \"{$user_timezone}\"
-                ) BETWEEN \"{$start_date}\" AND \"{$end_date}\"
-            ";
+        } else {
+            $start_date = Carbon::now()->startOfDay();
+            $end_date = Carbon::now()->endOfDay();
         }
         
         $sql = "
@@ -86,7 +81,11 @@ class ReportController extends Controller
                     JOIN
                 merchant_deposits AS md ON rbc.id = md.reseller_bank_card_id
                     AND md.status = :md_status
-                    {$date_filter}
+                    AND CONVERT_TZ(
+                        md.created_at,
+                        \"{$timezone}\",
+                        \"{$user_timezone}\"
+                    ) BETWEEN \"{$start_date}\" AND \"{$end_date}\"
                     INNER JOIN
                 model_has_transactions AS mht ON md.id = mht.model_id AND mht.model_type = :tx_model
                     JOIN
