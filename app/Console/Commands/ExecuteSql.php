@@ -595,19 +595,8 @@ class ExecuteSql extends Command
         if (Schema::hasColumn('merchant_withdrawals', 'reseller_bank_card_id')) {
             throw new \Exception('column exist!');
         }
-        $merchantWithdrawal = MerchantWithdrawal::all();
         Schema::table('merchant_withdrawals', function (Blueprint $table) {
             $table->unsignedBigInteger('reseller_bank_card_id')->after('reseller_id')->default(0);
         });
-
-        foreach ($merchantWithdrawal as $r) {
-            $reseller_bank_card = ResellerBankCard::where('reseller_id', $r->reseller_id)
-                ->where('payment_channel_id', $r->payment_channel_id)
-                ->inRandomOrder()
-                ->first();
-
-            $r->reseller_bank_card_id = $reseller_bank_card->id;
-            $r->save();
-        }
     }
 }
