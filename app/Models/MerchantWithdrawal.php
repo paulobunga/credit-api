@@ -20,6 +20,7 @@ class MerchantWithdrawal extends Model
     protected $fillable = [
         'merchant_id',
         'reseller_id',
+        'reseller_bank_card_id',
         'payment_channel_id',
         'order_id',
         'player_id',
