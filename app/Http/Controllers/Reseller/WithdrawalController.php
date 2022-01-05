@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Reseller;
 
+use App\Filters\DateFilter;
 use Dingo\Api\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\MerchantWithdrawal;
+use App\Http\Controllers\Controller;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Http\Controllers\Controller;
-use App\Models\MerchantWithdrawal;
-use App\Filters\DateFilter;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 
 class WithdrawalController extends Controller
 {
@@ -23,6 +23,7 @@ class WithdrawalController extends Controller
             ->with([
                 'transactions',
                 'reseller',
+                'resellerBankCard'
             ])
             ->allowedFilters([
                 AllowedFilter::partial('merchant_order_id'),

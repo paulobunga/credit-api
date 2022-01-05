@@ -19,6 +19,9 @@ class WithdrawalTransformer extends TransformerAbstract
             'merchant_order_id' => $m->merchant_order_id,
             'channel' => $m->paymentChannel->name,
             'attributes' => $m->attributes,
+            'payout_channel' => $m->resellerBankCard ? array(
+                $m->resellerBankCard->paymentChannel->name => $m->resellerBankCard->primary
+            ) : null,
             'amount' => $m->amount,
             'earn' => $m->earn,
             'status' => (int) $m->status,
