@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Reseller;
 
 use Dingo\Api\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\ResellerBankCard;
@@ -34,10 +33,9 @@ class BankCardController extends Controller
                 AllowedFilter::exact('channel', 'payment_channel.name'),
                 'status'
             ])
-            ->where('reseller_id', Auth::id())
-            ->paginate($this->perPage);
+            ->where('reseller_id', auth()->id());
 
-        return $this->response->withPaginator($bankcards, $this->transformer);
+        return $this->paginate($bankcards, $this->transformer);
     }
     
     /**
@@ -51,7 +49,7 @@ class BankCardController extends Controller
     {
         $bankcard = $this->model::where([
             'id' => $this->parameters('bankcard'),
-            'reseller_id' => Auth::id()
+            'reseller_id' => auth()->id()
         ])->firstOrFail();
 
         if (!in_array($bankcard->status, [
