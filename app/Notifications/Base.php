@@ -9,8 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use NotificationChannels\OneSignal\OneSignalMessage;
-use App\Channels\Web\OneSignalWeb as Web;
-use App\Channels\Android\OneSignalAndroid as Android;
+use App\Channels\OneSignal;
 
 abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
 {
@@ -56,8 +55,7 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
         return [
             'database',
             'broadcast',
-            Web::class,
-            Android::class,
+            OneSignal::class
         ];
     }
 

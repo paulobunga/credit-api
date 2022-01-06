@@ -2,20 +2,22 @@
 
 namespace App\Console\Commands;
 
-use App\Models\MerchantDeposit;
+use Carbon\Carbon;
+use App\Models\Reseller;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Str;
+use App\Models\PaymentChannel;
+use App\Models\MerchantDeposit;
+use App\Models\ResellerDeposit;
 use Illuminate\Console\Command;
+use App\Models\MerchantWithdrawal;
+use App\Models\ResellerBankCard;
+use App\Models\ResellerWithdrawal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
-use Carbon\Carbon;
-use Carbon\CarbonPeriod;
-use App\Models\Reseller;
-use App\Models\PaymentChannel;
-use App\Models\ResellerDeposit;
-use App\Models\ResellerWithdrawal;
 
 class ExecuteSql extends Command
 {
@@ -586,5 +588,15 @@ class ExecuteSql extends Command
                 $table->string('sim_num', 20)->default('')->after('trx_id');
             });
         }
+    }
+
+    protected function merchantWithdrawalAddResellerBankCardId()
+    {
+        if (Schema::hasColumn('merchant_withdrawals', 'reseller_bank_card_id')) {
+            throw new \Exception('column exist!');
+        }
+        Schema::table('merchant_withdrawals', function (Blueprint $table) {
+            $table->unsignedBigInteger('reseller_bank_card_id')->after('reseller_id')->default(0);
+        });
     }
 }

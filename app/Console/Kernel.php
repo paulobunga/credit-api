@@ -35,26 +35,31 @@ class Kernel extends ConsoleKernel
         $schedule->command('report:daily')
             ->name('ReportDaily')
             ->runInBackground()
+            ->onOneServer()
             ->everyTenMinutes();
         # Activate code check
         $schedule->command('activate:check')
             ->name('ActivateCheck')
             ->runInBackground()
+            ->onOneServer()
             ->everyMinute();
         # Check cash in orders
         $schedule->command('check:cashin')
             ->name('CheckCashIn')
             ->runInBackground()
+            ->onOneServer()
             ->everyMinute();
         # Auto approve payout orders
         $schedule->command('auto:approval')
             ->name('AutoApproval')
             ->runInBackground()
+            ->onOneServer()
             ->everyMinute();
         # Online agent check
         $schedule->command('online:check')
             ->name('OnlineCheck')
             ->runInBackground()
+            ->onOneServer()
             ->everyMinute();
     }
 }

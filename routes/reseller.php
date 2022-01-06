@@ -49,7 +49,12 @@ $api->group([
 
         $api->resource('sms', 'SmsController', ['only' => ['index', 'store']]);
         $api->get('/sms/inbox', ['as' => 'sms.inbox', 'uses' => 'SmsController@inbox']);
+        $api->post('/sms/upsert', ['as' => 'sms.upsert', 'uses' => 'SmsController@upsert']);
 
         $api->resource('reports', 'ReportController', ['only' => ['index']]);
+        $api->get('/reports/bankcards/summary', [
+            'as' => 'reports.summaryBankcards',
+            'uses' => 'ReportController@summaryBankCards'
+        ]);
     });
 });

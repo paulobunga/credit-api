@@ -20,6 +20,7 @@ class MerchantWithdrawal extends Model
     protected $fillable = [
         'merchant_id',
         'reseller_id',
+        'reseller_bank_card_id',
         'payment_channel_id',
         'order_id',
         'player_id',
@@ -72,6 +73,11 @@ class MerchantWithdrawal extends Model
     public function paymentChannel()
     {
         return $this->belongsTo(PaymentChannel::class);
+    }
+
+    public function resellerBankCard()
+    {
+        return $this->hasOne(ResellerBankCard::class, 'id', 'reseller_bank_card_id')->with('paymentChannel');
     }
 
     public function transactions()

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Reseller;
 
+use App\Filters\DateFilter;
 use Dingo\Api\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\MerchantWithdrawal;
+use App\Http\Controllers\Controller;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Http\Controllers\Controller;
-use App\Models\MerchantWithdrawal;
-use App\Filters\DateFilter;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 
 class WithdrawalController extends Controller
 {
@@ -23,6 +23,7 @@ class WithdrawalController extends Controller
             ->with([
                 'transactions',
                 'reseller',
+                'resellerBankCard'
             ])
             ->allowedFilters([
                 AllowedFilter::partial('merchant_order_id'),
@@ -72,7 +73,9 @@ class WithdrawalController extends Controller
                 'image',
             ],
             'reference_id' => 'required_if:status,' . MerchantWithdrawal::STATUS['FINISHED'],
+            'reseller_bank_card_id' => 'required_if:status,' . MerchantWithdrawal::STATUS['FINISHED']
         ]);
+        
         if ($request->status == MerchantWithdrawal::STATUS['FINISHED']) {
             if (Storage::disk('s3')->exists("withdrawals/$withdrawal->order_id")) {
                 throw new \Exception('Slip is already exists!', 405);
@@ -84,6 +87,7 @@ class WithdrawalController extends Controller
             );
             $withdrawal->update([
                 'status' => $request->status,
+                'reseller_bank_card_id' => $request->reseller_bank_card_id,
                 'extra' => $withdrawal->extra + ['reference_id' => $request->reference_id]
             ]);
         } else {

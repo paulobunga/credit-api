@@ -111,7 +111,6 @@ $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 $app->register(SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
-// $app->register(App\Channels\PusherBeams\PusherBeamsServiceProvider::class);
 if (class_exists(\Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class)) {
     $app->register(\Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 }

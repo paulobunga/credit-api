@@ -22,8 +22,8 @@ $api->group([
         $api->put("/auth/update", ['as' => 'auth.update', 'uses' => 'AuthController@update']);
         $api->put("/auth/renew", ['as' => 'auth.renew', 'uses' => 'AuthController@renew']);
         $api->put("/auth/whitelist", ['as' => 'auth.whitelist', 'uses' => 'AuthController@whitelist']);
-        $api->get('/auth/beam', ['as' => 'auth.beam', 'uses' => 'AuthController@beam']);
         $api->post('/auth/channel', ['as' => 'auth.channel', 'uses' => 'AuthController@channel']);
+        $api->post('/auth/onesignal', ['as' => 'auth.onesignal', 'uses' => 'AuthController@onesignal']);
 
         $api->resource('deposits', 'DepositController', ['only' => ['index']]);
         $api->put("/deposits/resend/{deposit}", ['as' => 'deposits.resend', 'uses' => 'DepositController@resend']);

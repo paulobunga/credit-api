@@ -69,6 +69,7 @@ class MerchantDepositSeeder extends Seeder
                     'merchant_order_id' => $merchant->id == 1 ? '9798223690986' : $this->faker->isbn13,
                     'merchant_id' => $merchant->id,
                     'reseller_id' => $reseller_bank_card->reseller->id,
+                    'reseller_bank_card_id' => $reseller_bank_card->id,
                     'payment_channel_id' => $reseller_bank_card->paymentChannel->id,
                     'attributes' => collect($reseller_bank_card->paymentChannel->attributes)->flatMap(function ($v) {
                         switch ($v) {

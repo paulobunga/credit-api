@@ -87,6 +87,8 @@ class CreateTableMerchants extends Migration
                 ->constrained();
             $table->foreignId('reseller_id')
                 ->constrained();
+            $table->unsignedBigInteger('reseller_bank_card_id')
+                ->default(0);
             $table->foreignId('payment_channel_id')
                 ->constrained();
             $table->string('order_id', 60)->unique();

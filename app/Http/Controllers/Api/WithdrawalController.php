@@ -312,7 +312,7 @@ class WithdrawalController extends Controller
             );
         }
         $attributes = $channel->validate($request->all());
-
+        $attributes_json = json_encode($attributes);
         $sql = "WITH reseller_channels AS (
                 SELECT
                     r.id AS id,
@@ -323,29 +323,41 @@ class WithdrawalController extends Controller
                     r.payout->>'$.daily_amount_limit' AS daily_amount_limit 
                 FROM
                     resellers AS r
-                    LEFT JOIN merchant_withdrawals AS mw ON mw.reseller_id = r.id 
-                    AND mw.status = :mw_status
-                    LEFT JOIN reseller_bank_cards AS rbc ON rbc.reseller_id = r.id
-                    LEFT JOIN merchant_deposits AS md ON md.reseller_bank_card_id = rbc.id
-                    AND md.status IN (:md_status_0, :md_status_1) 
-                    AND md.updated_at BETWEEN :md_start AND :md_end
+                    LEFT JOIN merchant_withdrawals AS mw 
+                        ON mw.reseller_id = r.id 
+                        AND mw.status = :mw_status
+                    LEFT JOIN reseller_bank_cards AS rbc 
+                        ON rbc.reseller_id = r.id
+                    LEFT JOIN merchant_deposits AS md 
+                        ON md.reseller_bank_card_id = rbc.id
+                        AND md.status IN (:md_status_0, :md_status_1) 
+                        AND md.updated_at BETWEEN :md_start AND :md_end
                 WHERE
                     r.currency = '{$request->currency}'
                     AND r.STATUS = :r_status
                     AND r.payout->>'$.status' = :r_payout_status
                     AND r.LEVEL = :r_level
-                    GROUP BY r.id
+                GROUP BY r.id
                 ),
                 reseller_daily AS (
                 SELECT 
                     rc.*,
-                    COALESCE(SUM(mw.amount),0) AS daily_amount
+                    COALESCE(SUM(mw.amount),0) AS daily_amount,
+                    COALESCE(COUNT(mw2.id),0) AS same_amount_reject
                 FROM 
                     reseller_channels AS rc
                     LEFT JOIN merchant_withdrawals AS mw 
-                    ON rc.id = mw.reseller_id 
-                    AND mw.status IN (:mw_daily_status_0, :mw_daily_status_1)
-                    AND mw.created_at BETWEEN :mw_daily_start AND :mw_daily_end
+                        ON rc.id = mw.reseller_id 
+                        AND mw.status IN (:mw_daily_status_0, :mw_daily_status_1)
+                        AND mw.created_at BETWEEN :mw_daily_start AND :mw_daily_end
+                    LEFT JOIN merchant_withdrawals AS mw2
+                        ON rc.id = mw2.reseller_id
+                        AND mw2.status = :mw_status_reject
+                        AND mw2.amount = {$request->amount}
+                        AND mw2.currency = '{$request->currency}'
+                        AND mw2.updated_at BETWEEN :mw_reject_start AND :mw_reject_end
+                        AND JSON_CONTAINS(mw2.attributes, '$attributes_json')
+                        AND mw2.payment_channel_id = {$channel->id}
                     GROUP BY rc.id
                 )
                 SELECT
@@ -355,8 +367,10 @@ class WithdrawalController extends Controller
                 WHERE 
                     payout < pending_limit 
                     AND daily_amount + {$request->amount} <= daily_amount_limit
+                    AND same_amount_reject = 0
                 ORDER BY payout ASC, payin DESC";
         // dd($sql);
+
         $resellers = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
             'r_level' => Reseller::LEVEL['RESELLER'],
@@ -370,8 +384,12 @@ class WithdrawalController extends Controller
             'mw_daily_status_1' => MerchantWithdrawal::STATUS['APPROVED'],
             'mw_daily_start' => Carbon::now()->startOfDay(),
             'mw_daily_end' => Carbon::now()->endOfDay(),
+            'mw_status_reject' => MerchantWithdrawal::STATUS['REJECTED'],
+            'mw_reject_start' => Carbon::now()->subHours(24),
+            'mw_reject_end' => Carbon::now()
         ]);
         // dd($resellers);
+
         if (empty($resellers)) {
             throw new \Exception('Channel is unavailable!', 404);
         }
