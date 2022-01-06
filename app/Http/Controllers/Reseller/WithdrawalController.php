@@ -23,7 +23,7 @@ class WithdrawalController extends Controller
             ->with([
                 'transactions',
                 'reseller',
-                'resellerBankCard'
+                'resellerBankCard.paymentChannel'
             ])
             ->allowedFilters([
                 AllowedFilter::partial('merchant_order_id'),

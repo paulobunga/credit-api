@@ -77,7 +77,7 @@ class MerchantWithdrawal extends Model
 
     public function resellerBankCard()
     {
-        return $this->hasOne(ResellerBankCard::class, 'id', 'reseller_bank_card_id')->with('paymentChannel');
+        return $this->hasOne(ResellerBankCard::class, 'id', 'reseller_bank_card_id');
     }
 
     public function transactions()
