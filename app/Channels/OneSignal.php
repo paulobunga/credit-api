@@ -3,6 +3,7 @@
 namespace App\Channels;
 
 use Berkayk\OneSignal\OneSignalClient;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\OneSignal\Exceptions\CouldNotSendNotification;
 
@@ -66,8 +67,12 @@ class OneSignal
                     ]
                 )
             );
+
             if ($response->getStatusCode() !== 200) {
+                Log::error($response->getBody());
                 throw CouldNotSendNotification::serviceRespondedWithAnError($response);
+            } else {
+                Log::info($response->getBody());
             }
         }
 

@@ -124,7 +124,7 @@ if (!function_exists('reseller_url')) {
      */
     function reseller_url($path = '')
     {
-        return str_replace('//api', '//reseller', env('APP_URL')) . $path;
+        return env('AGENT_URL') . $path;
     }
 }
 
