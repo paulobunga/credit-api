@@ -49,10 +49,9 @@ class ResellerBankCardController extends Controller
                 'channel',
                 'currency',
                 'status'
-            ])
-            ->paginate($this->perPage);
+            ]);
 
-        return $this->response->withPaginator($reseller_bank_card, $this->transformer);
+        return $this->paginate($reseller_bank_card, $this->transformer);
     }
 
     /**
