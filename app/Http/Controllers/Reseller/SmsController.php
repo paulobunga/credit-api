@@ -150,7 +150,7 @@ class SmsController extends Controller
     public function upsert(Request $request)
     {
         $this->validate($request, [
-            'data' => 'required|array',
+            'data' => 'present|array',
         ]);
         $response = $request->get('data', []);
         foreach ($response as $k => $sms) {
