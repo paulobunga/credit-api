@@ -38,6 +38,11 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
         'status' => 'boolean',
     ];
 
+    public const STATUS = [
+        'DISABLED' => false,
+        'ACTIVE' => true,
+    ];
+
     public function getIsSuperAdminAttribute()
     {
         return $this->hasRole('Super Admin');

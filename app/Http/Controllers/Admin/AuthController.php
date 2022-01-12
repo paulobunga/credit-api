@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Support\Facades\Log;
 use Dingo\Api\Http\Request;
 use App\Http\Controllers\Controller as Controller;
+use App\Models\Admin;
 use App\Transformers\Admin\AuthTransformer;
 
 class AuthController extends Controller
@@ -20,6 +21,10 @@ class AuthController extends Controller
 
         if (!$token = auth()->guard('admin')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
+        }
+        
+        if  (auth('admin')->user()->status === Admin::STATUS['DISABLED']) {
+            return response()->json(['message' => 'Unauthorized: Account Disabled'], 401);
         }
 
         if (
