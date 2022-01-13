@@ -37,6 +37,11 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
         'status' => 'boolean',
     ];
 
+    public const STATUS = [
+        'DISABLED' => false,
+        'ACTIVE' => true,
+    ];
+
     public function whiteList()
     {
         return $this->hasOne(MerchantWhiteList::class);
