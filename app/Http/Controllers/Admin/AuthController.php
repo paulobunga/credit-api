@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Support\Facades\Log;
 use Dingo\Api\Http\Request;
 use App\Http\Controllers\Controller as Controller;
+use App\Models\Admin;
 use App\Transformers\Admin\AuthTransformer;
 
 class AuthController extends Controller
@@ -22,8 +23,12 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
 
+        if (auth('admin')->user()->status === Admin::STATUS['DISABLED']) {
+            return response()->json(['message' => 'Unauthorized: Account Disabled'], 401);
+        }
+
         if (
-            !auth()->guard('admin')->user()->isSuperAdmin &&
+            !auth('admin')->user()->isSuperAdmin &&
             !in_array($request->ip(), app(\App\Settings\AdminSetting::class)->white_lists)
         ) {
             Log::error($request->ip() . " is not in admin[" . auth()->id() . '] white list.');

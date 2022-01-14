@@ -130,7 +130,7 @@ class ReportController extends Controller
                     *
                 FROM
                     deposit_summary 
-                UNION SELECT 
+                UNION ALL SELECT 
                     *
                 FROM
                     withdraw_summary

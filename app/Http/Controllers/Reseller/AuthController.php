@@ -28,6 +28,10 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
 
+        if  (auth('reseller')->user()->status === Reseller::STATUS['DISABLED']) {
+            return response()->json(['message' => 'Unauthorized: Account Disabled'], 401);
+        }
+
         return $this->response->item(auth('reseller')->user(), new AuthTransformer($token));
     }
 

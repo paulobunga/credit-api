@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\Controller as Controller;
+use App\Models\Merchant;
 use App\Transformers\Merchant\AuthTransformer;
 use App\Models\MerchantWhiteList;
 
@@ -25,6 +26,10 @@ class AuthController extends Controller
 
         if (!$token = auth('merchant')->attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
+        }
+
+        if  (auth('merchant')->user()->status === Merchant::STATUS['DISABLED']) {
+            return response()->json(['message' => 'Unauthorized: Account Disabled'], 401);
         }
 
         if (!in_array(
