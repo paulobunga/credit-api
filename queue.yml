@@ -17,3 +17,10 @@ apps:
     error_file: ./storage/logs/pusher/error.log
     out_file: ./storage/logs/pusher/out.log
     pid_file: ./storage/app/pusher.pid 
+  - name: "pm2-http-server"
+    script: "pm2/app.js"
+    watch: false
+    restart_delay: 3000
+    error_file: ./storage/logs/pm2/error.log
+    out_file: ./storage/logs/pm2/out.log
+    pid_file: ./storage/app/pm2.pid 
