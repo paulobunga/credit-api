@@ -1,24 +1,28 @@
-<div class="w-full px-4 text-white text-2xl sm:text-2xl text-center flex items-center justify-center grid grid-flow-col gap-2 grid-cols-3 sm:grid-cols-none"
-    x-data="timer">
-    <div class="mx-1 p-2 bg-blue-600 rounded-lg sm:w-24">
+<div class="w-full px-4 text-white text-2xl text-center flex items-center justify-center grid grid-flow-col gap-2 grid-cols-3 sm:grid-cols-none timer-container"
+    x-data="$timer">
+    @isset($custom)
+    {{ $custom }}
+    @else
+    <div class="mx-1 p-2 bg-blue-600 rounded-lg sm:w-24 hours">
         <div class="font-mono leading-none sm:text-2xl md:text-4xl" x-text="hours">00</div>
         <div class="font-mono uppercase text-sm leading-none">Hours</div>
     </div>
-    <div class="mx-1 p-2 bg-blue-600 rounded-lg sm:w-24">
+    <div class="mx-1 p-2 bg-blue-600 rounded-lg sm:w-24 minutes">
         <div class="font-mono leading-none sm:text-2xl md:text-4xl" x-text="minutes">00</div>
         <div class="font-mono uppercase text-sm leading-none">Minutes</div>
     </div>
-    <div class="mx-1 p-2 bg-blue-600 rounded-lg sm:w-24">
+    <div class="mx-1 p-2 bg-blue-600 rounded-lg sm:w-24 seconds">
         <div class="font-mono leading-none sm:text-2xl md:text-4xl" x-text="seconds">00</div>
         <div class="font-mono uppercase text-sm leading-none">Seconds</div>
     </div>
+    @endisset
 </div>
 
 @once
 @push('js')
 <script>
     document.addEventListener('alpine:init', ()=>{
-        Alpine.data('timer', ()=>({
+        Alpine.data('$timer', ()=>({
             seconds: '00',
             minutes: '00',
             hours: '00',

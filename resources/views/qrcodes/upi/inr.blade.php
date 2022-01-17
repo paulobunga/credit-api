@@ -1,4 +1,5 @@
-@extends('qrcodes.default')
+@extends('qrcodes.inr')
+
 @section('attributes')
 <div class="grid grid-flow-row sm:gap-y-4 gap-y-2 text-sm sm:text-lg">
     <div class="py-4 md:py-6 text-center flex justify-center">

@@ -351,29 +351,55 @@ class DepositController extends Controller
         ]));
     }
 
+    /**
+     * Update deposit extra information
+     *
+     * @param \Dingo\Api\Http\Request $request
+     * @method PUT|PATCH
+     * @return json
+     */
     public function update(Request $request)
     {
+        $merchant = $this->validateSign($request, [
+            'merchant_order_id',
+            'time',
+        ]);
         $this->validate($request, [
-            'reference_no' => "required",
-            'merchant_id' => 'required',
+            'time' => 'required|numeric',
+            'currency' => 'required|in:' .
+                implode(',', array_keys(app(\App\Settings\CurrencySetting::class)->currency)),
+            'sender_mobile_number' => 'required_if:currency,BDT|numeric'
         ]);
-        $deposit = $this->model::where([
-            'merchant_id' => $request->merchant_id,
-            'merchant_order_id' => $this->parameters('deposit')
+        $m = $this->model::with(['paymentChannel'])->where([
+            'merchant_id' => $merchant->id,
+            'merchant_order_id' => $request->merchant_order_id,
         ])->firstOrFail();
-        if ($deposit->status != MerchantDeposit::STATUS['CREATED']) {
-            throw new \Exception('deposit is already pending', 510);
+        if ($m->status != MerchantDeposit::STATUS['PENDING']) {
+            throw new \Exception('Status is not allowed to update', 401);
         }
-        $deposit->update([
-            'status' => MerchantDeposit::STATUS['PENDING'],
-            'extra' => array_merge($request->extra, [
-                'reference_no' => $request->reference_no
-            ])
-        ]);
+        switch ($request->currency) {
+            case 'BDT':
+                $m->paymentChannel->validate([
+                    'wallet_number' => $request->sender_mobile_number
+                ]);
+                $m->update([
+                    'extra' => ['sender_mobile_number' => $request->sender_mobile_number] + $m->extra
+                ]);
+                break;
+            default:
+                throw new \Exception('Currency is not supported', 405);
+        }
 
         return $this->success();
     }
 
+    /**
+     * Get payment page
+     *
+     * @param \Dingo\Api\Http\Request $request
+     * @method GET
+     * @return html
+     */
     public function pay(Request $request)
     {
         $merchant = $this->validateSign($request);

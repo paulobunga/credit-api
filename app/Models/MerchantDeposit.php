@@ -117,10 +117,9 @@ class MerchantDeposit extends Model
             'time' => $this->created_at->timestamp,
         ];
 
-        return app('api.url')->version(env('API_VERSION'))
-            ->route('api.deposits.pay', $params + [
-                'sign' => $this->createSign($params, $this->merchant->api_key)
-            ]);
+        return apiRoute('api.deposits.pay', $params + [
+            'sign' => $this->createSign($params, $this->merchant->api_key)
+        ]);
     }
 
     public function getExpiredAtAttribute()

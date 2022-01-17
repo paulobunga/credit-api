@@ -23,7 +23,7 @@ class MerchantSeeder extends Seeder
             'username' => 'merchant@gmail.com',
             'password' => 'P@ssw0rd',
             'phone' => '+8865721455',
-            'callback_url' => app('api.url')->version(env('API_VERSION'))->route('api.demos.callback'),
+            'callback_url' => apiRoute('api.demos.callback'),
             'status' => true,
         ]);
         $merchant->whiteList()->create([
