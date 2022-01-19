@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -48,9 +47,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->routeMiddleware([
             'api.auth' => \App\Http\Middleware\Authenticate::class,
         ]);
-        Gate::before(function ($user) {
-            return $user->hasRole('Super Admin') ? true : null;
-        });
         $this->bootBladeComponents();
     }
 
