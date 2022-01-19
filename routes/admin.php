@@ -18,6 +18,7 @@ $api->group([
         $api->post('/auth/refresh', ['as' => 'auth.refresh', 'uses' => 'AuthController@refresh']);
         $api->post('/auth/me', ['as' => 'auth.me', 'uses' => 'AuthController@me']);
         $api->put('/auth/update', ['as' => 'auth.update', 'uses' => 'AuthController@update']);
+        $api->get('/roles', [ 'as' => 'roles.index', 'uses' => 'RoleController@index' ]);
 
         $api->group([
             'middleware' => [
@@ -26,7 +27,7 @@ $api->group([
         ], function ($api) {
             $api->resource('permissions', 'PermissionController', ['except' => ['show']]);
 
-            $api->resource('roles', 'RoleController', ['except' => ['show']]);
+            $api->resource('roles', 'RoleController', ['except' => ['show', 'index']]);
 
             $api->resource('banks', 'BankController', ['except' => ['show']]);
 

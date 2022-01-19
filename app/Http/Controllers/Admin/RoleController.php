@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class RoleController extends Controller
@@ -14,6 +15,8 @@ class RoleController extends Controller
 
     public function index(Request $request)
     {
+        Gate::authorize('index', new $this->model);
+
         $roles = QueryBuilder::for($this->model)
             ->allowedFilters(['name'])
             ->paginate($this->perPage);
