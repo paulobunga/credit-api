@@ -10,7 +10,7 @@ class BDT
         'wallet_number'
     ];
 
-    public $sms_rule = '/Tk ([\d,]+\.\d{2})*\nCustomer: (\d+)*\nTxnID: (\w+)*\nComm: Tk ([\d,]+\.\d{2})*\nBalance: Tk ([\d,]+\.\d{2})*/';
+    public $sms_rule = '/Tk ([\d,]+\.\d{2})*[\n|\s]Customer: (\d+)*[\n|\s]TxnID: (\w+)*[\n|\s]Comm: Tk ([\d,]+\.\d{2})*[\n|\s]Balance: Tk ([\d,]+\.\d{2})*/';
 
     public $sms_map = [
         'amount' => 1,
