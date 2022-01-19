@@ -21,6 +21,6 @@ class RolePolicy
 
     public function index($user)
     {
-      return $user->hasAnyRole(['Super Admin', 'Admin']) || $user->hasAnyPermission(['admin.admins.store', 'admin.admins.update']);
+      return $user->hasAnyPermission(['admin.admins.store', 'admin.admins.update']);
     }
 }

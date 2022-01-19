@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Spatie\Permission\Exceptions\UnauthorizedException;
+use Illuminate\Support\Facades\Gate;
 
 class RoleOrPermissionMiddleware
 {
@@ -20,10 +21,19 @@ class RoleOrPermissionMiddleware
         if ($routepermission = $request->route()[1]['as'] ?? null) {
             $rolesOrPermissions[] = $routepermission;
         }
-        if (!$authGuard->user()->hasAnyRole($rolesOrPermissions) && !$authGuard->user()->hasAnyPermission($rolesOrPermissions)) {
-            throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
+
+        if ($authGuard->user()->hasAnyRole($rolesOrPermissions)) {
+            return $next($request);
         }
 
-        return $next($request);
+        if ($authGuard->user()->hasAnyPermission($rolesOrPermissions)) {
+            return $next($request);
+        }
+       
+        if (Gate::authorize('index', Role::class)) {
+           return $next($request);
+        }
+
+        throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
     }
 }
