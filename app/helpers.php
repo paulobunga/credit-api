@@ -111,7 +111,7 @@ if (!function_exists('apiRoute')) {
      * @param  bool|null  $secure
      * @return string
      */
-    function apiRoute($name, $parameters = [], $secure = null)
+    function apiRoute($name, $parameters = [], $secure = true)
     {
         return app('api.url')->version(env('API_VERSION'))->route($name, $parameters, $secure);
     }
