@@ -14,66 +14,48 @@ use Knuckles\Scribe\Tools\WritingUtils as u;
 
     <link rel="stylesheet" href="{!! $assetPathPrefix !!}css/theme-default.style.css" media="screen">
     <link rel="stylesheet" href="{!! $assetPathPrefix !!}css/theme-default.print.css" media="print">
-    <script src="{{ u::getVersionedAsset($assetPathPrefix.'js/theme-default.js') }}"></script>
 
-    <link rel="stylesheet" href="//unpkg.com/@highlightjs/cdn-assets@10.7.2/styles/obsidian.min.css">
-    <script src="//unpkg.com/@highlightjs/cdn-assets@10.7.2/highlight.min.js"></script>
-    <script>
-        hljs.highlightAll();
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
 
-    @if($tryItOut['enabled'] ?? true)
-    <script src="//cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
-    <script>
-        var baseUrl = "{{ $tryItOut['base_url'] ?? config('app.url') }}";
-    </script>
-    <script src="{{ u::getVersionedAsset($assetPathPrefix.'js/tryitout.js') }}"></script>
-    <style>
-        form input{
-            width: 100% !important;
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@10.7.2/styles/obsidian.min.css">
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@10.7.2/highlight.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jets/0.14.1/jets.min.js"></script>
+
+    @if(isset($metadata['example_languages']))
+    <style id="language-style">
+        /* starts out as display none and is replaced with js later  */
+        @foreach($metadata['example_languages'] as $lang) body .content . {
+                {
+                $lang
+            }
         }
+
+        -example code {
+            display: none;
+        }
+
+        @endforeach
     </style>
     @endif
+
+    @if($tryItOut['enabled'] ?? true)
+    <script>
+        var baseUrl = "{{ $tryItOut['base_url'] ?? config('app.url') }}";
+        var useCsrf = Boolean({{ $tryItOut['use_csrf'] ?? null }});
+        var csrfUrl = "{{ $tryItOut['csrf_url'] ?? null }}";
+    </script>
+    <script src="{{ u::getVersionedAsset($assetPathPrefix.'js/tryitout.js') }}"></script>
+    @endif
+
+    <script src="{{ u::getVersionedAsset($assetPathPrefix.'js/theme-default.js') }}"></script>
 
 </head>
 
 <body data-languages="{{ json_encode($metadata['example_languages'] ?? []) }}">
-    <a href="#" id="nav-button">
-        <span>
-            MENU
-            <img src="{!! $assetPathPrefix !!}images/navbar.png" alt="navbar-image" />
-        </span>
-    </a>
-    <div class="tocify-wrapper">
-        @if($metadata['logo'] != false)
-        <img src="{{ $metadata['logo'] }}" alt="logo" class="logo" style="padding-top: 10px;" width="230px" />
-        @endif
-        @isset($metadata['example_languages'])
-        <div class="lang-selector">
-            @foreach($metadata['example_languages'] as $lang)
-            <a href="#" data-language-name="{{ $lang }}">{{ $lang }}</a>
-            @endforeach
-        </div>
-        @endisset
-        <div class="search">
-            <input type="text" class="search" id="input-search" placeholder="Search">
-        </div>
-        <ul class="search-results"></ul>
 
-        <ul id="toc">
-        </ul>
+    @include("scribe::themes.default.sidebar")
 
-        @if(isset($metadata['links']))
-        <ul class="toc-footer" id="toc-footer">
-            @foreach(array_slice($metadata['links'], 0, count($metadata['links'])-1) as $link)
-            <li>{!! $link !!}</li>
-            @endforeach
-        </ul>
-        @endif
-        <ul class="toc-footer" id="last-updated">
-            <li>Last updated: {{ $metadata['last_updated'] }}</li>
-        </ul>
-    </div>
     <div class="page-wrapper">
         <div class="dark-box"></div>
         <div class="content">
@@ -81,29 +63,21 @@ use Knuckles\Scribe\Tools\WritingUtils as u;
 
             {!! $auth !!}
 
-            {!! $append !!}
-
             @include("scribe::themes.default.groups")
 
+            {!! $append !!}
         </div>
         <div class="dark-box">
             @if(isset($metadata['example_languages']))
             <div class="lang-selector">
-                @foreach($metadata['example_languages'] as $lang)
-                <a href="#" data-language-name="{{$lang}}">{{$lang}}</a>
+                @foreach($metadata['example_languages'] as $name => $lang)
+                @php if (is_numeric($name)) $name = $lang; @endphp
+                <button type="button" class="lang-button" data-language-name="{{$lang}}">{{$name}}</button>
                 @endforeach
             </div>
             @endif
         </div>
     </div>
-    @isset($metadata['example_languages'])
-    <script>
-        $(function () {
-        var exampleLanguages = @json($metadata['example_languages']);
-        setupLanguages(exampleLanguages);
-    });
-    </script>
-    @endisset
 </body>
 
 </html>

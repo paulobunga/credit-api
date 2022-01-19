@@ -7,10 +7,7 @@
 </h2>
 
 <p>
-    @component('scribe::components.badges.auth', [
-    'authenticated' => $endpoint->metadata->authenticated
-    ])
-    @endcomponent
+    @component('scribe::components.badges.auth', ['authenticated' => $endpoint->metadata->authenticated])@endcomponent
 </p>
 
 {!! Parsedown::instance()->text($endpoint->metadata->description ?: '') !!}
@@ -18,7 +15,11 @@
 <span id="example-requests-{!! $endpoint->endpointId() !!}">
     <blockquote>Example request:</blockquote>
     @foreach($metadata['example_languages'] as $language)
-    @include("scribe::partials.example-requests.$language")
+
+    <div class="{{ $language }}-example">
+        @include("scribe::partials.example-requests.$language")
+    </div>
+
     @endforeach
 </span>
 
@@ -37,9 +38,9 @@
         </summary>
         <pre>
             <code class="language-http">
-                @foreach($response->headers as $header => $value)
+            @foreach($response->headers as $header => $value)
                 {{ $header }}: {{ is_array($value) ? implode('; ', $value) : $value }}
-                @endforeach 
+            @endforeach
             </code>
         </pre>
     </details>
@@ -89,12 +90,12 @@
         <button type="button"
             style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
             id="btn-tryout-{{ $endpoint->endpointId() }}" onclick="tryItOut('{{ $endpoint->endpointId() }}');">Try it
-            out
+            out ⚡
         </button>
         <button type="button"
             style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
             id="btn-canceltryout-{{ $endpoint->endpointId() }}" onclick="cancelTryOut('{{ $endpoint->endpointId() }}');"
-            hidden>Cancel
+            hidden>Cancel 🛑
         </button>&nbsp;&nbsp;
         <button type="submit"
             style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
@@ -125,6 +126,7 @@
         'type' => $parameter->type ?? 'string',
         'required' => $parameter->required,
         'description' => $parameter->description,
+        'example' => $parameter->example ?? '',
         'endpointId' => $endpoint->endpointId(),
         'component' => 'url',
         ])
@@ -141,6 +143,7 @@
         'type' => $parameter->type,
         'required' => $parameter->required,
         'description' => $parameter->description,
+        'example' => $parameter->example ?? '',
         'endpointId' => $endpoint->endpointId(),
         'component' => 'query',
         ])
