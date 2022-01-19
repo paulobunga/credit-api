@@ -299,6 +299,7 @@ class WithdrawalController extends Controller
             'amount' => 'required|numeric',
             'callback_url' => 'required|url'
         ]);
+
         $channel = PaymentChannel::where([
             'payout->status' => true,
             'currency' => $request->currency,

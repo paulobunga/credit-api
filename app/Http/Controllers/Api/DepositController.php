@@ -187,7 +187,7 @@ class DepositController extends Controller
      * @bodyParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
      * @bodyParam sign string required Signature. Example: c8104a183967516bbb542d10dcc04f2e
      * @bodyParam amount string required Amount of the deposit. Example: 500
-     * @bodyParam callback_url url Callback URL of the deposit, Example: :base_url/demos/callback/9798223690986
+     * @bodyParam callback_url url required Callback URL of the deposit, Example: :base_url/demos/callback/9798223690986
      * @response status=200
      * {
      *   "data": {
@@ -247,8 +247,23 @@ class DepositController extends Controller
             'channel' => 'required',
             'method' => 'required',
             'amount' => 'required|numeric',
-            'callback_url' => 'nullable|url'
+            'callback_url' => 'required|url'
         ]);
+
+        $same_orders = $this->model::where([
+            'merchant_id' => $merchant->id,
+            'amount' => $request->amount,
+            'currency' => $request->currency,
+            'player_id' => $request->get('player_id', -1)
+        ])->whereIn('status', [
+            MerchantDeposit::STATUS['PENDING'],
+            MerchantDeposit::STATUS['EXPIRED'],
+        ])->count();
+
+        if ($same_orders) {
+            throw new \Exception('Same amount payin order is found!', 405);
+        }
+
         $channel = PaymentChannel::where([
             'payin->status' => true,
             'currency' => $request->currency,
