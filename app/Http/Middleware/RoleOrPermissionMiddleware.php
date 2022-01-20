@@ -29,9 +29,9 @@ class RoleOrPermissionMiddleware
         if ($authGuard->user()->hasAnyPermission($rolesOrPermissions)) {
             return $next($request);
         }
-       
-        if (Gate::authorize('index', Role::class)) {
-           return $next($request);
+        
+        if ($request->user()->can('index', [Role::class, $request->route()[1]['as']])) {
+          return $next($request);
         }
 
         throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);

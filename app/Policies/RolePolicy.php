@@ -9,18 +9,8 @@ class RolePolicy
 {
     use HandlesAuthorization;
 
-    /**
-     * Create a new policy instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function index($user, $route)
     {
-        //
-    }
-
-    public function index($user)
-    {
-      return $user->hasAnyPermission(['admin.admins.store', 'admin.admins.update']);
+      return in_array($route, ['admin.roles.index']) && $user->hasAnyPermission(['admin.admins.store', 'admin.admins.update']);
     }
 }
