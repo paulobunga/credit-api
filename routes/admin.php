@@ -22,7 +22,7 @@ $api->group([
 
         $api->group([
             'middleware' => [
-                'role_or_permission:Super Admin',
+                'role_or_permission:Super Admin,admin',
             ],
         ], function ($api) {
             $api->resource('permissions', 'PermissionController', ['except' => ['show']]);

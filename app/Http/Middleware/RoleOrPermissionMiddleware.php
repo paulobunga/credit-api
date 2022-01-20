@@ -18,20 +18,14 @@ class RoleOrPermissionMiddleware
         $rolesOrPermissions = is_array($roleOrPermission)
             ? $roleOrPermission
             : explode('|', $roleOrPermission);
-        if ($routepermission = $request->route()[1]['as'] ?? null) {
-            $rolesOrPermissions[] = $routepermission;
-        }
 
         if ($authGuard->user()->hasAnyRole($rolesOrPermissions)) {
             return $next($request);
         }
 
-        if ($authGuard->user()->hasAnyPermission($rolesOrPermissions)) {
+        $route = $request->route()[1]['as'] ?? null;
+        if ($route && $authGuard->user()->can($route)) {
             return $next($request);
-        }
-        
-        if ($request->user()->can('index', [Role::class, $request->route()[1]['as']])) {
-          return $next($request);
         }
 
         throw UnauthorizedException::forRolesOrPermissions($rolesOrPermissions);
