@@ -90,4 +90,24 @@ class AuthController extends Controller
 
         return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
     }
+
+    /**
+     * Reset user password.
+     *
+     * @method PUT
+     * @param \Dingo\Api\Http\Request $request
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
+    public function resetPassword(Request $request)
+    { 
+        $this->validate($request, [
+            'password' => 'required|confirmed',
+        ]);
+        auth()->user()->update([
+            'password' => $request->password,
+        ]);
+
+        return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
+    }
 }

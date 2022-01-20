@@ -18,6 +18,7 @@ $api->group([
         $api->post('/auth/refresh', ['as' => 'auth.refresh', 'uses' => 'AuthController@refresh']);
         $api->post('/auth/me', ['as' => 'auth.me', 'uses' => 'AuthController@me']);
         $api->put('/auth/update', ['as' => 'auth.update', 'uses' => 'AuthController@update']);
+        $api->put('/auth/reset_password', ['as' => 'auth.reset_password', 'uses' => 'AuthController@resetPassword']);
 
         $api->group([
             'middleware' => [
