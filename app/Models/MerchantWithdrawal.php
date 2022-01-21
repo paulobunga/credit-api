@@ -126,7 +126,6 @@ class MerchantWithdrawal extends Model
 
     public function setExtraAttribute($value)
     {
-        $extra = (array)json_decode($this->attributes['extra']);
-        $this->attributes['extra'] = json_encode(array_merge($extra, $value));
+        $this->attributes['extra'] = json_encode(array_merge($this->extra ?? [], $value));
     }
 }

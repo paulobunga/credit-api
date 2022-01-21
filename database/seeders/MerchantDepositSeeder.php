@@ -45,6 +45,10 @@ class MerchantDepositSeeder extends Seeder
                     'merchant_id' => $merchant->id,
                     'reseller_bank_card_id' => $reseller_bank_card->id,
                     'status' => MerchantDeposit::STATUS['APPROVED'],
+                    'extra' => [
+                        'admin_id' => 1,
+                        'reference_id' => $this->faker->regexify('[a-zA-Z0-9]{10}')
+                    ]
                 ]);
                 if ($d->paymentChannel->isSupportSMS()) {
                     $trx_id = $this->faker->regexify('[a-zA-Z0-9]{10}');
@@ -54,7 +58,7 @@ class MerchantDepositSeeder extends Seeder
                         'model_name' => 'merchant.deposit',
                         'platform' => 'Android',
                         'address' => $d->paymentChannel->payin->sms_addresses[0],
-                        'trx_id' => $trx_id ,
+                        'trx_id' => $trx_id,
                         'sim_num' => $reseller_bank_card->attributes['wallet_number'],
                         'body' => __('sms.' . $d->paymentChannel->name, [
                             'amount' => $d->amount,
@@ -93,10 +97,16 @@ class MerchantDepositSeeder extends Seeder
                     'callback_url' => apiRoute('api.demos.callback'),
                 ]);
                 $withdrawal->update([
-                    'status' => MerchantWithdrawal::STATUS['FINISHED']
+                    'status' => MerchantWithdrawal::STATUS['FINISHED'],
+                    'extra' => [
+                        'reference_id' => $this->faker->regexify('[a-zA-Z0-9]{10}')
+                    ]
                 ]);
                 $withdrawal->update([
-                    'status' => MerchantWithdrawal::STATUS['APPROVED']
+                    'status' => MerchantWithdrawal::STATUS['APPROVED'],
+                    'extra' => [
+                        'admin_id' => 1
+                    ]
                 ]);
                 MerchantSettlement::create([
                     'merchant_id' => $merchant->id,
