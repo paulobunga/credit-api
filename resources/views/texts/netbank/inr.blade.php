@@ -1,4 +1,5 @@
-@extends('texts.default')
+@extends('texts.inr')
+
 @section('attributes')
 <div
     class="grid grid-flow-row sm:gap-4 gap-y-2 text-sm sm:text-md md:text-lg text-left">

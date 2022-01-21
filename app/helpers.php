@@ -102,6 +102,21 @@ if (!function_exists('asset')) {
     }
 }
 
+if (!function_exists('apiRoute')) {
+    /**
+     * Generate a URL to a named route.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  bool|null  $secure
+     * @return string
+     */
+    function apiRoute($name, $parameters = [], $secure = true)
+    {
+        return app('api.url')->version(env('API_VERSION'))->route($name, $parameters, $secure);
+    }
+}
+
 if (!function_exists('admin_url')) {
     /**
      * Generate an asset path to admin panel.

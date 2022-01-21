@@ -25,7 +25,7 @@ class MerchantFactory extends Factory
             'username' => $this->faker->unique()->numerify('merchant#@gmail.com'),
             'phone' => $this->faker->phoneNumber,
             'password' => 'P@ssw0rd',
-            'callback_url' => app('api.url')->version(env('API_VERSION'))->route('api.demos.callback'),
+            'callback_url' => apiRoute('api.demos.callback'),
             'status' => $this->faker->boolean,
         ];
     }

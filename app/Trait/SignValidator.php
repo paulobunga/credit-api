@@ -3,12 +3,12 @@
 namespace App\Trait;
 
 use Dingo\Api\Http\Request;
+use App\Models\Merchant;
 
 trait SignValidator
 {
-    protected $merchant_class = \App\Models\Merchant::class;
 
-    protected function validateSign(Request $request)
+    protected function validateSign(Request $request, array $only = [])
     {
         $this->validate($request, [
             'uuid' => 'required|exists:merchants,uuid',
@@ -16,8 +16,12 @@ trait SignValidator
         ], [
             'sign.required' => 'sign is required'
         ]);
-        $merchant = $this->merchant_class::where('uuid', $request->uuid)->firstOrFail();
-        $sign = $this->createSign($request->all(), $merchant->api_key);
+        $merchant = Merchant::where('uuid', $request->uuid)->firstOrFail();
+        if (empty($only)) {
+            $sign = $this->createSign($request->all(), $merchant->api_key);
+        } else {
+            $sign = $this->createSign($request->only(['uuid', ...$only]), $merchant->api_key);
+        }
         if ($sign !== $request->sign) {
             if (env('APP_ENV') == 'local') {
                 throw new \Exception("request sign is invalid, {$sign}", 444);

@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Gate;
+use Knuckles\Scribe\Scribe;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
@@ -45,12 +45,15 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->app->routeMiddleware([
+        app()->routeMiddleware([
             'api.auth' => \App\Http\Middleware\Authenticate::class,
         ]);
-        Gate::before(function ($user) {
-            return $user->hasRole('Super Admin') ? true : null;
-        });
+        if (class_exists(\Knuckles\Scribe\Scribe::class)) {
+            Scribe::afterGenerating(function (array $paths) {
+                // Move the files, upload to S3, etc...
+                copy('public/favicon.ico', 'docs/favicon.ico');
+            });
+        }
         $this->bootBladeComponents();
     }
 

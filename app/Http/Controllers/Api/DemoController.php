@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Dingo\Api\Http\Request;
 use App\Trait\SignValidator;
@@ -46,6 +45,8 @@ class DemoController extends Controller
                 $data = array_merge($request->all(), [
                     'merchant_order_id' => Str::uuid()->toString(),
                     'uuid' => $merchant->uuid,
+                    'player_id' => 0,
+                    'callback_url' => apiRoute('api.demos.callback')
                 ]);
                 $data['sign'] = $this->createSign($data, $merchant->api_key);
                 try {
@@ -106,7 +107,8 @@ class DemoController extends Controller
                 $data = array_merge($request->all(), [
                     'merchant_order_id' => Str::uuid()->toString(),
                     'uuid' => $merchant->uuid,
-                    'callback_url' => env('APP_URL') . '/demos/callback'
+                    'player_id' => 0,
+                    'callback_url' => apiRoute('api.demos.callback')
                 ]);
                 $data['sign'] = $this->createSign($data, $merchant->api_key);
                 try {

@@ -1,31 +1,36 @@
-@extends('qrcodes.default')
-@section('attributes')
-<div class="grid grid-flow-row sm:gap-y-4 gap-y-2 text-sm sm:text-lg">
-    <div
-        class="py-4 md:py-6 grid grid-flow-col grid-cols-8 gap-x-2 text-center border-b-2 border-gray-400 border-opacity-25 items-center">
-        <div class="font-bold col-span-2">Wallet Number</div>
-        <div class="overflow-x-auto col-span-4">
-            {{ $attributes['wallet_number'] }}
-        </div>
-        <div class="col-span-2" x-data="{'input': '{{ $attributes['wallet_number'] }}' }">
-            <button class="px-3 py-1 bg-blue-600 text-white rounded-full"
-                x-on:click="$clipboard(input); $store.$alert.show('success', 'Wallet Number is copied!')">
-                Copy
-            </button>
-        </div>
-    </div>
-    <div
-        class="py-4 md:py-6 grid grid-flow-col grid-cols-8 gap-x-2 text-center border-b-2 border-gray-400 border-opacity-25 items-center">
-        <div class="font-bold col-span-2">Amount</div>
-        <div class="font-bold text-red-600 col-span-4">
-            {{ $amount }} {{ $deposit->currency }}
-        </div>
-        <div class="col-span-2" x-data="{'input': '{{ $amount }}' }">
-            <button class="px-3 py-1 bg-blue-600 text-white rounded-full"
-                x-on:click="$clipboard(input); $store.$alert.show('success', 'Amount is copied!')">
-                Copy
-            </button>
-        </div>
-    </div>
-</div>
+@extends('qrcodes.bdt')
+
+@section('head')
+<title>{{ env('APP_NAME') }} - Upay PayIn</title>
+@endsection
+
+@push('style')
+<style>
+    .gradient-color {
+        --tw-gradient-from: #4D87C1;
+        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgb(77, 135, 193 / 0));
+        --tw-gradient-to: #1856AB;
+    }
+
+    .divider {
+        --tw-border-opacity: 1;
+        border-color: rgb(39 39 42) / var(--tw-border-opacity));
+        border-style: dotted;
+        border-top-width: 2px;
+    }
+
+    .btn {
+        --tw-bg-opacity: 1;
+        background-color: rgb(250 204 21/ var(--tw-bg-opacity));
+        color: #000;
+    }
+
+    .relative.bg-white {
+        background: #E5E5E5;
+    }
+</style>
+@endpush
+
+@section('logo')
+<img src="/img/logos/upay.png" />
 @endsection

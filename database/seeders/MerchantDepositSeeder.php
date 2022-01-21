@@ -41,7 +41,7 @@ class MerchantDepositSeeder extends Seeder
                     'method' => Arr::random($reseller_bank_card->paymentChannel->payment_methods),
                     'amount' => 1000,
                     'currency' => $credit->currency,
-                    'callback_url' => app('api.url')->version(env('API_VERSION'))->route('api.demos.callback'),
+                    'callback_url' => apiRoute('api.demos.callback'),
                     'merchant_id' => $merchant->id,
                     'reseller_bank_card_id' => $reseller_bank_card->id,
                     'status' => MerchantDeposit::STATUS['APPROVED'],
@@ -90,7 +90,7 @@ class MerchantDepositSeeder extends Seeder
                     'amount' => 100,
                     'currency' => $credit->currency,
                     'status' => MerchantWithdrawal::STATUS['PENDING'],
-                    'callback_url' => app('api.url')->version(env('API_VERSION'))->route('api.demos.callback'),
+                    'callback_url' => apiRoute('api.demos.callback'),
                 ]);
                 $withdrawal->update([
                     'status' => MerchantWithdrawal::STATUS['FINISHED']

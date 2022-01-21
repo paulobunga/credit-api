@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1e72cc35e963aec2336d2d7393b411e4",
+    "content-hash": "caa005c3d7f243ad8dbdd3725fe4d070",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -10277,16 +10277,16 @@
         },
         {
             "name": "knuckleswtf/scribe",
-            "version": "3.10.2",
+            "version": "3.21.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/knuckleswtf/scribe.git",
-                "reference": "b4f78bfb949382491c12f1857c52cea433065f2d"
+                "reference": "615754c9a99898af7bb5c5bcd2c3f6604bb20f1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/knuckleswtf/scribe/zipball/b4f78bfb949382491c12f1857c52cea433065f2d",
-                "reference": "b4f78bfb949382491c12f1857c52cea433065f2d",
+                "url": "https://api.github.com/repos/knuckleswtf/scribe/zipball/615754c9a99898af7bb5c5bcd2c3f6604bb20f1e",
+                "reference": "615754c9a99898af7bb5c5bcd2c3f6604bb20f1e",
                 "shasum": ""
             },
             "require": {
@@ -10363,7 +10363,7 @@
             ],
             "support": {
                 "issues": "https://github.com/knuckleswtf/scribe/issues",
-                "source": "https://github.com/knuckleswtf/scribe/tree/3.10.2"
+                "source": "https://github.com/knuckleswtf/scribe/tree/3.21.0"
             },
             "funding": [
                 {
@@ -10371,7 +10371,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-09-10T21:21:19+00:00"
+            "time": "2022-01-02T12:43:42+00:00"
         },
         {
             "name": "mockery/mockery",
@@ -12654,5 +12654,5 @@
         "php": "^7.3|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }

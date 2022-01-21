@@ -28,7 +28,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Unauthorized Credentials'], 401);
         }
 
-        if  (auth('merchant')->user()->status === Merchant::STATUS['DISABLED']) {
+        if (auth('merchant')->user()->status === Merchant::STATUS['DISABLED']) {
             return response()->json(['message' => 'Unauthorized: Account Disabled'], 401);
         }
 
@@ -130,15 +130,13 @@ class AuthController extends Controller
     {
         return Broadcast::auth($request);
     }
-    
+
     /**
      * Get Token of onesignal service
      *
      * @method POST
-     * 
      * @param  \Dingo\Api\Http\Request $request
-     * 
-     * @return array
+     * @return json
      */
     public function onesignal(Request $request)
     {

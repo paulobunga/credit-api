@@ -121,7 +121,7 @@ if (class_exists(\Knuckles\Scribe\ScribeServiceProvider::class)) {
 $app->register(App\Providers\BroadcastServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\RouteServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 
 $app->alias('cache', \Illuminate\Cache\CacheManager::class);

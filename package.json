@@ -18,6 +18,8 @@
     "tailwindcss": "^3.0.5"
   },
   "dependencies": {
-    "animate.css": "^4.1.1"
+    "animate.css": "^4.1.1",
+    "express": "^4.17.2",
+    "pm2": "^5.1.2"
   }
 }

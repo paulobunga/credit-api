@@ -23,7 +23,9 @@ trait PaymentChannelObserver
 
         $request = Arr::only($request, $this->reference->attributes);
 
-        $validator = app('validator')->make($request, $this->reference->rules());
+        $validator = app('validator')->make($request, $this->reference->rules(), [
+            'wallet_number.regex' => 'incorrect mobile number format'
+        ]);
 
         if ($validator->fails()) {
             throw new ValidationHttpException(
