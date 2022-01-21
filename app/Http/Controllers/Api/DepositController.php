@@ -251,22 +251,22 @@ class DepositController extends Controller
             'callback_url' => 'required|url'
         ]);
 
-        $same_orders = $this->model::where([
-            'merchant_id' => $merchant->id,
-            'amount' => $request->amount,
-            'currency' => $request->currency,
-            'player_id' => $request->get('player_id', -1)
-        ])->whereIn('status', [
-            MerchantDeposit::STATUS['PENDING'],
-            MerchantDeposit::STATUS['EXPIRED'],
-        ])->whereBetween('created_at', [
-            Carbon::now()->subHours(24),
-            Carbon::now(),
-        ])->count();
+        // $same_orders = $this->model::where([
+        //     'merchant_id' => $merchant->id,
+        //     'amount' => $request->amount,
+        //     'currency' => $request->currency,
+        //     'player_id' => $request->get('player_id', -1)
+        // ])->whereIn('status', [
+        //     MerchantDeposit::STATUS['PENDING'],
+        //     MerchantDeposit::STATUS['EXPIRED'],
+        // ])->whereBetween('created_at', [
+        //     Carbon::now()->subHours(24),
+        //     Carbon::now(),
+        // ])->count();
 
-        if ($same_orders) {
-            throw new \Exception('Same amount payin order is found in 24 hours!', 405);
-        }
+        // if ($same_orders) {
+        //     throw new \Exception('Same amount payin order is found in 24 hours!', 405);
+        // }
 
         $channel = PaymentChannel::where([
             'payin->status' => true,
