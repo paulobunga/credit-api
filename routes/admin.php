@@ -105,7 +105,7 @@ $api->group([
             
             $api->resource('logs', 'LogController', ['only' => ['index', 'show', 'destroy']]);
 
-            $api->resource('pm2s', 'Pm2Controller', ['only' => ['index']]);
+            $api->resource('pm2s', 'Pm2Controller', ['only' => ['index', 'store']]);
         });
     });
 });
