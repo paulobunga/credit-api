@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Trait\SignValidator;
@@ -258,10 +259,13 @@ class DepositController extends Controller
         ])->whereIn('status', [
             MerchantDeposit::STATUS['PENDING'],
             MerchantDeposit::STATUS['EXPIRED'],
+        ])->whereBetween('created_at', [
+            Carbon::now()->subHours(24),
+            Carbon::now(),
         ])->count();
 
         if ($same_orders) {
-            throw new \Exception('Same amount payin order is found!', 405);
+            throw new \Exception('Same amount payin order is found in 24 hours!', 405);
         }
 
         $channel = PaymentChannel::where([
