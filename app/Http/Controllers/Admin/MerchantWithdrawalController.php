@@ -176,10 +176,10 @@ class MerchantWithdrawalController extends Controller
         $transfer_from = Reseller::findOrFail($m->reseller->id);
         $m->update([
             'reseller_id' => $request->reseller_id,
-            'extra' => array_merge($m->extra, [
+            'extra' => [
                 'transfer_from_reseller_id' => $transfer_from->id,
                 'transfer_by_admin_id' => auth()->id(),
-            ]),
+            ],
         ]);
         // send notification
         $transfer_from->notify(new \App\Notifications\WithdrawalTransfer($m));

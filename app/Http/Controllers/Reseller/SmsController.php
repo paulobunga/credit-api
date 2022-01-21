@@ -109,7 +109,7 @@ class SmsController extends Controller
         if ($deposit = $data['match']) {
             $deposit->update([
                 'status' => MerchantDeposit::STATUS['APPROVED'],
-                'extra' => $deposit->extra + ['reference_id' => $data['trx_id']]
+                'extra' => ['reference_id' => $data['trx_id']]
             ]);
             $m = $this->model::create([
                 'reseller_id' => auth()->id(),
@@ -178,7 +178,7 @@ class SmsController extends Controller
             if ($deposit = $data['match']) {
                 $deposit->update([
                     'status' => MerchantDeposit::STATUS['APPROVED'],
-                    'extra' => $deposit->extra + ['reference_id' => $data['trx_id']]
+                    'extra' => ['reference_id' => $data['trx_id']]
                 ]);
                 $m = $this->model::create([
                     'reseller_id' => auth()->id(),

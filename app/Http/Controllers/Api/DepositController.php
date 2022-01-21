@@ -402,7 +402,7 @@ class DepositController extends Controller
                     'wallet_number' => $request->sender_mobile_number
                 ]);
                 $m->update([
-                    'extra' => ['sender_mobile_number' => $request->sender_mobile_number] + $m->extra
+                    'extra' => ['sender_mobile_number' => $request->sender_mobile_number]
                 ]);
                 break;
             default:
