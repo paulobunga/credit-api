@@ -162,6 +162,7 @@ class MerchantWithdrawalController extends Controller
     {
         $m = $this->model::where([
             'id' => $this->parameters('merchant_withdrawal'),
+            'status' => MerchantWithdrawal::STATUS['PENDING']
         ])->firstOrFail();
         $this->validate($request, [
             'reseller_id' => 'required|numeric',
