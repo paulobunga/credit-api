@@ -123,4 +123,10 @@ class MerchantWithdrawal extends Model
             Carbon::now()->addMinutes(1)
         );
     }
+
+    public function setExtraAttribute($value)
+    {
+        $extra = (array)json_decode($this->attributes['extra']);
+        $this->attributes['extra'] = json_encode(array_merge($extra, $value));
+    }
 }

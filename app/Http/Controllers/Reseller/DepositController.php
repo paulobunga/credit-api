@@ -98,7 +98,7 @@ class DepositController extends Controller
         if ($request->status == MerchantDeposit::STATUS['APPROVED']) {
             $deposit->update([
                 'status' => $request->status,
-                'extra' => $deposit->extra + ['reference_id' => $request->reference_id]
+                'extra' => ['reference_id' => $request->reference_id]
             ]);
         } else {
             $deposit->update([

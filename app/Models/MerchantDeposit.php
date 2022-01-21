@@ -137,4 +137,10 @@ class MerchantDeposit extends Model
     {
         return array_keys(self::CALLBACK_STATUS)[$this->attributes['callback_status']];
     }
+
+    public function setExtraAttribute($value)
+    {
+        $extra = (array)json_decode($this->attributes['extra']);
+        $this->attributes['extra'] = json_encode(array_merge($extra, $value));
+    }
 }
