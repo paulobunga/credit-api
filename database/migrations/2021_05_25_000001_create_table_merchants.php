@@ -21,7 +21,6 @@ class CreateTableMerchants extends Migration
             $table->string('username')->unique()->index();
             $table->string('phone', 20);
             $table->string('api_key', 30);
-            $table->string('callback_url');
             $table->boolean('status')->default(false)->comment('F:Disabled,T:Enabled');
             $table->string('password', 60);
             $table->timestamps();

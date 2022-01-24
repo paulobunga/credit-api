@@ -337,6 +337,8 @@ class WithdrawalController extends Controller
                     r.currency = '{$request->currency}'
                     AND r.STATUS = :r_status
                     AND r.payout->>'$.status' = :r_payout_status
+                    AND r.payout->>'$.min' <= {$request->amount}
+                    AND r.payout->>'$.max' >= {$request->amount}
                     AND r.LEVEL = :r_level
                 GROUP BY r.id
                 ),

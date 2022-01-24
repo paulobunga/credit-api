@@ -27,7 +27,6 @@ class AuthTransformer extends TransformerAbstract
             'api_key' => $merchant->api_key,
             'api_white_lists' => $merchant->whiteList->api ?? [],
             'backend_white_lists' => $merchant->whiteList->backend ?? [],
-            'callback_url' => $merchant->callback_url,
             'status' => $merchant->status,
             'access_token' => $this->token,
             'token_type' => 'bearer',

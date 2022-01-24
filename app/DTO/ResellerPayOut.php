@@ -12,6 +12,10 @@ final class ResellerPayOut extends Base
 
     public int $daily_amount_limit;
 
+    public int $min;
+
+    public int $max;
+
     public const STATUS = [
         'INACTIVE' => 'false',
         'ACTIVE' => 'true',

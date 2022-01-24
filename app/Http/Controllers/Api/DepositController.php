@@ -312,6 +312,8 @@ class DepositController extends Controller
                 AND r.LEVEL = :r_level
                 AND r.STATUS = :r_status
                 AND r.payin->>'$.status' = :r_payin_status
+                AND r.payin->>'$.min' <= {$request->amount}
+                AND r.payin->>'$.max' >= {$request->amount}
                 AND rbc.STATUS = :rbc_status
                 AND pc.payin->>'$.status' = :pc_status
                 AND pc.currency = '{$request->currency}'

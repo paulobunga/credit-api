@@ -2,12 +2,14 @@
 
 namespace App\Observers;
 
+use \App\Models\PaymentChannel;
+
 trait ResellerBankCardObserver
 {
-    public static function validateAttribute(string $channel, string $currency, array $attributes, $ignore = 0)
+    public static function validateAttribute(PaymentChannel $channel, string $currency, array $attributes, $ignore = 0)
     {
         $bankcard = null;
-        switch ($channel) {
+        switch ($channel->name) {
             case 'UPI':
                 $bankcard = static::where('attributes->upi_id', $attributes['upi_id'])->first();
                 break;
@@ -23,7 +25,10 @@ trait ResellerBankCardObserver
             case 'NAGAD':
             case 'ROCKET':
             case 'UPAY':
-                $bankcard = static::where('attributes->wallet_number', $attributes['wallet_number'])->first();
+                $bankcard = static::where([
+                    'attributes->wallet_number' =>  $attributes['wallet_number'],
+                    'payment_channel_id' => $channel->id
+                ])->first();
                 break;
         }
         if ($bankcard && $bankcard->id != $ignore) {

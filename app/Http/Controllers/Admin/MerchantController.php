@@ -57,7 +57,6 @@ class MerchantController extends Controller
             'username' => 'required|unique:merchants,username',
             'password' => 'required|confirmed',
             'phone' => 'required',
-            'callback_url' => 'required',
             'currency' => 'required|array',
             'currency.*.label' => 'required|distinct',
             'currency.*.value' => 'required|boolean',
@@ -84,7 +83,6 @@ class MerchantController extends Controller
             'username' => $request->username,
             'password' => $request->password,
             'phone' => $request->phone,
-            'callback_url' => $request->callback_url,
             'status' => $request->status
         ]);
 
@@ -110,14 +108,12 @@ class MerchantController extends Controller
             'name' => "required|unique:merchants,name,{$merchant->id}",
             'username' => "required|unique:merchants,username,{$merchant->id}",
             'phone' => 'required',
-            'callback_url' => 'required',
             'status' => 'required|boolean'
         ]);
         $merchant->update([
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
-            'callback_url' => $request->callback_url,
             'status' => $request->status
         ]);
 

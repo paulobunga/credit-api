@@ -73,6 +73,7 @@ class AuthController extends Controller
         $currency_setting = app(\App\Settings\CurrencySetting::class);
         $reseller_setting = app(\App\Settings\ResellerSetting::class);
         $agent_setting = app(\App\Settings\AgentSetting::class);
+        $cs = $currency_setting->currency[$request->currency];
 
         Reseller::create([
             'level' => Reseller::LEVEL['RESELLER'],
@@ -90,7 +91,9 @@ class AuthController extends Controller
                 ),
                 'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
                 'status' => true,
-                'auto_sms_approval' => false
+                'auto_sms_approval' => false,
+                'min' => $cs['payin']['min'],
+                'max' => $cs['payin']['max'],
             ],
             'payout' => [
                 'commission_percentage' => $currency_setting->getCommissionPercentage(
@@ -100,6 +103,8 @@ class AuthController extends Controller
                 'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
                 'status' => true,
                 'daily_amount_limit' => 50000,
+                'min' => $cs['payout']['min'],
+                'max' => $cs['payout']['max'],
             ],
             'downline_slot' => $agent_setting->getDefaultDownLineSlot(Reseller::LEVEL['RESELLER']),
             'status' =>  Reseller::STATUS['INACTIVE'],

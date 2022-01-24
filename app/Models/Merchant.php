@@ -29,7 +29,6 @@ class Merchant extends Model implements AuthenticatableContract, AuthorizableCon
         'phone',
         'api_key',
         'password',
-        'callback_url',
         'status',
     ];
 

@@ -12,6 +12,10 @@ final class ResellerPayIn extends Base
 
     public bool $auto_sms_approval;
 
+    public int $min;
+
+    public int $max;
+
     public const STATUS = [
         'INACTIVE' => 'false',
         'ACTIVE' => 'true',
