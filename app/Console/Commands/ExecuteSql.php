@@ -599,4 +599,13 @@ class ExecuteSql extends Command
             $table->unsignedBigInteger('reseller_bank_card_id')->after('reseller_id')->default(0);
         });
     }
+
+    protected function merchantsDropCallbackUrlColumn()
+    {
+        if (Schema::hasColumn('merchants', 'callback_url')) {
+            Schema::table('merchants', function (Blueprint $table) {
+                $table->dropColumn(['callback_url']);
+            });
+        }
+    }
 }

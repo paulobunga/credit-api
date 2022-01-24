@@ -82,15 +82,11 @@ class AuthController extends Controller
             'name' => "required|unique:merchants,name," . auth()->id(),
             'username' => "required|unique:merchants,username," . auth()->id(),
             'phone' => 'required',
-            'transaction_fee' => 'required|numeric',
-            'callback_url' => 'required',
         ]);
         auth()->user()->update([
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
-            'transaction_fee' => $request->transaction_fee,
-            'callback_url' => $request->callback_url,
         ]);
 
         return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));

@@ -19,7 +19,6 @@ class MerchantTransformer extends TransformerAbstract
             'username' => $m->username,
             'phone' => $m->phone,
             'api_key' => $m->api_key,
-            'callback_url' => $m->callback_url,
             'whiteList' => $m->whiteList,
             'status' => $m->status,
         ];
