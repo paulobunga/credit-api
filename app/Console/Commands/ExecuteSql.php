@@ -608,4 +608,36 @@ class ExecuteSql extends Command
             });
         }
     }
+
+    protected function addResellersPayInPayoutMinMax()
+    {
+        DB::beginTransaction();
+        try {
+            DB::statement("
+                Update resellers
+                SET payin = JSON_SET(payin, '$.min', 500, '$.max', 5000),
+                    payout = JSON_SET(payout, '$.min', 2000, '$.max', 5000)
+            ");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        DB::commit();
+        $setting = app('settings.currency');
+        foreach ($setting->currency as $currency => $s) {
+            if (isset($s['payin']) || isset($s['payout'])) {
+                continue;
+            }
+            $s['payin'] = [
+                'min' => 500,
+                'max' => 5000,
+            ];
+            $s['payout'] = [
+                'min' => 2000,
+                'max' => 5000,
+            ];
+            $setting->currency[$currency] = $s;
+        }
+        $setting->save();
+    }
 }

@@ -30,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('pusher', function () {
             return app('Illuminate\Broadcasting\BroadcastManager')->driver('pusher')->getPusher();
         });
+        $this->app->singleton('settings.currency', function () {
+            return app(\App\Settings\CurrencySetting::class);
+        });
         // register custom morph type
         Relation::morphMap([
             'admin' => 'App\Models\Admin',

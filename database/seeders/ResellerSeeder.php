@@ -45,13 +45,17 @@ class ResellerSeeder extends Seeder
                         'commission_percentage' => $c->getCommissionPercentage($currency, $level),
                         'pending_limit' => $rs->getDefaultPendingLimit($level),
                         'status' => true,
-                        'auto_sms_approval'=> false
+                        'auto_sms_approval'=> false,
+                        'max' => $setting['payin']['max'],
+                        'min' => $setting['payin']['min']
                     ],
                     'payout' => [
                         'commission_percentage' => $c->getCommissionPercentage($currency, $level),
                         'pending_limit' => $rs->getDefaultPendingLimit($level),
                         'status' => true,
                         'daily_amount_limit' => 50000,
+                        'max' => $setting['payin']['max'],
+                        'min' => $setting['payin']['min']
                     ],
                     'downline_slot' => $as->getDefaultDownLineSlot($level),
                     'status' => Reseller::STATUS['ACTIVE'],
@@ -59,6 +63,7 @@ class ResellerSeeder extends Seeder
                 ]);
             }
         }
+        $setting = $c->currency['VND'];
         $vnd_agent = Reseller::where([
             'currency' => 'VND',
             'level' => Reseller::LEVEL['AGENT']
@@ -79,13 +84,17 @@ class ResellerSeeder extends Seeder
                 'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['RESELLER']),
                 'pending_limit' => $rs->default_pending_limit,
                 'status' => true,
-                'auto_sms_approval'=> false
+                'auto_sms_approval'=> false,
+                'max' => $setting['payin']['max'],
+                'min' => $setting['payin']['min']
             ],
             'payout' => [
                 'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['RESELLER']),
                 'pending_limit' => $rs->default_pending_limit,
                 'status' => true,
                 'daily_amount_limit' => 50000,
+                'max' => $setting['payin']['max'],
+                'min' => $setting['payin']['min']
             ],
             'downline_slot' => 0,
             'status' => true,
