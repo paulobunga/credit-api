@@ -105,7 +105,7 @@ class ResellerBankCardController extends Controller
         ]);
         $attributes = $reseller_bank_card->paymentChannel->validate($request->get('attributes'));
         ResellerBankCard::validateAttribute(
-            $reseller_bank_card->paymentChannel->name,
+            $reseller_bank_card->paymentChannel,
             $reseller_bank_card->reseller->currency,
             $attributes,
             $reseller_bank_card->id
