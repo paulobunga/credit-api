@@ -42,7 +42,6 @@ class BankSeeder extends Seeder
             'UPI' => [
                 'INR' => [
                     'methods' => [
-                        PaymentChannel::METHOD['TEXT'],
                         PaymentChannel::METHOD['QRCODE'],
                     ],
                     'attributes' => ['upi_id'],
@@ -54,7 +53,7 @@ class BankSeeder extends Seeder
             'BKASH' => [
                 'BDT' => [
                     'methods' => [
-                        PaymentChannel::METHOD['QRCODE'],
+                        PaymentChannel::METHOD['TEXT'],
                     ],
                     'attributes' => ['wallet_number'],
                     'payin' => [
@@ -65,7 +64,7 @@ class BankSeeder extends Seeder
             'NAGAD' => [
                 'BDT' => [
                     'methods' => [
-                        PaymentChannel::METHOD['QRCODE'],
+                        PaymentChannel::METHOD['TEXT'],
                     ],
                     'attributes' => ['wallet_number'],
                     'payin' => [
@@ -76,7 +75,7 @@ class BankSeeder extends Seeder
             'ROCKET' => [
                 'BDT' => [
                     'methods' => [
-                        PaymentChannel::METHOD['QRCODE'],
+                        PaymentChannel::METHOD['TEXT'],
                     ],
                     'attributes' => ['wallet_number'],
                     'payin' => [
@@ -87,7 +86,7 @@ class BankSeeder extends Seeder
             'UPAY' => [
                 'BDT' => [
                     'methods' => [
-                        PaymentChannel::METHOD['QRCODE'],
+                        PaymentChannel::METHOD['TEXT'],
                     ],
                     'attributes' => ['wallet_number'],
                     'payin' => [
