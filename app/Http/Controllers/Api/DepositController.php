@@ -69,6 +69,17 @@ class DepositController extends Controller
 
     protected $transformer = DepositTransformer::class;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('whitelist:merchant_api', [
+            'except' => [
+                'update',
+                'pay'
+            ]
+        ]);
+    }
+
     /**
      * Get deposit list
      *

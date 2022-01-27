@@ -69,6 +69,15 @@ class WithdrawalController extends Controller
 
     protected $transformer = WithdrawalTransformer::class;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('whitelist:merchant_api', [
+            'except' => [
+                'pay'
+            ]
+        ]);
+    }
     /**
      * Get withdrawal list
      *

@@ -18,14 +18,7 @@ $api->group([
     $api->get("/pay/deposits", ['as' => 'deposits.pay', 'uses' => 'DepositController@pay']);
     $api->get("/pay/withdrawals", ['as' => 'withdrawals.pay', 'uses' => 'WithdrawalController@pay']);
 
-    $api->group([
-        'middleware' => [
-            'whitelist:merchant_api'
-        ],
-    ], function ($api) {
+    $api->resource('deposits', 'DepositController', ['except' => ['destroy']]);
 
-        $api->resource('deposits', 'DepositController', ['except' => ['destroy']]);
-
-        $api->resource('withdrawals', 'WithdrawalController', ['except' => ['destroy']]);
-    });
+    $api->resource('withdrawals', 'WithdrawalController', ['except' => ['destroy']]);
 });
