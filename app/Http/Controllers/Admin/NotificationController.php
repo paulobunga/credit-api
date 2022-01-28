@@ -36,7 +36,8 @@ class NotificationController extends Controller
             }
           })
         ])
-        ->where('notifiable_id', auth()->id());
+        ->where('notifiable_id', auth()->id())
+        ->where('notifiable_type', 'admin');
 
       return $this->paginate($notification, $this->transformer);
     }
