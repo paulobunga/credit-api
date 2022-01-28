@@ -224,10 +224,7 @@ class ResellerController extends Controller
             'type' => $request->type,
             'transaction_type' => $transaction_type,
             'amount' => $request->amount,
-            'extra' => array_merge(
-                $request->extra,
-                ['memo' => $ability ? 'success' : '', 'creator' => auth()->id()]
-            ),
+            'extra' => ['memo' => $ability ? 'success' : '', 'creator' => auth()->id()],
             'status' => $ability ?
                 ResellerDeposit::STATUS['APPROVED'] :
                 ResellerDeposit::STATUS['PENDING']
@@ -267,10 +264,7 @@ class ResellerController extends Controller
             'type' => $request->type,
             'transaction_type' => $transaction_type,
             'amount' => $request->amount,
-            'extra' => array_merge(
-                $request->extra,
-                ['memo' => $ability ? 'success' : '', 'creator' => auth()->id()]
-            ),
+            'extra' => ['memo' => $ability ? 'success' : '', 'creator' => auth()->id()],
             'status' => $ability ?
                 ResellerWithdrawal::STATUS['APPROVED'] :
                 ResellerWithdrawal::STATUS['PENDING']
@@ -350,7 +344,7 @@ class ResellerController extends Controller
         } elseif ($request->status_type == "payout") {
             $m->payout->status = $request->status;
         } else {
-            $m->status = $request->status? Reseller::STATUS['ACTIVE'] : Reseller::STATUS['DISABLED'];
+            $m->status = $request->status ? Reseller::STATUS['ACTIVE'] : Reseller::STATUS['DISABLED'];
         }
         $m->save();
 
