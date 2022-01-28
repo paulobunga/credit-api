@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Notifications;
 
 use App\Models\MerchantDeposit;
@@ -44,11 +43,11 @@ class DepositExpiredReport extends Base
      */
     protected function getData($notifiable)
     {
-        $body = "Total payin expired ".count($this->reports)." transactions: ";
-        $setting = app(\App\Settings\CurrencySetting::class)->currency;
-        foreach ($setting as $currency => $s) {
-            $count = array_count_values(array_column($this->reports, 'currency'))[$currency];
-            $body .= "\n" . $currency . " (" . $count . ")";
+        $body = "Total payin expired: ";
+        foreach ($this->reports as $report => $rs) {
+          foreach($rs as $r => $v) {
+            $body .= "\n".$r.' ('.$report.'): '.$v;
+          }
         }
 
         return [

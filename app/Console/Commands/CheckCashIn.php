@@ -41,7 +41,7 @@ class CheckCashIn extends Command
     public function handle()
     {
         $setting = app(\App\Settings\CurrencySetting::class)->currency;
-        $expired_limit = app(\App\Settings\AdminSetting::class)->expired_payin_limit;
+        $expired_limit = app(\App\Settings\AdminSetting::class)->expired_payin_limit_notify;
         $report = [];
 
         foreach ($setting as $currency => $s) {
@@ -70,7 +70,6 @@ class CheckCashIn extends Command
                 }
             }
         }
-
         if (!empty($report)) {
             \App\Models\Admin::all()->each(function ($admin) use ($report) {
               $admin->notify(new \App\Notifications\DepositExpiredReport($report));
