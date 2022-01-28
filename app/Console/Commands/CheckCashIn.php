@@ -49,5 +49,13 @@ class CheckCashIn extends Command
                     'status' => MerchantDeposit::STATUS['EXPIRED']
                 ]);
         }
+
+        $expired_rows = MerchantDeposit::where('status', MerchantDeposit::STATUS['EXPIRED'])->get();
+        $expired_limit = app(\App\Settings\AdminSetting::class)->expired_payin_limit;
+        if($expired_rows->count() >= $expired_limit) {
+            \App\Models\Admin::all()->each(function ($admin) use ($expired_rows) {
+              $admin->notify(new \App\Notifications\DepositExpiredReport($expired_rows->toArray()));
+            });
+        }
     }
 }

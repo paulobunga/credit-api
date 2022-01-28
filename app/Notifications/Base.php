@@ -25,6 +25,16 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
     }
 
     /**
+     * Get notify id
+     *
+     * @return string
+     */
+    protected function getNotifyId(): string
+    {
+      return $this->id;
+    }
+
+    /**
      * Get icon path
      *
      * @return string

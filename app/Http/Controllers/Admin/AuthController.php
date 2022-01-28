@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Broadcast;
 use Dingo\Api\Http\Request;
 use App\Http\Controllers\Controller as Controller;
 use App\Models\Admin;
@@ -109,5 +111,51 @@ class AuthController extends Controller
         ]);
 
         return $this->response->item(auth()->user(), new AuthTransformer($request->bearerToken()));
+    }
+
+
+
+    /**
+     * Get token of onesignal service
+     *
+     * @method POST
+     * @param \Dingo\Api\Http\Request $request
+     *
+     * @return array
+     */
+    public function onesignal(Request $request)
+    {
+        $this->validate($request, [
+            'data' => 'required',
+            'platform' => 'required',
+        ]);
+
+        auth()->user()->devices()->updateOrCreate(
+            [
+                'platform' => $request->platform,
+                'uuid' => $request->data['userId']
+            ],
+            [
+                'logined_at' => Carbon::now(),
+                'token' => ''
+            ]
+        );
+
+        return $this->success();
+    }
+
+
+    /**
+     * Authenticate to private channel
+     *
+     * @method POST
+     * @param  \Dingo\Api\Http\Request $request
+     * @throws \Exception $e if ID is not matched
+     *
+     * @return \Dingo\Api\Http\Response
+     */
+    public function channel(Request $request)
+    {
+      return Broadcast::auth($request);
     }
 }

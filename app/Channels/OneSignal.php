@@ -11,6 +11,7 @@ class OneSignal
 {
     protected $reseller_client;
     protected $merchant_client;
+    protected $admin_client;
 
     public function __construct()
     {
@@ -24,6 +25,11 @@ class OneSignal
             env("ONESIGNAL_RESELLER_REST_API_KEY"),
             ''
         );
+        $this->admin_client = new OneSignalClient(
+            env("ONESIGNAL_ADMIN_APP_ID"),
+            env("ONESIGNAL_ADMIN_REST_API_KEY"),
+            ''
+        );
     }
 
     protected function getOneSignalClient($name)
@@ -33,6 +39,8 @@ class OneSignal
                 return $this->reseller_client;
             case 'merchant':
                 return $this->merchant_client;
+            case 'admin':
+                return $this->admin_client;
             default:
                 return null;
         }

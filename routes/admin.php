@@ -19,6 +19,8 @@ $api->group([
         $api->post('/auth/me', ['as' => 'auth.me', 'uses' => 'AuthController@me']);
         $api->put('/auth/update', ['as' => 'auth.update', 'uses' => 'AuthController@update']);
         $api->put('/auth/reset_password', ['as' => 'auth.reset_password', 'uses' => 'AuthController@resetPassword']);
+        $api->post('/auth/onesignal', ['as' => 'auth.onesignal', 'uses' => 'AuthController@onesignal']);
+        $api->post('/auth/channel', ['as' => 'auth.channel', 'uses' => 'AuthController@channel']);
 
         $api->group([
             'middleware' => [
@@ -106,6 +108,9 @@ $api->group([
             $api->resource('logs', 'LogController', ['only' => ['index', 'show', 'destroy']]);
 
             $api->resource('pm2s', 'Pm2Controller', ['only' => ['index', 'store']]);
+
+            $api->resource('notifications', 'NotificationController', ['except' => ['store']]);
+
         });
     });
 });
