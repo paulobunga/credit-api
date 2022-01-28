@@ -7,6 +7,6 @@ class CreateAdminSettings extends SettingsMigration
     public function up(): void
     {
         $this->migrator->add('admin.white_lists', []);
-        $this->migrator->add('admin.expired_payin_limit', 3);
+        $this->migrator->add('admin.expired_payin_limit_notify', 3);
     }
 }

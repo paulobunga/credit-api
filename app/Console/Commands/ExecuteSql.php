@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
+use App\Models\Setting;
 
 class ExecuteSql extends Command
 {
@@ -639,5 +640,19 @@ class ExecuteSql extends Command
             $setting->currency[$currency] = $s;
         }
         $setting->save();
+    }
+
+    protected function addExpiredPayinLimitNotify()
+    {
+        $result = Setting::where('name', 'expired_payin_limit_notify')->get();
+        if(count($result) === 0) {
+          $data = [
+            'group' => 'admin',
+            'name' => 'expired_payin_limit_notify',
+            'locked' => 0,
+            'payload' => '3'
+          ];
+          Setting::insert($data);
+        }
     }
 }
