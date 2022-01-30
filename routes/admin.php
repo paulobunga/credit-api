@@ -104,13 +104,16 @@ $api->group([
                 'uses' => "ReportController@merchant",
                 'as' => "report_merchants.index"
             ]);
-            
+
             $api->resource('logs', 'LogController', ['only' => ['index', 'show', 'destroy']]);
 
             $api->resource('pm2s', 'Pm2Controller', ['only' => ['index', 'store']]);
 
             $api->resource('notifications', 'NotificationController', ['except' => ['store']]);
 
+            $api->resource('teams', 'TeamController');
+            $api->get('/teams/index/genre', ['uses' => "TeamController@genre", 'as' => "teams.genre"]);
+            $api->put('/teams/member/{team}', ['uses' => "TeamController@member", 'as' => "teams.member"]);
         });
     });
 });

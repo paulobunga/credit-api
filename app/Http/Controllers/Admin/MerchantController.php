@@ -29,7 +29,7 @@ class MerchantController extends Controller
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::partial('name'),
-                AllowedFilter::exact('currency'),
+                AllowedFilter::exact('currency', 'credits.currency'),
                 AllowedFilter::exact('status')
             ])
             ->allowedSorts([

@@ -4,8 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
-use App\Models\Permission;
 use App\Models\Role;
+use App\Models\Team;
+use App\Models\Permission;
 
 class PermissionAndRoleSeeder extends Seeder
 {
@@ -25,7 +26,7 @@ class PermissionAndRoleSeeder extends Seeder
                 'admin.roles.index',
                 'admin.reseller_deposits.update',
                 'admin.reseller_withdrawals.update',
-                ])->pluck('name')->toArray()
+            ])->pluck('name')->toArray()
         );
         $role = Role::create(['name' => 'IT']);
         $role->givePermissionTo(
@@ -36,5 +37,16 @@ class PermissionAndRoleSeeder extends Seeder
                 'admin.admins.destory',
             ])->pluck('name')->toArray()
         );
+        # create default team based on currency
+        foreach (app('settings.currency')->currency as $currency => $_) {
+            foreach (Team::TYPE as $type) {
+                Team::create([
+                    'name' => 'Default',
+                    'type' => $type,
+                    'currency' => $currency,
+                    'description' => "Default {$currency} {$type} Team",
+                ]);
+            }
+        }
     }
 }

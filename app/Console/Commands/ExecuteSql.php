@@ -3,22 +3,21 @@
 namespace App\Console\Commands;
 
 use Carbon\Carbon;
-use App\Models\Reseller;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Str;
-use App\Models\PaymentChannel;
-use App\Models\MerchantDeposit;
-use App\Models\ResellerDeposit;
 use Illuminate\Console\Command;
-use App\Models\MerchantWithdrawal;
-use App\Models\ResellerBankCard;
-use App\Models\ResellerWithdrawal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
-use App\Models\Setting;
+use Spatie\LaravelSettings\Migrations\SettingsMigrator;
+use App\Models\Team;
+use App\Models\Merchant;
+use App\Models\Reseller;
+use App\Models\PaymentChannel;
+use App\Models\ResellerDeposit;
+use App\Models\ResellerWithdrawal;
 
 class ExecuteSql extends Command
 {
@@ -381,7 +380,6 @@ class ExecuteSql extends Command
         ]);
         $cs->currency = $currency;
         $cs->save();
-        $cs->refresh();
         $channels = [
             'BKASH' => [
                 'BDT' => [
@@ -644,15 +642,47 @@ class ExecuteSql extends Command
 
     protected function addExpiredPayinLimitNotify()
     {
-        $result = Setting::where('name', 'expired_payin_limit_notify')->get();
-        if(count($result) === 0) {
-          $data = [
-            'group' => 'admin',
-            'name' => 'expired_payin_limit_notify',
-            'locked' => 0,
-            'payload' => '3'
-          ];
-          Setting::insert($data);
+        app(SettingsMigrator::class)->add('admin.expired_payin_limit_notify', 3);
+    }
+
+    protected function addTableTeams()
+    {
+        (new \CreateTableTeams())->up();
+        foreach (app('settings.currency')->currency as $currency => $_) {
+            foreach (Team::TYPE as $type) {
+                Team::create([
+                    'name' => 'Default',
+                    'type' => $type,
+                    'currency' => $currency,
+                    'description' => "Default {$currency} {$type} Team",
+                ]);
+            }
+        }
+        // assign agent to default groups
+        foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $agent) {
+            $agent->assignTeams([
+                'name' => 'Default',
+                'type' => Team::TYPE['PAYIN'],
+                'currency' => $agent->currency,
+            ], [
+                'name' => 'Default',
+                'type' => Team::TYPE['PAYOUT'],
+                'currency' => $agent->currency,
+            ]);
+        }
+        // assign merchant to default groups
+        foreach (Merchant::with('credits')->get() as $merchant) {
+            foreach ($merchant->credits as $credit) {
+                $merchant->assignTeams([
+                    'name' => 'Default',
+                    'type' => Team::TYPE['PAYIN'],
+                    'currency' => $credit->currency,
+                ], [
+                    'name' => 'Default',
+                    'type' => Team::TYPE['PAYOUT'],
+                    'currency' => $credit->currency,
+                ]);
+            }
         }
     }
 }

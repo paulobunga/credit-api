@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Team;
 use App\Models\Merchant;
 use App\Settings\CurrencySetting;
 
@@ -34,6 +35,15 @@ class MerchantSeeder extends Seeder
                 'currency' => $currency,
                 'credit' => 0,
                 'transaction_fee' => $setting['transaction_fee_percentage']
+            ]);
+            $merchant->assignTeams([
+                'name' => 'Default',
+                'type' => Team::TYPE['PAYIN'],
+                'currency' => $currency,
+            ], [
+                'name' => 'Default',
+                'type' => Team::TYPE['PAYOUT'],
+                'currency' => $currency,
             ]);
         }
     }

@@ -13,11 +13,13 @@ use Laravel\Lumen\Auth\Authorizable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Observers\MerchantObserver;
 use App\Trait\HasJWTSubject;
+use App\Trait\HasTeams;
 
 class Merchant extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
     use Notifiable;
+    use HasTeams;
     use MerchantObserver;
 
     public $pushNotificationType = 'users';

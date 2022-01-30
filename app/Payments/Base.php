@@ -25,6 +25,8 @@ abstract class Base
             FROM
                 reseller_bank_cards AS rbc
                 LEFT JOIN resellers AS r ON rbc.reseller_id = r.id
+                LEFT JOIN model_has_teams AS mht ON mht.model_id = r.id AND model_type = 'reseller'
+                LEFT JOIN teams AS t ON mht.team_id = t.id
                 LEFT JOIN payment_channels AS pc ON rbc.payment_channel_id = pc.id
                 LEFT JOIN merchant_deposits AS md ON md.reseller_bank_card_id = rbc.id AND md.status <= :md_status 
             WHERE
@@ -38,6 +40,8 @@ abstract class Base
                 AND rbc.STATUS = :rbc_status
                 AND pc.payin->>'$.status' = :pc_status
                 AND pc.currency = '{$request->currency}'
+                AND t.type = 'PAYIN'
+                AND t.name = '{$request->get('class', 'Default')}'
                 GROUP BY rbc.id
             ),
             reseller_pending AS (

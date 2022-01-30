@@ -258,6 +258,7 @@ class DepositController extends Controller
             'currency' => 'required|in:' . implode(',', array_keys($cs->currency)),
             'channel' => 'required',
             'method' => 'required',
+            'class' => 'nullable',
             'amount' => 'required|numeric',
             'callback_url' => 'required|url'
         ]);
