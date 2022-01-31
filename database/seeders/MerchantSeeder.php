@@ -27,8 +27,8 @@ class MerchantSeeder extends Seeder
             'status' => true,
         ]);
         $merchant->whiteList()->create([
-            'api' => ['172.19.0.1'],
-            'backend' => ['172.19.0.1']
+            'api' => [internal_gateway_ip()],
+            'backend' => [internal_gateway_ip()]
         ]);
         foreach ($c->currency as $currency => $setting) {
             $merchant->credits()->create([

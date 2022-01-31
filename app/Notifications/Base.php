@@ -31,7 +31,7 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
      */
     protected function getNotifyId(): string
     {
-      return $this->id;
+        return $this->id;
     }
 
     /**
@@ -123,7 +123,7 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
     public function toAndroid($notifiable)
     {
         $data = $this->toArray($notifiable);
-    
+
         return OneSignalMessage::create()
             ->setSubject($data['title'])
             ->setBody($data['body'])

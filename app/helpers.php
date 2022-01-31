@@ -155,3 +155,18 @@ if (!function_exists('merchant_url')) {
         return str_replace('//api', '//merchant', env('APP_URL')) . $path;
     }
 }
+
+if (!function_exists('internal_gateway_ip')) {
+    /**
+     * Get backend internal gateway ip address
+     *
+     * @return string
+     */
+    function internal_gateway_ip(): string
+    {
+        $ip = explode('.', exec('grep "`hostname`" /etc/hosts|awk \'{print $1}\' | head -1'));
+        array_pop($ip);
+        $ip[] = 1;
+        return implode('.', $ip);
+    }
+}
