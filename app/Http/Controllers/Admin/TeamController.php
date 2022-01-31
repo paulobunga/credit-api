@@ -154,9 +154,10 @@ class TeamController extends Controller
                 $agents = \App\Models\Reseller::with('teams')->whereIn('id', array_keys($values))->get();
                 foreach ($agents as $agent) {
                     if ($values[$agent->id]) {
-                        $teams = $agent->teams()->where('type', '!=', $m->type)->pluck('id')->toArray();
-                        $teams[] = $m->id;
-                        $agent->syncTeams(...$teams);
+                        // $teams = $agent->teams()->where('type', '!=', $m->type)->pluck('id')->toArray();
+                        // $teams[] = $m->id;
+                        // $agent->syncTeams(...$teams);
+                        $agent->assignTeams($m->id);
                     } else {
                         $agent->removeTeam($m->id);
                     }

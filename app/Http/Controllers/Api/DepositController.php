@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Carbon\Carbon;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Trait\SignValidator;
+use App\Models\Team;
 use App\Models\Reseller;
 use App\Models\MerchantDeposit;
 use App\Models\PaymentChannel;
@@ -279,6 +279,14 @@ class DepositController extends Controller
         // if ($same_orders) {
         //     throw new \Exception('Same amount payin order is found in 24 hours!', 405);
         // }
+        $team = $merchant->teams()->where([
+            'name' => $request->get('class', 'Default'),
+            'currency' => $request->currency,
+            'type' => Team::TYPE['PAYIN']
+        ])->count();
+        if (empty($team)) {
+            throw new \Exception('Class is not supported!', 405);
+        }
 
         $channel = PaymentChannel::where([
             'payin->status' => true,
