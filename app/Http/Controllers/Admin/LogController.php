@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
 use App\Models\Log as LogModel;
+use App\Http\Controllers\Controller;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class LogController extends Controller
 {
@@ -41,7 +40,13 @@ class LogController extends Controller
 
         return ['data' => $results];
     }
-
+    
+    /**
+     * Return the detail logs by date
+     *
+     * @param  mixed $request
+     * @return array
+     */
     public function show(Request $request)
     {
         $table = $this->parameters('log');
@@ -51,13 +56,40 @@ class LogController extends Controller
         $this->validate($request, [
             'level' => 'required|in:' . implode(',', LogModel::LEVELS),
         ]);
+
+        $query_str = escape_like($request->queryStr);
+
         $logs = QueryBuilder::for($this->model->setTable($table)->newQuery())
             ->when($request->level != "total", function ($query) use ($request) {
                 $query->where('level', $request->level);
             })
-            ->when($request->get('queryStr', null), function ($query) use ($request) {
-                $query->where('message', 'like', '%' . $request->queryStr . '%');
-            });
+            ->when($request->get('queryStr', null), function ($query) use ($query_str) {
+                $query->where('message', 'like', '%' . $query_str . '%');
+                $query->orWhere('context', 'like', '%' . $query_str . '%');
+            })
+            ->orderBy('created_at', 'desc');
+
+        if ($query_str) {
+            $stats = QueryBuilder::for($this->model->setTable($table)->newQuery())
+                ->when($request->get('queryStr', null), function ($query) use ($query_str) {
+                    $query->where('message', 'like', '%' . $query_str . '%');
+                    $query->orWhere('context', 'like', '%' . $query_str . '%');
+                })
+                ->selectRaw("
+                  COUNT(id) as total,
+                  COALESCE(SUM(level='emergency'),0) AS emergency, 
+                  COALESCE(SUM(level='alert'),0) as alert, 
+                  COALESCE(SUM(level='critical'),0) AS critical, 
+                  COALESCE(SUM(level='error'),0) AS error,
+                  COALESCE(SUM(level='warning'),0) AS warning, 
+                  COALESCE(SUM(level='notice'),0) AS notice,
+                  COALESCE(SUM(level='info'),0) AS info, 
+                  COALESCE(SUM(level='debug'),0) AS debug
+                ")
+                ->first();
+
+            return $this->paginate($logs, $this->transformer, [ "levels" => $stats ]);
+        }
 
         return $this->paginate($logs, $this->transformer);
     }

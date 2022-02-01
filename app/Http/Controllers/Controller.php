@@ -99,7 +99,7 @@ abstract class Controller extends BaseController
      * @param string|callable|object $transformer transform model to reseponse
      * @return \Dingo\Api\Http\Response
      */
-    protected function paginate(QueryBuilder $builder, $transformer)
+    protected function paginate(QueryBuilder $builder, $transformer, array $meta = [])
     {
         if ($this->export) {
             $routes = array_slice(explode('.', request()->route()[1]['as']), 0, 2);
@@ -108,11 +108,13 @@ abstract class Controller extends BaseController
             return new $class($builder->get());
         }
 
+        $response = [];
         if (!empty($this->perPage)) {
-            return $this->response->withPaginator($builder->paginate($this->perPage), $transformer);
+            $response = $this->response->withPaginator($builder->paginate($this->perPage), $transformer);
         } else {
-            return $this->response->collection($builder->get(), $transformer);
+            $response = $this->response->collection($builder->get(), $transformer);
         }
+        return !empty($meta) ? $response->setMeta($meta) : $response;
     }
 
     /**

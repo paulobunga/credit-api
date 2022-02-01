@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Query\Expression;
 use App\Trait\UserTimezone;
 
 class Log extends Model
@@ -58,7 +59,7 @@ class Log extends Model
             $table->text('message');
             $table->string('channel', 10);
             $table->string('level', 12);
-            $table->longText('context')->nullable();
+            $table->json('context')->default(new Expression('(JSON_OBJECT())'));
             $table->datetime('created_at')->useCurrent();
         });
         return $this;
