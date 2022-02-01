@@ -1,4 +1,4 @@
-@extends('qrcodes.bdt')
+@extends('texts.bdt')
 
 @section('head')
 <title>{{ env('APP_NAME') }} - NAGAD PayIn</title>
