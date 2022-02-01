@@ -42,7 +42,7 @@ class CheckCashIn extends Command
     {
         $setting = app(\App\Settings\CurrencySetting::class)->currency;
         $expired_limit = app(\App\Settings\AdminSetting::class)->expired_payin_limit_notify;
-        $report = [];
+        $reports = [];
 
         foreach ($setting as $currency => $s) {
             $expired_minutes = $s['expired_minutes'];
@@ -52,27 +52,23 @@ class CheckCashIn extends Command
                 ->join('resellers', 'resellers.id', 'reseller_bank_cards.reseller_id')
                 ->where('merchant_deposits.currency', $currency)
                 ->where('merchant_deposits.created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
-                ->having(DB::raw('COUNT(resellers.name)'), '>=', $expired_limit)
-                ->select('resellers.name', DB::raw('COUNT(resellers.name) AS total_expired'), 'merchant_deposits.currency')
-                ->groupBy('resellers.name', 'merchant_deposits.currency')
+                ->select('resellers.name', 'merchant_deposits.currency', 'merchant_deposits.merchant_order_id', 'merchant_deposits.amount')
                 ->get();
 
             MerchantDeposit::where('status', MerchantDeposit::STATUS['PENDING'])
                 ->where('currency', $currency)
                 ->where('created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
-                ->update([
-                    'status' => MerchantDeposit::STATUS['EXPIRED']
-                ]);
-            if (!empty($o->toArray())) {
-                $report[$currency] = [];
-                foreach ($o as $k => $v) {
-                    $report[$currency][$v->name] = $v->total_expired;
-                }
+                ->update(['status' => MerchantDeposit::STATUS['EXPIRED']]);
+
+            if (!empty($o->toArray()) && $o->count() >= $expired_limit) {
+                $reports[$currency][$o->first()->name] = $o->count();
+                $reports[$currency]['data'] = $o;
             }
         }
-        if (!empty($report)) {
-            \App\Models\Admin::all()->each(function ($admin) use ($report) {
-              $admin->notify(new \App\Notifications\DepositExpiredReport($report));
+
+        if (!empty($reports)) {
+            \App\Models\Admin::all()->each(function ($admin) use ($reports) {
+                $admin->notify(new \App\Notifications\DepositExpiredReport($reports));
             });
         }
     }

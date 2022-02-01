@@ -109,11 +109,13 @@ $api->group([
 
             $api->resource('pm2s', 'Pm2Controller', ['only' => ['index', 'store']]);
 
-            $api->resource('notifications', 'NotificationController', ['except' => ['store']]);
-
             $api->resource('teams', 'TeamController');
             $api->get('/teams/index/genre', ['uses' => "TeamController@genre", 'as' => "teams.genre"]);
             $api->put('/teams/member/{team}', ['uses' => "TeamController@member", 'as' => "teams.member"]);
+
+            $api->resource('notifications', 'NotificationController', ['only' => ['index', 'destroy']]);
+            $api->get("/notifications/unread", ['uses' => "NotificationController@unread", 'as' => "notifications.unread"]);
+            $api->post("/notifications/mark", ['uses' => "NotificationController@mark", 'as' => "notifications.mark"]);
         });
     });
 });

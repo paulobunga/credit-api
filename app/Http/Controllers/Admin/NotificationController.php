@@ -3,11 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Filters\DateFilter;
 use Dingo\Api\Http\Request;
-use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
-use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 
 class NotificationController extends Controller
@@ -24,36 +20,42 @@ class NotificationController extends Controller
      */
     public function index(Request $request)
     {
-      $notification = QueryBuilder::for($this->model)
-        ->allowedFilters([
-          AllowedFilter::exact('id'),
-          AllowedFilter::custom('created_at_between', new DateFilter('notifications')),
-          AllowedFilter::callback('status', function (Builder $query, $value) {
-            if($value) {
-              $query->whereNotNull('read_at');
-            } else {
-              $query->whereNull('read_at');
-            }
-          })
-        ])
-        ->where('notifiable_id', auth()->id())
-        ->where('notifiable_type', 'admin');
-
-      return $this->paginate($notification, $this->transformer);
+      return $this->response->collection(auth()->user()->notifications, $this->transformer);
     }
 
+
+  /**
+   * Get unread notification list
+   * @param \Dingo\Api\Http\Request $request
+   * @method GET
+   * @return json
+   */
+    public function unread(Request $request)
+    {
+      return $this->response->collection(auth()->user()->unreadNotifications, $this->transformer);
+    }
+
+
     /**
-     * Read notification
+     * Mark notification
      *
      * @return \Dingo\Api\Http\JsonResponse
      */
-    public function update(Request $request)
+    public function mark(Request $request)
     {
-      $notification = $this->model::findOrFail($this->parameters('notification'));
-      $notification->read_at = Carbon::now();
-      $notification->save();
-      
-      return $this->response->item($notification, $this->transformer);
+        $this->validate($request, [
+            'mark_type' => 'required|in:read,unread',
+            'id' => 'required|array'
+        ]);
+
+        $notifications = auth()->user()->notifications()->whereIn('id', $request->id);
+        if ($request->mark_type == "read") {
+            $notifications->update(['read_at' => Carbon::now()]);
+        } else {
+            $notifications->update(['read_at' => null]);
+        }
+        
+        return $this->response->collection($notifications->get(), $this->transformer);
     }
 
   /**
@@ -63,9 +65,12 @@ class NotificationController extends Controller
    */
     public function destroy(Request $request)
     {
-      $bank = $this->model::findOrFail($this->parameters('notification'));
-      $bank->delete();
+        $notification = auth()->user()->notifications()->where('id', $this->parameters('notification'))->first();
+        if ($notification->count() === 0) {
+          throw new \Exception("Notification not found!");
+        }
+        $notification->delete();
 
-      return $this->success();
+        return $this->success();
     }
 }

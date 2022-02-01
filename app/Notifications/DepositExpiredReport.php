@@ -45,9 +45,15 @@ class DepositExpiredReport extends Base
     {
         $body = "Total payin expired: ";
         foreach ($this->reports as $report => $rs) {
-          foreach($rs as $r => $v) {
-            $body .= "\n".$r.' ('.$report.'): '.$v;
-          }
+            foreach ($rs as $r => $v) {
+                if ($r != 'data') {
+                    $body .= "\n Agent " . $r . "(" . $report . "): " . $v . " orders";
+                } else {
+                    foreach ($v as $k => $data) {
+                        $body .= "\n Merchant OrderId: " . $data->merchant_order_id . ', Amount: ' . $data->amount;
+                    }
+                }
+            }
         }
 
         return [
