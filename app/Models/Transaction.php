@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Trait\UserTimezone;
+use App\Trait\HasNumFormat;
 
 class Transaction extends Model
 {
-    public $timestamps = false;
     use UserTimezone;
+    use HasNumFormat;
+
+    public $timestamps = false;
 
     protected $fillable = [
         'user_id',
@@ -35,7 +38,7 @@ class Transaction extends Model
         'RESELLER_WITHDRAW_CREDIT' => 7,
         'RESELLER_WITHDRAW_COIN' => 8,
         'SYSTEM_TRANSACTION_FEE' => 9,
-        'SYSTEM_DEDUCT_CREDIT'=> 10,
+        'SYSTEM_DEDUCT_CREDIT' => 10,
         'SYSTEM_TOPUP_COMMISSION' => 11,
         'SYSTEM_TOPUP_CREDIT' => 12,
         'MERCHANT_SETTLE_CREDIT' => 13,

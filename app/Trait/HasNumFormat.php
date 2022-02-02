@@ -26,6 +26,16 @@ trait HasNumFormat
         return $this->toCurrencyFormat($value);
     }
 
+    public function getBeforeAttribute($value)
+    {
+        return $this->toCurrencyFormat($value);
+    }
+
+    public function getAfterAttribute($value)
+    {
+        return $this->toCurrencyFormat($value);
+    }
+
     public function getEarnAttribute()
     {
         $class = $this->getMorphClass();
