@@ -91,7 +91,7 @@ class SmsController extends Controller
             'currency' => auth()->user()->currency,
             'body' => $request->body,
             'address' =>  $request->address,
-
+            'sim_num' => $request->sim_num
         ]);
 
         if (!isset($data['trx_id']) || !$data['trx_id']) {
@@ -100,6 +100,7 @@ class SmsController extends Controller
 
         $m = ResellerSms::where([
             'reseller_id' => auth()->id(),
+            'address' => $request->address,
             'trx_id' => $data['trx_id'],
         ])->first();
         if ($m) {
@@ -152,7 +153,14 @@ class SmsController extends Controller
         $this->validate($request, [
             'data' => 'present|array',
         ]);
+
         $response = $request->get('data', []);
+        if (empty($response)) {
+            return response()->json([
+                'message' => 'SMS list is empty'
+            ]);
+        }
+
         foreach ($response as $k => $sms) {
             $data = ResellerSms::match([
                 'reseller_id' => auth()->id(),
@@ -168,6 +176,7 @@ class SmsController extends Controller
             }
             $m = ResellerSms::where([
                 'reseller_id' => auth()->id(),
+                'address' => $request->address,
                 'trx_id' => $data['trx_id'],
             ])->first();
             if ($m) {
