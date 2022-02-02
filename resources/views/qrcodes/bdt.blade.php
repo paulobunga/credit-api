@@ -127,9 +127,7 @@
                 })).json();
                 Alpine.store('$alert').show(response.code == 200?'success':'error', response.message);
                 if(response.code == 200){
-                    // wait 3 seconds
-                    await new Promise(resolve => setTimeout(resolve, 3000));
-                    location.reload();
+                    this.hasMobileNumber = true;
                 }
             },
         };
