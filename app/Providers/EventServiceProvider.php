@@ -31,27 +31,33 @@ class EventServiceProvider extends ServiceProvider
     public function register()
     {
         Log::listen(function (MessageLogged $msg) {
+            if ($e = $msg->context['exception'] ?? null) {
+                $msg->context['exception'] = [
+                    'code' => $e->getCode(),
+                    'line' => $e->getLine(),
+                    'file' => $e->getFile(),
+                    'message' => $e->getMessage(),
+                ];
+            }
             $context = [
                 'request' => [
                     'url' => request()->fullUrl(),
                     'data' => request()->all(),
                 ],
-                'context' => [
-                    'exception' => $msg->context['exception']->__toString()
-                ],
+                'context' => $msg->context,
             ];
             $this->model->create([
                 'message'       => $msg->message,
                 'channel'       => Log::getName(),
                 'level'         => $msg->level,
                 'context'       => Schema::connection('log')
-                                    ->getColumnType(
-                                        $this->model->setTable($this->model->getTable())
-                                        ->getTable(),
-                                        'context'
-                                    ) === 'json'
-                                    ? $context
-                                    : json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                    ->getColumnType(
+                        $this->model->setTable($this->model->getTable())
+                            ->getTable(),
+                        'context'
+                    ) === 'json'
+                    ? $context
+                    : json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
             ]);
         });
     }
