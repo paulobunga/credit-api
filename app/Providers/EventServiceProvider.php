@@ -23,7 +23,6 @@ class EventServiceProvider extends ServiceProvider
     {
         $this->model = new LogModel();
     }
-    
     /**
      * Register Event Service Provider
      *
@@ -31,14 +30,15 @@ class EventServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        
         Log::listen(function (MessageLogged $msg) {
             $context = [
                 'request' => [
                     'url' => request()->fullUrl(),
                     'data' => request()->all(),
                 ],
-                'context' => $msg->context,
+                'context' => [
+                    'exception' => $msg->context['exception']->__toString()
+                ],
             ];
             $this->model->create([
                 'message'       => $msg->message,
@@ -49,8 +49,8 @@ class EventServiceProvider extends ServiceProvider
                                         $this->model->setTable($this->model->getTable())
                                         ->getTable(),
                                         'context'
-                                    ) === 'json' 
-                                    ? $context 
+                                    ) === 'json'
+                                    ? $context
                                     : json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
             ]);
         });
