@@ -87,6 +87,7 @@ class ResellerSms extends Model
             MerchantDeposit::STATUS['PENDING'],
         ])->orderByDesc('id')->get();
 
+        $count = 0;
         foreach ($deposits as $d) {
             if (
                 $data['amount'] == $d->amount &&
@@ -94,11 +95,15 @@ class ResellerSms extends Model
                 in_array($sms['address'], $d->paymentChannel->payin->sms_addresses)
             ) {
                 $match = $d;
-                break;
+                ++$count;
+                continue;
             }
         }
-        $data['match'] = $match;
-
+        if ($count > 1) {
+            $data['match'] = null;
+        } else {
+            $data['match'] = $match;
+        }
         return $data;
     }
 }
