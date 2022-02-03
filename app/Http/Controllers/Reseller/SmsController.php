@@ -176,7 +176,7 @@ class SmsController extends Controller
             }
             $m = ResellerSms::where([
                 'reseller_id' => auth()->id(),
-                'address' => $request->address,
+                'address' => $sms['address'],
                 'trx_id' => $data['trx_id'],
             ])->first();
             if ($m) {
