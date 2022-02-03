@@ -77,7 +77,7 @@ class ResellerBankCardController extends Controller
             ->where('currency', $reseller->currency)
             ->firstOrFail();
         $attributes = $payment_channel->validate($request->get('attributes'));
-        ResellerBankCard::validateAttribute($payment_channel, $reseller->currency, $attributes);
+        ResellerBankCard::validateAttribute($payment_channel, $attributes);
         $bankcard = $this->model::create([
             'reseller_id' => $reseller->id,
             'payment_channel_id' => $payment_channel->id,
@@ -106,7 +106,6 @@ class ResellerBankCardController extends Controller
         $attributes = $reseller_bank_card->paymentChannel->validate($request->get('attributes'));
         ResellerBankCard::validateAttribute(
             $reseller_bank_card->paymentChannel,
-            $reseller_bank_card->reseller->currency,
             $attributes,
             $reseller_bank_card->id
         );

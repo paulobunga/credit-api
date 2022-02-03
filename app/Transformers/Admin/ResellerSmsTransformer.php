@@ -7,12 +7,13 @@ use League\Fractal\TransformerAbstract;
 
 class ResellerSmsTransformer extends TransformerAbstract
 {
-
     public function transform(Model $m)
     {
         return [
             'id' => $m->id,
             'name' => $m->reseller->name,
+            'trx_id' => $m->trx_id,
+            'sim_num' => $m->sim_num,
             'address' => $m->address,
             'body' => $m->body,
             'status' => $m->status,

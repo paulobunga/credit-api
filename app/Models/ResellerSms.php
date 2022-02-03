@@ -52,12 +52,6 @@ class ResellerSms extends Model
     public static function match(array $sms)
     {
         $channels = PaymentChannel::where('currency', $sms['currency'])->get();
-        $deposits = MerchantDeposit::whereHas('reseller', function ($q) use ($sms) {
-            $q->where('resellers.id', $sms['reseller_id']);
-        })->whereIn('status', [
-            MerchantDeposit::STATUS['PENDING'],
-            MerchantDeposit::STATUS['EXPIRED'],
-        ])->orderByDesc('id')->get();
 
         $data = [];
         foreach ($channels as $ch) {
@@ -80,15 +74,31 @@ class ResellerSms extends Model
                 break;
             }
         }
+
+        if (!isset($data['trx_id']) || empty($data['trx_id'])) {
+            return $data;
+        }
+
         $match = null;
+
+        $deposits = MerchantDeposit::with('paymentChannel')->whereHas('reseller', function ($q) use ($sms) {
+            $q->where('resellers.id', $sms['reseller_id']);
+        })->whereIn('status', [
+            MerchantDeposit::STATUS['PENDING'],
+        ])->orderByDesc('id')->get();
+
         foreach ($deposits as $d) {
-            if ($data['amount'] == $d->amount) {
+            if (
+                $data['amount'] == $d->amount &&
+                $data['payer'] == $d->extra['sender_mobile_number'] &&
+                in_array($sms['address'], $d->paymentChannel->payin->sms_addresses)
+            ) {
                 $match = $d;
                 break;
             }
         }
         $data['match'] = $match;
-        
+
         return $data;
     }
 }

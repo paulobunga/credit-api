@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Settings\AdminSetting;
 use App\Models\Admin;
 
 class AdminSeeder extends Seeder
@@ -12,7 +13,7 @@ class AdminSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(AdminSetting $as)
     {
         $admin = Admin::factory()->create([
             'name' => 'AdminMarket0',
@@ -24,5 +25,7 @@ class AdminSeeder extends Seeder
             'username' => 'admin1@gmail.com'
         ]);
         $admin->assignRole('IT');
+        $as->white_lists = [internal_gateway_ip()];
+        $as->save();
     }
 }

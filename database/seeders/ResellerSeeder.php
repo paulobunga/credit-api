@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Team;
 use App\Models\Reseller;
 use App\Models\Transaction;
 use App\Models\ResellerDeposit;
@@ -45,7 +46,7 @@ class ResellerSeeder extends Seeder
                         'commission_percentage' => $c->getCommissionPercentage($currency, $level),
                         'pending_limit' => $rs->getDefaultPendingLimit($level),
                         'status' => true,
-                        'auto_sms_approval'=> false,
+                        'auto_sms_approval' => false,
                         'max' => $setting['payin']['max'],
                         'min' => $setting['payin']['min']
                     ],
@@ -61,6 +62,7 @@ class ResellerSeeder extends Seeder
                     'status' => Reseller::STATUS['ACTIVE'],
                     'password' => 'P@ssw0rd',
                 ]);
+                $this->assignTeam($agent);
             }
         }
         $setting = $c->currency['VND'];
@@ -69,7 +71,7 @@ class ResellerSeeder extends Seeder
             'level' => Reseller::LEVEL['AGENT']
         ])->first();
         // create test VND
-        \App\Models\Reseller::create([
+        $agent = \App\Models\Reseller::create([
             'upline_id' => $vnd_agent->id,
             'uplines' => array_merge($vnd_agent->uplines, [$vnd_agent->id]),
             'level' => Reseller::LEVEL['RESELLER'],
@@ -84,7 +86,7 @@ class ResellerSeeder extends Seeder
                 'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['RESELLER']),
                 'pending_limit' => $rs->default_pending_limit,
                 'status' => true,
-                'auto_sms_approval'=> false,
+                'auto_sms_approval' => false,
                 'max' => $setting['payin']['max'],
                 'min' => $setting['payin']['min']
             ],
@@ -99,6 +101,8 @@ class ResellerSeeder extends Seeder
             'downline_slot' => 0,
             'status' => true,
         ]);
+        $this->assignTeam($agent);
+
         // create reseller deposit
         foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
             ResellerDeposit::create([
@@ -117,6 +121,19 @@ class ResellerSeeder extends Seeder
                 ]
             ]);
         }
+    }
+
+    protected function assignTeam(Reseller $agent)
+    {
+        $agent->assignTeams([
+            'name' => 'Default',
+            'type' => Team::TYPE['PAYIN'],
+            'currency' => $agent->currency,
+        ], [
+            'name' => 'Default',
+            'type' => Team::TYPE['PAYOUT'],
+            'currency' => $agent->currency,
+        ]);
     }
 
     protected function getName($currency, $level)

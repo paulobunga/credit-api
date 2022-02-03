@@ -4,4 +4,6 @@
     "[blade]": {
         "editor.autoClosingBrackets": "always"
     },
+    "phpcs.standard": "./phpcs.xml",
+    "phpcs.executablePath": "/home/laradock/.composer/vendor/bin/phpcs",
 }

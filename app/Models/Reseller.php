@@ -13,8 +13,9 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Trait\HasJWTSubject;
 use App\DTO\ResellerPayIn;
 use App\DTO\ResellerPayOut;
-use App\Trait\UserTimezone;
+use App\Trait\HasTeams;
 use App\Trait\HasOnline;
+use App\Trait\UserTimezone;
 use App\Observers\ResellerObserver;
 
 class Reseller extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
@@ -23,6 +24,11 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     use Notifiable;
     use UserTimezone;
     use HasOnline;
+    use HasTeams {
+        assignTeams as _assignTeams;
+        syncTeams as _syncTeams;
+        removeTeam as _removeTeam;
+    }
     use ResellerObserver;
 
     public $pushNotificationType = 'users';
@@ -93,6 +99,30 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     public function devices()
     {
         return $this->morphMany(Device::class, 'user');
+    }
+
+    public function assignTeams(...$teams)
+    {
+        if ($this->level != static::LEVEL['RESELLER']) {
+            return;
+        }
+        return $this->_assignTeams(...$teams);
+    }
+
+    public function syncTeams(...$teams)
+    {
+        if ($this->level != static::LEVEL['RESELLER']) {
+            return;
+        }
+        return $this->_syncTeams(...$teams);
+    }
+
+    public function removeTeam($team)
+    {
+        if ($this->level != static::LEVEL['RESELLER']) {
+            return;
+        }
+        return $this->_removeTeam($team);
     }
 
     public function getWithdrawalCreditAttribute()

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Team;
 use App\Models\Merchant;
 use App\Settings\CurrencySetting;
 
@@ -26,14 +27,23 @@ class MerchantSeeder extends Seeder
             'status' => true,
         ]);
         $merchant->whiteList()->create([
-            'api' => ['172.19.0.1'],
-            'backend' => ['172.19.0.1']
+            'api' => [internal_gateway_ip()],
+            'backend' => [internal_gateway_ip()]
         ]);
         foreach ($c->currency as $currency => $setting) {
             $merchant->credits()->create([
                 'currency' => $currency,
                 'credit' => 0,
                 'transaction_fee' => $setting['transaction_fee_percentage']
+            ]);
+            $merchant->assignTeams([
+                'name' => 'Default',
+                'type' => Team::TYPE['PAYIN'],
+                'currency' => $currency,
+            ], [
+                'name' => 'Default',
+                'type' => Team::TYPE['PAYOUT'],
+                'currency' => $currency,
             ]);
         }
     }

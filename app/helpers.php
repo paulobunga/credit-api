@@ -155,3 +155,37 @@ if (!function_exists('merchant_url')) {
         return str_replace('//api', '//merchant', env('APP_URL')) . $path;
     }
 }
+
+if (!function_exists('internal_gateway_ip')) {
+    /**
+     * Get backend internal gateway ip address
+     *
+     * @return string
+     */
+    function internal_gateway_ip(): string
+    {
+        $ip = explode('.', exec('grep "`hostname`" /etc/hosts|awk \'{print $1}\' | head -1'));
+        array_pop($ip);
+        $ip[] = 1;
+        return implode('.', $ip);
+    }
+}
+
+if (!function_exists('escape_like')) {        
+    /**
+     * Escape special characters for a LIKE query.
+     *
+     * @param string $value
+     * @param string $char
+     *
+     * @return string
+     */
+    function escape_like(string $value, string $char = '\\'): string
+    {
+        return str_replace(
+            [$char, '%', '_'],
+            [$char.$char, $char.'%', $char.'_'],
+            $value
+        );
+    }
+}

@@ -29,7 +29,7 @@
             distance: 0,
             countdown: null,
             expiredTime: new Date("{{ $dateTime }}").getTime(),
-            now: new Date().getTime(),
+            now: new Date("{{ \Carbon\Carbon::now()->toDateTimeString() }}").getTime(),
             init() {
                 this.countdown = setInterval(() => {
                     // Calculate time

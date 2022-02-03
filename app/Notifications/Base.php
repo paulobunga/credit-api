@@ -25,6 +25,16 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
     }
 
     /**
+     * Get notify id
+     *
+     * @return string
+     */
+    protected function getNotifyId(): string
+    {
+        return $this->id;
+    }
+
+    /**
      * Get icon path
      *
      * @return string
@@ -113,7 +123,7 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
     public function toAndroid($notifiable)
     {
         $data = $this->toArray($notifiable);
-    
+
         return OneSignalMessage::create()
             ->setSubject($data['title'])
             ->setBody($data['body'])

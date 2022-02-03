@@ -15,10 +15,9 @@ $api->group([
         $api->post("/demos/callback", ['as' => 'demos.callback', 'uses' => 'DemoController@callback']);
     }
 
-    $api->get("/pay/deposits", ['as' => 'deposits.pay', 'uses' => 'DepositController@pay']);
-    $api->get("/pay/withdrawals", ['as' => 'withdrawals.pay', 'uses' => 'WithdrawalController@pay']);
-
     $api->resource('deposits', 'DepositController', ['except' => ['destroy']]);
+    $api->get("/pay/deposits", ['as' => 'deposits.pay', 'uses' => 'DepositController@pay']);
 
     $api->resource('withdrawals', 'WithdrawalController', ['except' => ['destroy']]);
+    $api->get("/pay/withdrawals", ['as' => 'withdrawals.pay', 'uses' => 'WithdrawalController@pay']);
 });
