@@ -70,7 +70,7 @@ class OnlineCheck extends Command
         $agents = Reseller::where([
             'level' => Reseller::LEVEL['RESELLER'],
             'currency' => 'BDT',
-            'pay->status' => true
+            'payin->status' => true
         ])->whereIn('id', $reseller_ids['offline'])->get();
         # TODO replace with broadcast function
         foreach ($agents as $agent) {
