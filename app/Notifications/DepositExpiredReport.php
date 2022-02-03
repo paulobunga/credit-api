@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Notifications;
 
 use App\Models\MerchantDeposit;
@@ -10,9 +11,9 @@ class DepositExpiredReport extends Base
 
     public function __construct($reports)
     {
-      parent::__construct(MerchantDeposit::first());
+        parent::__construct(MerchantDeposit::first());
 
-      $this->reports = $reports;
+        $this->reports = $reports;
     }
 
     /**
@@ -32,7 +33,7 @@ class DepositExpiredReport extends Base
      */
     protected function getLink(): string
     {
-        return admin_url('/notifications?id='.$this->getNotifyId());
+        return admin_url('/notifications?id=' . $this->getNotifyId());
     }
 
     /**
@@ -47,17 +48,17 @@ class DepositExpiredReport extends Base
         foreach ($this->reports as $report => $rs) {
             foreach ($rs as $r => $v) {
                 if ($r != 'data') {
-                    $body .= "\n Agent " . $r . "(" . $report . "): " . $v . " orders";
+                    $body .= "\nAgent " . $r . "(" . $report . "): " . $v . " orders";
                 } else {
                     foreach ($v as $k => $data) {
-                        $body .= "\n Merchant OrderId: " . $data->merchant_order_id . ', Amount: ' . $data->amount;
+                        $body .= "\nMerchant OrderId: " . $data->merchant_order_id . ', Amount: ' . $data->amount;
                     }
                 }
             }
         }
 
         return [
-          'id'=> $this->getNotifyId(),
+          'id' => $this->getNotifyId(),
           'title' => 'Payin Expired',
           'body' => $body,
           'time' => (string)Carbon::now()

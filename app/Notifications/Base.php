@@ -15,11 +15,11 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
 {
     use Queueable;
 
-    public Model $model;
+    public $model;
 
     protected string $icon;
 
-    public function __construct(Model $m)
+    public function __construct(mixed $m = null)
     {
         $this->model = $m;
     }
