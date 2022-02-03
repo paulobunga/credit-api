@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\Admin;
 use App\Models\Online;
 use App\Models\Reseller;
+use App\Notifications\Admin\PayinOff;
 use Carbon\Carbon;
 
 class OnlineCheck extends Command
@@ -64,5 +66,19 @@ class OnlineCheck extends Command
         Online::where('user_type', 'reseller')
             ->whereIn('user_id', $reseller_ids['offline'])
             ->update(['status' => 0]);
+
+        $agents = Reseller::where([
+            'level' => Reseller::LEVEL['RESELLER'],
+            'currency' => 'BDT',
+            'pay->status' => true
+        ])->whereIn('id', $reseller_ids['offline'])->get();
+        # TODO replace with broadcast function
+        foreach ($agents as $agent) {
+            $agent->payin->status = false;
+            $agent->save();
+            foreach (Admin::all() as $admin) {
+                $admin->notify(new PayinOff($agent));
+            }
+        }
     }
 }
