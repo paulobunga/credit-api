@@ -47,20 +47,19 @@ class CheckCashIn extends Command
         foreach ($setting as $currency => $s) {
             $expired_minutes = $s['expired_minutes'];
 
-            $o = MerchantDeposit::where('merchant_deposits.status', MerchantDeposit::STATUS['PENDING'])
-                ->join('reseller_bank_cards', 'reseller_bank_cards.id', 'merchant_deposits.reseller_bank_card_id')
-                ->join('resellers', 'resellers.id', 'reseller_bank_cards.reseller_id')
-                ->where('merchant_deposits.currency', $currency)
-                ->where('merchant_deposits.created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
-                ->select('resellers.name', 'merchant_deposits.currency', 'merchant_deposits.merchant_order_id', 'merchant_deposits.amount')
-                ->get();
-
-            MerchantDeposit::where('status', MerchantDeposit::STATUS['PENDING'])
+            $k = MerchantDeposit::where('status', MerchantDeposit::STATUS['PENDING'])
                 ->where('currency', $currency)
                 ->where('created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
                 ->update(['status' => MerchantDeposit::STATUS['EXPIRED']]);
 
-            if (!empty($o->toArray()) && $o->count() >= $expired_limit) {
+            $o = MerchantDeposit::where('merchant_deposits.status', MerchantDeposit::STATUS['EXPIRED'])
+              ->join('reseller_bank_cards', 'reseller_bank_cards.id', 'merchant_deposits.reseller_bank_card_id')
+              ->join('resellers', 'resellers.id', 'reseller_bank_cards.reseller_id')
+              ->where('merchant_deposits.currency', $currency)
+              ->select('resellers.name', 'merchant_deposits.currency', 'merchant_deposits.merchant_order_id', 'merchant_deposits.amount')
+              ->get();
+
+            if (!empty($o->toArray()) && $o->count() >= $expired_limit && $k > 0) {
                 $reports[$currency][$o->first()->name] = $o->count();
                 $reports[$currency]['data'] = $o;
             }
