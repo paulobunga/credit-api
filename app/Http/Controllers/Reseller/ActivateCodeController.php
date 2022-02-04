@@ -13,9 +13,16 @@ use App\Http\Controllers\Controller;
 class ActivateCodeController extends Controller
 {
     protected $model = ResellerActivateCode::class;
-    
+
     protected $transformer = \App\Transformers\Reseller\ActivateCodeTransformer::class;
 
+    /**
+     * Get activate code list
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @method GET
+     * @return json
+     */
     public function index(Request $request)
     {
         $codes = QueryBuilder::for($this->model)
@@ -36,6 +43,13 @@ class ActivateCodeController extends Controller
         return $this->response->withPaginator($codes, $this->transformer);
     }
 
+    /**
+     * Create activate code
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @method POST
+     * @return json
+     */
     public function store(Request $request)
     {
         $pending_codes = ResellerActivateCode::where(

@@ -9,21 +9,21 @@ use App\Models\Reseller;
 use App\Notifications\Admin\PayinOff;
 use Carbon\Carbon;
 
-class OnlineCheck extends Command
+class CheckOnline extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'online:check';
+    protected $signature = 'check:online';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Check Reseller is online';
+    protected $description = 'Check agent online status';
 
     /**
      * Create a new command instance.

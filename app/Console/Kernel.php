@@ -16,12 +16,12 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\ReportDaily::class,
         \App\Console\Commands\PermissionList::class,
-        \App\Console\Commands\ActivateCheck::class,
+        \App\Console\Commands\CheckActivate::class,
+        \App\Console\Commands\CheckCashIn::class,
+        \App\Console\Commands\CheckOnline::class,
         \App\Console\Commands\ExecuteSql::class,
         \App\Console\Commands\ImportFile::class,
-        \App\Console\Commands\CheckCashIn::class,
         \App\Console\Commands\AutoApproval::class,
-        \App\Console\Commands\OnlineCheck::class,
     ];
 
     public function __construct(Application $app)
@@ -52,27 +52,27 @@ class Kernel extends ConsoleKernel
             ->runInBackground()
             ->onOneServer()
             ->everyTenMinutes();
-        # Activate code check
-        $schedule->command('activate:check')
-            ->name('ActivateCheck')
+        # check Activate code
+        $schedule->command('check:activate')
+            ->name('CheckActivate')
             ->runInBackground()
             ->onOneServer()
             ->everyMinute();
-        # Check cash in orders
+        # Check payin orders
         $schedule->command('check:cashin')
             ->name('CheckCashIn')
+            ->runInBackground()
+            ->onOneServer()
+            ->everyMinute();
+        # Check Online status
+        $schedule->command('check:online')
+            ->name('CheckOnline')
             ->runInBackground()
             ->onOneServer()
             ->everyMinute();
         # Auto approve payout orders
         $schedule->command('auto:approval')
             ->name('AutoApproval')
-            ->runInBackground()
-            ->onOneServer()
-            ->everyMinute();
-        # Online agent check
-        $schedule->command('online:check')
-            ->name('OnlineCheck')
             ->runInBackground()
             ->onOneServer()
             ->everyMinute();
