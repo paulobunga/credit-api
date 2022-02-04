@@ -67,8 +67,8 @@ class ResellerController extends Controller
      * Create an agent
      *
      * @param \Dingo\Api\Http\Request $request
-     *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @method PUT
+     * @return json
      */
     public function store(Request $request)
     {
@@ -141,10 +141,11 @@ class ResellerController extends Controller
     }
 
     /**
-     * Update an agent via id
+     * Update an agent by id
      *
-     * @param \Dingo\Api\Http\Request
-     * @return \Dingo\Api\Http\JsonResponse
+     * @param \Dingo\Api\Http\Request $request
+     * @method PUT
+     * @return json
      */
     public function update(Request $request)
     {
@@ -177,9 +178,10 @@ class ResellerController extends Controller
     }
 
     /**
-     * Delete an agent via id
-     * @param \Dingo\Api\Http\Request
-     * @return \Illuminate\Http\JsonResponse
+     * Delete an agent by id
+     * @param \Dingo\Api\Http\Request $request
+     * @method DELETE
+     * @return json
      */
     public function destroy(Request $request)
     {
@@ -193,9 +195,10 @@ class ResellerController extends Controller
     }
 
     /**
-     * Top up agent credit or coin via id
-     * @param \Dingo\Api\Http\Request
-     * @return \Dingo\Api\Http\JsonResponse
+     * Top up agent credit or coin by id
+     * @param \Dingo\Api\Http\Request $request
+     * @method PUT
+     * @return json
      */
     public function deposit(Request $request)
     {
@@ -224,7 +227,10 @@ class ResellerController extends Controller
             'type' => $request->type,
             'transaction_type' => $transaction_type,
             'amount' => $request->amount,
-            'extra' => ['memo' => $ability ? 'success' : '', 'creator' => auth()->id()],
+            'extra' => array_merge($request->extra, [
+                'memo' => $ability ? 'success' : '',
+                'creator' => auth()->id()
+            ]),
             'status' => $ability ?
                 ResellerDeposit::STATUS['APPROVED'] :
                 ResellerDeposit::STATUS['PENDING']
@@ -234,9 +240,10 @@ class ResellerController extends Controller
     }
 
     /**
-     * Withdraw agent credit or coin via id
-     * @param \Dingo\Api\Http\Request
-     * @return \Dingo\Api\Http\JsonResponse
+     * Withdraw agent credit or coin by id
+     * @param \Dingo\Api\Http\Request $request
+     * @method PUT
+     * @return json
      */
     public function withdrawal(Request $request)
     {
@@ -264,7 +271,10 @@ class ResellerController extends Controller
             'type' => $request->type,
             'transaction_type' => $transaction_type,
             'amount' => $request->amount,
-            'extra' => ['memo' => $ability ? 'success' : '', 'creator' => auth()->id()],
+            'extra' => array_merge($request->extra, [
+                'memo' => $ability ? 'success' : '',
+                'creator' => auth()->id()
+            ]),
             'status' => $ability ?
                 ResellerWithdrawal::STATUS['APPROVED'] :
                 ResellerWithdrawal::STATUS['PENDING']
@@ -274,9 +284,10 @@ class ResellerController extends Controller
     }
 
     /**
-     * Reset agent password via id
-     * @param \Dingo\Api\Http\Request
-     * @return \Dingo\Api\Http\JsonResponse
+     * Reset agent password by id
+     * @param \Dingo\Api\Http\Request $request
+     * @method PUT
+     * @return json
      */
     public function resetPassword(Request $request)
     {
@@ -291,8 +302,9 @@ class ResellerController extends Controller
     }
 
     /**
-     * Make up agent pay in order
+     * Make up agent payin order
      * @param \Dingo\Api\Http\Request $request
+     * @method PUT
      * @return json
      */
     public function makeUp(Request $request)
@@ -332,6 +344,13 @@ class ResellerController extends Controller
         return $this->success();
     }
 
+    /**
+     * Toggle agent Status
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @method PUT
+     * @return json
+     */
     public function toggleStatus(Request $request)
     {
         $m = $this->model::findOrFail($this->parameters('reseller'));
