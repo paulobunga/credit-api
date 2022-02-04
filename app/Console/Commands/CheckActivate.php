@@ -6,14 +6,14 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use App\Models\ResellerActivateCode;
 
-class ActivateCheck extends Command
+class CheckActivate extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'activate:check';
+    protected $signature = 'check:activate';
 
     /**
      * The console command description.

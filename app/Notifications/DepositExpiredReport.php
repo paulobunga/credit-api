@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Models\MerchantDeposit;
 use Carbon\Carbon;
 
 class DepositExpiredReport extends Base
@@ -11,7 +10,7 @@ class DepositExpiredReport extends Base
 
     public function __construct($reports)
     {
-        parent::__construct(MerchantDeposit::first());
+        parent::__construct();
 
         $this->reports = $reports;
     }
@@ -44,15 +43,13 @@ class DepositExpiredReport extends Base
      */
     protected function getData($notifiable)
     {
-        $body = "Total payin expired: ";
+        $body = "Total payin expired ";
         foreach ($this->reports as $report => $rs) {
             foreach ($rs as $r => $v) {
-                if ($r != 'data') {
-                    $body .= "\nAgent " . $r . "(" . $report . "): " . $v . " orders";
+                if ($r != "Total Amount") {
+                    $body .= "\n" . $r . " (" . $report . "): " . $v . " orders";
                 } else {
-                    foreach ($v as $k => $data) {
-                        $body .= "\nMerchant OrderId: " . $data->merchant_order_id . ', Amount: ' . $data->amount;
-                    }
+                    $body .= ", " . $r . ": " . $v;
                 }
             }
         }
@@ -61,7 +58,7 @@ class DepositExpiredReport extends Base
           'id' => $this->getNotifyId(),
           'title' => 'Payin Expired',
           'body' => $body,
-          'time' => (string)Carbon::now()
+          'time' => Carbon::now()->toDateTimeString(),
         ];
     }
 }

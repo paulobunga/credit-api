@@ -33,7 +33,7 @@
             init() {
                 this.countdown = setInterval(() => {
                     // Calculate time
-                    this.now = new Date().getTime();
+                    this.now = this.now + 100;
                     this.distance = this.expiredTime - this.now;
                     // Set Times
                     this.days = this.padNum( Math.floor(this.distance / (1000*60*60*24)) );

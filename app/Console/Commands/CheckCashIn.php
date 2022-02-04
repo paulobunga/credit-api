@@ -48,21 +48,27 @@ class CheckCashIn extends Command
             $expired_minutes = $s['expired_minutes'];
 
             $k = MerchantDeposit::where('status', MerchantDeposit::STATUS['PENDING'])
-                ->where('currency', $currency)
-                ->where('created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
-                ->update(['status' => MerchantDeposit::STATUS['EXPIRED']]);
+              ->where('currency', $currency)
+              ->where('created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
+              ->update(['status' => MerchantDeposit::STATUS['EXPIRED']]);
 
-            $o = MerchantDeposit::where('merchant_deposits.status', MerchantDeposit::STATUS['EXPIRED'])
-              ->join('reseller_bank_cards', 'reseller_bank_cards.id', 'merchant_deposits.reseller_bank_card_id')
-              ->join('resellers', 'resellers.id', 'reseller_bank_cards.reseller_id')
-              ->where('merchant_deposits.currency', $currency)
-              ->select('resellers.name', 'merchant_deposits.currency', 'merchant_deposits.merchant_order_id', 'merchant_deposits.amount')
-              ->get();
+            // $o = MerchantDeposit::where('merchant_deposits.status', MerchantDeposit::STATUS['EXPIRED'])
+            //   ->join('reseller_bank_cards', 'reseller_bank_cards.id', 'merchant_deposits.reseller_bank_card_id')
+            //   ->join('resellers', 'resellers.id', 'reseller_bank_cards.reseller_id')
+            //   ->where('merchant_deposits.currency', $currency)
+            //   ->where('merchant_deposits.created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
+            //   ->having(DB::raw('COUNT(resellers.name)'), '>=', $expired_limit)
+            //   ->select('resellers.name', DB::raw('COUNT(resellers.name) AS total_expired'), DB::raw('TRUNCATE(SUM(merchant_deposits.amount), 2) AS total_amount'), 'merchant_deposits.currency')
+            //   ->groupBy('resellers.name', 'merchant_deposits.currency')
+            //   ->get();
 
-            if (!empty($o->toArray()) && $o->count() >= $expired_limit && $k > 0) {
-                $reports[$currency][$o->first()->name] = $o->count();
-                $reports[$currency]['data'] = $o;
-            }
+            // if (!empty($o->toArray()) && $k > 0) {
+            //     $reports[$currency] = [];
+            //     foreach ($o as $k => $v) {
+            //         $reports[$currency][$v->name] = $v->total_expired;
+            //         $reports[$currency]['Total Amount'] = $v->total_amount;
+            //     }
+            // }
         }
 
         if (!empty($reports)) {
