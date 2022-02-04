@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>
-        {{ env('APP_NAME') }} - social gaming platform 
+        {{ env('APP_NAME') }} - social gaming platform
     </title>
     <meta name="description" content="" />
-    <meta name="keywords" content="games, play, gamepoint, gamepoints, free,player, points.">
+    <meta name="keywords" content="autocashin, auto cashin, payment, online payment gateway.">
     <link rel="stylesheet" href="{{ mix('css/animate.min.css') }}" />
     <link rel="stylesheet" href="{{ mix('css/app.css') }}" />
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet">
@@ -217,15 +217,13 @@
 
 <body class="leading-normal tracking-normal text-gray-900" style="font-family: 'Source Sans Pro', sans-serif;">
 
-
-
     <div class="h-screen pb-14 bg-right bg-cover" style="background-image:url('img/bg.svg');">
         <!--Nav-->
         <div class="w-full container mx-auto p-6">
 
             <div class="w-full flex items-center justify-between">
                 <a class="flex items-center no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/">
-                    <img class="h-10 w-10 mr-4" src="{{ asset('/img/logo.png') }}" />
+                    <img src="{{ asset('/img/logo.png') }}" width="120px" height="100px"/>
                     {{ env('APP_NAME') }}
                 </a>
 
@@ -258,14 +256,15 @@
             <div class="flex flex-col w-full xl:w-2/5 justify-center lg:items-start overflow-y-hidden">
                 <h1
                     class="my-4 text-3xl md:text-5xl text-purple-800 font-bold leading-tight text-center md:text-left slide-in-bottom-h1">
-                    GamePoints is the online platform for multiplayer social gaming</h1>
+                </h1>
                 <p class="leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle">
-                    By now you can play GamePoint's social multipleyer games on our own platform, Android and partner portals</p>
+                </p>
 
                 <p class="text-blue-400 font-bold pb-8 lg:pb-6 text-center md:text-left fade-in">Download our app:</p>
                 <div class="flex w-full justify-center md:justify-start pb-24 lg:pb-0 fade-in">
                     <a href="/android/gamepts.apk">
-                        <img class="shadow rounded-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:shadow-lg" src="{{ asset('img/play_store.svg') }}" alt="">
+                        <img class="shadow rounded-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
+                            src="{{ asset('img/play_store.svg') }}" alt="">
                     </a>
                 </div>
 
@@ -278,18 +277,14 @@
 
             <!--Footer-->
             <div class="w-full pt-16 pb-6 text-sm text-center md:text-left text-purple-800 ">
-                <a class="text-gray-500 no-underline hover:no-underline">All contents: © GamePoints &copy; 2020 - {{ date('Y')}}</a>
+                <a class="text-gray-500 no-underline hover:no-underline">
+                    All contents: © {{ env('APP_NAME') }} &copy; 2021 - {{ date('Y') }}</a>
             </div>
 
         </div>
 
 
     </div>
-
-
-    <!-- jQuery if you need it
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-      -->
 
 </body>
 
