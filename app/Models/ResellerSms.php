@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\PaymentChannel;
-use App\Models\MerchantDeposit;
 use App\Trait\UserTimezone;
 
 class ResellerSms extends Model
@@ -36,6 +34,7 @@ class ResellerSms extends Model
         'PENDING' => 0,
         'MATCH' => 1,
         'UNMATCH' => 2,
+        'INVALID' => 403,
     ];
 
     public function reseller()
@@ -44,21 +43,17 @@ class ResellerSms extends Model
     }
 
     /**
-     * Match SMS with payin orders
+     * Parse SMS data from channels
      *
      * @param  array $sms
+     * @param  mixed $channels
      * @return array
      */
-    public static function match(array $sms)
+    public static function parse(array $sms, $channels)
     {
-        $channels = PaymentChannel::where('currency', $sms['currency'])->get();
-
         $data = [];
         foreach ($channels as $ch) {
             if (!$ch->isSupportSMS()) {
-                continue;
-            }
-            if ($ch->currency != $sms['currency']) {
                 continue;
             }
             if (!in_array($sms['address'], $ch->payin->sms_addresses)) {
@@ -68,42 +63,11 @@ class ResellerSms extends Model
             if (empty($data)) {
                 continue;
             }
-            if (!$data['trx_id']) {
-                continue;
-            } else {
+            if (!empty($data['trx_id'])) {
                 break;
             }
         }
 
-        if (!isset($data['trx_id']) || empty($data['trx_id'])) {
-            return $data;
-        }
-
-        $match = null;
-
-        $deposits = MerchantDeposit::with('paymentChannel')->whereHas('reseller', function ($q) use ($sms) {
-            $q->where('resellers.id', $sms['reseller_id']);
-        })->whereIn('status', [
-            MerchantDeposit::STATUS['PENDING'],
-        ])->orderByDesc('id')->get();
-
-        $count = 0;
-        foreach ($deposits as $d) {
-            if (
-                $data['amount'] == $d->amount &&
-                $data['payer'] == $d->extra['sender_mobile_number'] &&
-                in_array($sms['address'], $d->paymentChannel->payin->sms_addresses)
-            ) {
-                $match = $d;
-                ++$count;
-                continue;
-            }
-        }
-        if ($count > 1) {
-            $data['match'] = null;
-        } else {
-            $data['match'] = $match;
-        }
         return $data;
     }
 }
