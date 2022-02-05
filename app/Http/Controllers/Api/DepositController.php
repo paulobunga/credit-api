@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -16,6 +15,7 @@ use App\Models\PaymentChannel;
 use App\Models\ResellerBankCard;
 use App\DTO\ResellerPayIn;
 use App\Transformers\Api\DepositTransformer;
+use App\Http\Controllers\Controller;
 
 /**
  * @group Deposit API
@@ -145,7 +145,7 @@ class DepositController extends Controller
             ->where('merchant_id', $merchant->id)
             ->paginate($this->perPage);
 
-        return $this->response->withPaginator($merchant_deposits, new DepositTransformer);
+        return $this->response->withPaginator($merchant_deposits, new DepositTransformer());
     }
 
     /**
@@ -181,7 +181,7 @@ class DepositController extends Controller
             'merchant_order_id' => $this->parameters('deposit')
         ])->firstOrFail();
 
-        return $this->response->item($deposit, new DepositTransformer);
+        return $this->response->item($deposit, new DepositTransformer());
     }
 
     /**
@@ -343,7 +343,7 @@ class DepositController extends Controller
      * Update deposit extra information
      *
      * @param \Dingo\Api\Http\Request $request
-     * @method PUT|PATCH
+     * @method PUT
      * @return json
      */
     public function update(Request $request)
@@ -373,6 +373,7 @@ class DepositController extends Controller
                 $m->update([
                     'extra' => ['sender_mobile_number' => $request->sender_mobile_number]
                 ]);
+                $m->paymentChannel->matchPayin($m);
                 break;
             default:
                 throw new \Exception('Currency is not supported', 405);

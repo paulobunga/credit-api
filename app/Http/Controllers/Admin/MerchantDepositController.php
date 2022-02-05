@@ -19,8 +19,9 @@ class MerchantDepositController extends Controller
 
     /**
      * Get Merchant Deposit lists
-     *
-     * @return \Dingo\Api\Http\JsonResponse
+     * @param  \Dingo\Api\Http\Request $request
+     * @method GET
+     * @return json
      */
     public function index(Request $request)
     {
@@ -68,13 +69,22 @@ class MerchantDepositController extends Controller
         return $this->paginate($merchant_deposits, $this->transformer);
     }
 
+    /**
+     * Update merchant deposit by id
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @method PUT
+     * @return json
+     */
     public function update(Request $request)
     {
         $m = $this->model::findOrFail($this->parameters('merchant_deposit'));
-        if (!in_array($m->status, [
-            MerchantDeposit::STATUS['PENDING'],
-            MerchantDeposit::STATUS['EXPIRED'],
-        ])) {
+        if (
+            !in_array($m->status, [
+                MerchantDeposit::STATUS['PENDING'],
+                MerchantDeposit::STATUS['EXPIRED'],
+            ])
+        ) {
             throw new \Exception('Status is not allowed to update', 401);
         }
         $this->validate($request, [
@@ -109,8 +119,8 @@ class MerchantDepositController extends Controller
 
     /**
      * Resend callback to merchant
-     *
-     * @return \Dingo\Api\Http\Response $response
+     * @method PUT
+     * @return json
      */
     public function resend()
     {
@@ -126,7 +136,7 @@ class MerchantDepositController extends Controller
         // push deposit information callback to callback url
         Queue::push((new \App\Jobs\GuzzleJob(
             $m,
-            new \App\Transformers\Api\DepositTransformer,
+            new \App\Transformers\Api\DepositTransformer(),
             $m->merchant->api_key
         )));
 

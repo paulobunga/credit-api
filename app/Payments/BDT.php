@@ -2,6 +2,9 @@
 
 namespace App\Payments;
 
+use App\Models\ResellerSms;
+use App\Models\MerchantDeposit;
+
 class BDT extends Base
 {
     public static function getDepositRandomSql($request)
@@ -63,5 +66,42 @@ class BDT extends Base
                 AND total_pending_amount + {$request->amount} <= credit
                 AND channel = '{$request->channel}' 
                 AND same_amount = 0";
+    }
+
+    public static function matchPayin($deposit, $channel)
+    {
+        $sms = ResellerSms::where(
+            [
+                'reseller_id' => $deposit->reseller->id,
+                'status' => ResellerSms::STATUS['PENDING']
+            ],
+        )->whereIn(
+            'address',
+            $channel->payin->sms_addresses
+        )->orderByDesc('id')->get();
+
+        $count = 0;
+        $match = null;
+        foreach ($sms as $s) {
+            $data = ResellerSms::parse($s->toArray(), [$channel]);
+            if (
+                $data['amount'] == $deposit->amount &&
+                $data['payer'] == $deposit->extra['sender_mobile_number']
+            ) {
+                $match = $s;
+                ++$count;
+            }
+        }
+        if ($count == 1) {
+            $deposit->update([
+                'status' => MerchantDeposit::STATUS['APPROVED'],
+                'extra' => ['reference_id' => $data['trx_id']]
+            ]);
+            $match->update([
+                'model_id' => $deposit->id,
+                'model_name' => 'merchant.deposit',
+                'status' => ResellerSms::STATUS['MATCH'],
+            ]);
+        }
     }
 }

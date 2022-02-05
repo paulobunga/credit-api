@@ -58,8 +58,25 @@ trait PaymentChannelObserver
         }
         $objName = "\\App\\Payments\\{$this->name}\\{$this->currency}";
         if (!class_exists($objName)) {
-            throw new \Exception("{$objName} is not unsupported!");
+            throw new \Exception("{$objName} is unsupported!");
         }
         return new $objName();
+    }
+
+    /**
+     * Match payin order based on its currency
+     *
+     * @param  App\Models\MerchantDeposit $deposit
+     * @return void
+     */
+    public function matchPayin($deposit)
+    {
+        if (method_exists($this->getReference(), 'matchPayin')) {
+            return $this->getReference()->matchPayin($deposit, $this);
+        }
+        $objName = "\\App\\Payments\\{$deposit->currency}";
+        if (method_exists($objName, 'matchPayin')) {
+            return $objName::matchPayin($deposit, $this);
+        }
     }
 }
