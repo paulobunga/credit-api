@@ -171,7 +171,7 @@ if (!function_exists('internal_gateway_ip')) {
     }
 }
 
-if (!function_exists('escape_like')) {        
+if (!function_exists('escape_like')) {
     /**
      * Escape special characters for a LIKE query.
      *
@@ -184,7 +184,7 @@ if (!function_exists('escape_like')) {
     {
         return str_replace(
             [$char, '%', '_'],
-            [$char.$char, $char.'%', $char.'_'],
+            [$char . $char, $char . '%', $char . '_'],
             $value
         );
     }
