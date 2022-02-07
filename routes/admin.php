@@ -1,4 +1,5 @@
 <?php
+
 $api->group([
     'namespace' => 'App\Http\Controllers\Admin',
     'prefix' => 'admin',
@@ -116,6 +117,8 @@ $api->group([
             $api->resource('notifications', 'NotificationController', ['only' => ['index', 'destroy']]);
             $api->get("/notifications/unread", ['uses' => "NotificationController@unread", 'as' => "notifications.unread"]);
             $api->post("/notifications/mark", ['uses' => "NotificationController@mark", 'as' => "notifications.mark"]);
+
+            $api->resource('activity_logs', 'ActivityLogController', ['only' => ['index', 'destroy']]);
         });
     });
 });

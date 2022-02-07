@@ -13,7 +13,9 @@ trait UserLogsActivity
     {
         $log = LogOptions::defaults();
         if (auth()->guard('admin')->check()) {
-            return $log->logAll()->logExcept(['password', 'username']);
+            return $log->logAll()
+                       ->logExcept(['password', 'username'])
+                       ->logOnlyDirty();
         } else {
             return $log->dontSubmitEmptyLogs();
         }
