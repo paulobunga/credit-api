@@ -102,9 +102,16 @@ abstract class Controller extends BaseController
     protected function paginate(QueryBuilder $builder, $transformer, array $meta = [])
     {
         if ($this->export) {
+            $class = 'App\\Exports';
             $routes = array_slice(explode('.', request()->route()[1]['as']), 0, 2);
-            $routes = array_map(fn ($r) => ucfirst(Str::camel(Str::singular($r))), $routes);
-            $class = '\\App\\Exports\\' . implode('\\', $routes) . 'Export';
+            foreach ($routes as $r) {
+                $path = '';
+                foreach (explode('_', $r) as $_r) {
+                    $path .= ucfirst(Str::singular($_r));
+                }
+                $class .= '\\' . $path;
+            }
+            $class .= 'Export';
             return new $class($builder->get());
         }
 
