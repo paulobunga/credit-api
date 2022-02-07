@@ -8,12 +8,14 @@ use App\Models\Transaction;
 use App\Trait\SignValidator;
 use App\Trait\UserTimezone;
 use App\Trait\HasNumFormat;
+use App\Trait\UserLogsActivity;
 
 class MerchantDeposit extends Model
 {
     use MerchantDepositObserver;
     use SignValidator;
     use UserTimezone;
+    use UserLogsActivity;
     use HasNumFormat;
 
     protected $fillable = [

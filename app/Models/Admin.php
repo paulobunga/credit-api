@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Trait\HasJWTSubject;
+use App\Trait\UserLogsActivity;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -21,6 +22,7 @@ use Spatie\Permission\Traits\HasRoles;
 class Admin extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
+    use UserLogsActivity;
     use Notifiable;
     use HasRoles;
 

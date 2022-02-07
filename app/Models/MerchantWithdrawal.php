@@ -9,12 +9,14 @@ use App\Observers\MerchantWithdrawalObserver;
 use App\Trait\SignValidator;
 use App\Trait\UserTimezone;
 use App\Trait\HasNumFormat;
+use App\Trait\UserLogsActivity;
 
 class MerchantWithdrawal extends Model
 {
     use MerchantWithdrawalObserver;
     use SignValidator;
     use UserTimezone;
+    use UserLogsActivity;
     use HasNumFormat;
 
     protected $fillable = [

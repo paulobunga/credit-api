@@ -20,6 +20,7 @@
         "pusher/pusher-php-server": "^7.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/data-transfer-object": "^3.7",
+        "spatie/laravel-activitylog": "^4.4",
         "spatie/laravel-permission": "^4.0",
         "spatie/laravel-query-builder": "^3.4",
         "spatie/laravel-settings": "^2.1",

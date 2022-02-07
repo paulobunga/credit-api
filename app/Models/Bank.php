@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Trait\UserTimezone;
+use App\Trait\UserLogsActivity;
 
 /**
  * Model of bank
@@ -14,6 +15,7 @@ class Bank extends Model
 {
     use HasFactory;
     use UserTimezone;
+    use UserLogsActivity;
 
     protected $fillable = [
         'ident',

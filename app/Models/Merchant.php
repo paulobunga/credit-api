@@ -14,12 +14,14 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Observers\MerchantObserver;
 use App\Trait\HasJWTSubject;
 use App\Trait\HasTeams;
+use App\Trait\UserLogsActivity;
 
 class Merchant extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
     use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
     use Notifiable;
     use HasTeams;
+    use UserLogsActivity;
     use MerchantObserver;
 
     public $pushNotificationType = 'users';

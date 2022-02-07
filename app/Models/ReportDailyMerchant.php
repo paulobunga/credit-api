@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Trait\UserTimezone;
+use App\Trait\UserLogsActivity;
 
 class ReportDailyMerchant extends Model
 {
     use UserTimezone;
+    use UserLogsActivity;
 
     public $timestamps = false;
 

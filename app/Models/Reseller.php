@@ -2,21 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Lumen\Auth\Authorizable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use App\Trait\HasJWTSubject;
-use App\DTO\ResellerPayIn;
-use App\DTO\ResellerPayOut;
 use App\Trait\HasTeams;
 use App\Trait\HasOnline;
+use App\DTO\ResellerPayIn;
+use App\DTO\ResellerPayOut;
 use App\Trait\UserTimezone;
+use App\Trait\HasJWTSubject;
+use App\Trait\UserLogsActivity;
 use App\Observers\ResellerObserver;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Lumen\Auth\Authorizable;
+use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 class Reseller extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
@@ -29,6 +30,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         syncTeams as _syncTeams;
         removeTeam as _removeTeam;
     }
+    use UserLogsActivity;
     use ResellerObserver;
 
     public $pushNotificationType = 'users';

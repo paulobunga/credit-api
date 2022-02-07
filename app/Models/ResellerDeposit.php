@@ -8,12 +8,14 @@ use App\Models\Transaction;
 use App\DTO\ResellerDepositExtra;
 use App\Trait\UserTimezone;
 use App\Trait\HasNumFormat;
+use App\Trait\UserLogsActivity;
 
 class ResellerDeposit extends Model
 {
     use ResellerDepositObserver;
     use UserTimezone;
     use HasNumFormat;
+    use UserLogsActivity;
 
     protected $fillable = [
         'reseller_id',

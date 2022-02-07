@@ -123,7 +123,7 @@ $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\RouteServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
-
+$app->register(Spatie\Activitylog\ActivitylogServiceProvider::class);
 $app->alias('cache', \Illuminate\Cache\CacheManager::class);
 /*
 |--------------------------------------------------------------------------

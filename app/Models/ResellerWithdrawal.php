@@ -8,11 +8,13 @@ use App\DTO\ResellerWithdrawalExtra;
 use App\Observers\ResellerWithdrawalObserver;
 use App\Trait\UserTimezone;
 use App\Trait\HasNumFormat;
+use App\Trait\UserLogsActivity;
 
 class ResellerWithdrawal extends Model
 {
     use ResellerWithdrawalObserver;
     use UserTimezone;
+    use UserLogsActivity;
     use HasNumFormat;
 
     protected $fillable = [

@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Trait\UserLogsActivity;
 
 class Team extends Model
 {
+    use UserLogsActivity;
+
     protected $fillable = [
         'name',
         'type',

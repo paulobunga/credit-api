@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Trait\UserLogsActivity;
 
 class ReportMonthlyReseller extends Model
 {
     use HasFactory;
+    use UserLogsActivity;
 
     public $timestamps = false;
 
