@@ -13,11 +13,23 @@ trait UserLogsActivity
     {
         $log = LogOptions::defaults();
         if (auth()->guard('admin')->check()) {
+            $route_name = request()->route()[1]['as'];
             return $log->logAll()
-                       ->logExcept(['password', 'username'])
-                       ->logOnlyDirty();
-        } else {
-            return $log->dontSubmitEmptyLogs();
+                    ->logOnlyDirty()
+                    ->logExcept(['updated_at'])
+                    ->useLogName($route_name)
+                    ->setDescriptionForEvent(function (string $eventName) use ($route_name) {
+                        $route_arr = explode(".", $route_name);
+                        switch ($route_arr[2]) {
+                            case 'update':
+                            case 'store':
+                            case 'destroy':
+                                return $eventName . " " . str_replace("_", " ", $route_arr[1]);
+                            default:
+                                return str_replace("_", " ", $route_arr[2]) . " " . $route_arr[1];
+                        }
+                    });
         }
+        return $log->dontSubmitEmptyLogs();
     }
 }
