@@ -28,28 +28,28 @@ trait UserLogsActivity
         }
 
         if ($eventName === "updated") {
-            $new = [];
-            $old = [];
+            $news = [];
+            $olds = [];
             foreach ($activity->properties["attributes"] as $key => $value) {
                 if (is_array($value)) {
-                    $new[$key] = array_udiff_assoc($activity->properties["attributes"][$key], $activity->properties["old"][$key], function ($new, $old) {
+                    $news[$key] = array_udiff_assoc($activity->properties["attributes"][$key], $activity->properties["old"][$key], function ($new, $old) {
                         if ($old === null || $new === null) {
                             return 0;
                         }
                         return $new <=> $old;
                     });
-                    $old[$key] = collect($activity->properties["old"][$key])->only(array_keys($new[$key]))->all();
+                    $olds[$key] = collect($activity->properties["old"][$key])->only(array_keys($news[$key]))->all();
                 } elseif ($key == "password") {
-                    $new[$key] = "";
-                    $old[$key] = "";
+                    $news[$key] = "";
+                    $olds[$key] = "";
                 } else {
-                    $new[$key] = $activity->properties["attributes"][$key];
-                    $old[$key] = $activity->properties["old"][$key];
+                    $news[$key] = $activity->properties["attributes"][$key];
+                    $olds[$key] = $activity->properties["old"][$key];
                 }
             }
             $activity->properties = [
-              "attributes" => $new,
-              "old" => $old,
+              "attributes" => $news,
+              "old" => $olds,
             ];
         }
 
