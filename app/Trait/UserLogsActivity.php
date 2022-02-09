@@ -4,31 +4,64 @@ namespace App\Trait;
 
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
 
 trait UserLogsActivity
 {
     use LogsActivity;
 
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $route_name = request()->route()[1]['as'];
+        $route_arr = explode(".", $route_name);
+        $description = "";
+
+        switch ($route_arr[2]) {
+            case 'update':
+            case 'store':
+            case 'destroy':
+                $description = $eventName . " " . str_replace("_", " ", $route_arr[1]);
+                break;
+            default:
+                 $description = str_replace("_", " ", $route_arr[2]) . " " . $route_arr[1];
+                break;
+        }
+
+        if ($eventName === "updated") {
+            $new = [];
+            $old = [];
+            foreach ($activity->properties["attributes"] as $key => $value) {
+                if (is_array($value)) {
+                    $new[$key] = array_udiff_assoc($activity->properties["attributes"][$key], $activity->properties["old"][$key], function ($new, $old) {
+                        if ($old === null || $new === null) {
+                            return 0;
+                        }
+                        return $new <=> $old;
+                    });
+                    $old[$key] = collect($activity->properties["old"][$key])->only(array_keys($new[$key]))->all();
+                } elseif ($key == "password") {
+                    $new[$key] = "";
+                    $old[$key] = "";
+                } else {
+                    $new[$key] = $activity->properties["attributes"][$key];
+                    $old[$key] = $activity->properties["old"][$key];
+                }
+            }
+            $activity->properties = [
+              "attributes" => $new,
+              "old" => $old,
+            ];
+        }
+
+        $activity->log_name = $route_name;
+        $activity->description = $description;
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         $log = LogOptions::defaults();
         if (auth()->guard('admin')->check()) {
-            $route_name = request()->route()[1]['as'];
-            return $log->logAll()
-                    ->logOnlyDirty()
-                    ->logExcept(['updated_at'])
-                    ->useLogName($route_name)
-                    ->setDescriptionForEvent(function (string $eventName) use ($route_name) {
-                        $route_arr = explode(".", $route_name);
-                        switch ($route_arr[2]) {
-                            case 'update':
-                            case 'store':
-                            case 'destroy':
-                                return $eventName . " " . str_replace("_", " ", $route_arr[1]);
-                            default:
-                                return str_replace("_", " ", $route_arr[2]) . " " . $route_arr[1];
-                        }
-                    });
+            return $log->logFillable()->logOnlyDirty();
         }
         return $log->dontSubmitEmptyLogs();
     }
