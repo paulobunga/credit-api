@@ -82,20 +82,22 @@ class BDT extends Base
 
         $count = 0;
         $match = null;
-        foreach ($sms as $s) {
+        $match_data = null;
+        foreach ($sms as $k => $s) {
             $data = ResellerSms::parse($s->toArray(), [$channel]);
             if (
                 $data['amount'] == $deposit->amount &&
                 $data['payer'] == $deposit->extra['sender_mobile_number']
             ) {
-                $match = $s;
+                $match = $sms[$k];
+                $match_data = $data;
                 ++$count;
             }
         }
         if ($count == 1) {
             $deposit->update([
                 'status' => MerchantDeposit::STATUS['APPROVED'],
-                'extra' => ['reference_id' => $data['trx_id']]
+                'extra' => ['reference_id' => $match_data['trx_id']]
             ]);
             $match->update([
                 'model_id' => $deposit->id,
