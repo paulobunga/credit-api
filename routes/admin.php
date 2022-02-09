@@ -115,7 +115,6 @@ $api->group([
             $api->put('/teams/member/{team}', ['uses' => "TeamController@member", 'as' => "teams.member"]);
 
             $api->resource('notifications', 'NotificationController', ['only' => ['index', 'destroy']]);
-            $api->get("/notifications/unread", ['uses' => "NotificationController@unread", 'as' => "notifications.unread"]);
             $api->post("/notifications/mark", ['uses' => "NotificationController@mark", 'as' => "notifications.mark"]);
 
             $api->resource('activity_logs', 'ActivityLogController', ['only' => ['index', 'destroy']]);
