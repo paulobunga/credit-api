@@ -66,10 +66,10 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     ];
 
     public const LEVEL = [
-        'REFERRER' => 0,
-        'AGENT_MASTER' => 1,
-        'AGENT' => 2,
-        'RESELLER' => 3
+        'HOME' => 0,
+        'SUPER_AGENT' => 1,
+        'MASTER_AGENT' => 2,
+        'AGENT' => 3
     ];
 
     public const STATUS = [
@@ -105,7 +105,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     public function assignTeams(...$teams)
     {
-        if ($this->level != static::LEVEL['RESELLER']) {
+        if ($this->level != static::LEVEL['AGENT']) {
             return;
         }
         return $this->_assignTeams(...$teams);
@@ -113,7 +113,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     public function syncTeams(...$teams)
     {
-        if ($this->level != static::LEVEL['RESELLER']) {
+        if ($this->level != static::LEVEL['AGENT']) {
             return;
         }
         return $this->_syncTeams(...$teams);
@@ -121,7 +121,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     public function removeTeam($team)
     {
-        if ($this->level != static::LEVEL['RESELLER']) {
+        if ($this->level != static::LEVEL['AGENT']) {
             return;
         }
         return $this->_removeTeam($team);

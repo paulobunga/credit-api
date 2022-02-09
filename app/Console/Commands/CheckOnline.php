@@ -68,7 +68,7 @@ class CheckOnline extends Command
             ->update(['status' => 0]);
 
         $agents = Reseller::where([
-            'level' => Reseller::LEVEL['RESELLER'],
+            'level' => Reseller::LEVEL['AGENT'],
             'currency' => 'BDT',
             'payin->status' => true
         ])->whereIn('id', $reseller_ids['offline'])->get();

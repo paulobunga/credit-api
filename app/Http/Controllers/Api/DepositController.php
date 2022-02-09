@@ -310,7 +310,7 @@ class DepositController extends Controller
         $reseller_bank_cards = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
             'r_payin_status' => ResellerPayIn::STATUS['ACTIVE'],
-            'r_level' => Reseller::LEVEL['RESELLER'],
+            'r_level' => Reseller::LEVEL['AGENT'],
             'pc_status' => PaymentChannel::STATUS['ACTIVE'],
             'md_status' => MerchantDeposit::STATUS['PENDING'],
             'rbc_status' => ResellerBankCard::STATUS['ACTIVE'],

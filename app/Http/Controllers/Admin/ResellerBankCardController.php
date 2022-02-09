@@ -70,7 +70,7 @@ class ResellerBankCardController extends Controller
             'status' => 'required|in:' . implode(',', ResellerBankCard::STATUS),
         ]);
         $reseller = Reseller::findOrFail($request->reseller);
-        if ($reseller->level != Reseller::LEVEL['RESELLER']) {
+        if ($reseller->level != Reseller::LEVEL['AGENT']) {
             throw new \Exception('only agent are allowed to create bank card!');
         }
         $payment_channel = \App\Models\PaymentChannel::where('name', $request->channel)

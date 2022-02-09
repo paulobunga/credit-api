@@ -19,8 +19,8 @@ class AgentSetting extends Settings
     public function getDefaultDownLineSlot($level)
     {
         switch ($level) {
-            case Reseller::LEVEL['AGENT_MASTER']:
-            case Reseller::LEVEL['AGENT']:
+            case Reseller::LEVEL['SUPER_AGENT']:
+            case Reseller::LEVEL['MASTER_AGENT']:
                 return $this->default_downline_slot;
             default:
                 return 0;

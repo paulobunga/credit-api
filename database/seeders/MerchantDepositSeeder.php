@@ -116,7 +116,7 @@ class MerchantDepositSeeder extends Seeder
                 ]);
             }
         }
-        foreach (Reseller::with('bankCards')->where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
+        foreach (Reseller::with('bankCards')->where('level', Reseller::LEVEL['AGENT'])->get() as $reseller) {
             if ($reseller->coin < 1) {
                 continue;
             }

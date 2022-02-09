@@ -74,20 +74,20 @@ class ResellerController extends Controller
     {
         $this->validate($request, [
             'level' => 'required|between:' . implode(',', [
-                Reseller::LEVEL['REFERRER'],
-                Reseller::LEVEL['RESELLER'],
+                Reseller::LEVEL['HOME'],
+                Reseller::LEVEL['AGENT'],
             ]),
             'upline' => [
-                'required_unless:level,' . Reseller::LEVEL['REFERRER'],
+                'required_unless:level,' . Reseller::LEVEL['HOME'],
             ],
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
             'phone' => 'required',
-            'currency' => 'required_if:level,' . Reseller::LEVEL['REFERRER'],
+            'currency' => 'required_if:level,' . Reseller::LEVEL['HOME'],
             'password' => 'required|confirmed',
         ]);
 
-        if ($request->level != Reseller::LEVEL['REFERRER']) {
+        if ($request->level != Reseller::LEVEL['HOME']) {
             $upline = Reseller::findOrFail($request->upline);
             $uplines = array_merge($upline->uplines, [$upline->id]);
             $currency = $upline->currency;
@@ -132,7 +132,7 @@ class ResellerController extends Controller
                 'max' => $cs['payout']['max'],
             ],
             'downline_slot' => $agent_setting->getDefaultDownLineSlot($request->level),
-            'status' => ($request->level == Reseller::LEVEL['RESELLER']) ?
+            'status' => ($request->level == Reseller::LEVEL['AGENT']) ?
                 Reseller::STATUS['INACTIVE'] :
                 Reseller::STATUS['ACTIVE'],
         ]);
@@ -168,8 +168,8 @@ class ResellerController extends Controller
             'payin' => $request->payin,
             'payout' => $request->payout,
             'downline_slot' => in_array($request->level, [
-                Reseller::LEVEL['AGENT_MASTER'],
-                Reseller::LEVEL['AGENT']
+                Reseller::LEVEL['SUPER_AGENT'],
+                Reseller::LEVEL['MASTER_AGENT']
             ]) ? $request->downline_slot : 0,
             'status' => $request->status
         ]);

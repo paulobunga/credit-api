@@ -21,13 +21,13 @@ class CurrencySetting extends Settings
             return 0;
         }
         switch ($level) {
-            case Reseller::LEVEL['REFERRER']:
+            case Reseller::LEVEL['HOME']:
                 return $c['referrer_percentage'];
-            case Reseller::LEVEL['AGENT_MASTER']:
+            case Reseller::LEVEL['SUPER_AGENT']:
                 return $c['master_agent_percentage'];
-            case Reseller::LEVEL['AGENT']:
+            case Reseller::LEVEL['MASTER_AGENT']:
                 return $c['agent_percentage'];
-            case Reseller::LEVEL['RESELLER']:
+            case Reseller::LEVEL['AGENT']:
                 return $c['reseller_percentage'];
         }
         return 0;

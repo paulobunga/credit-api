@@ -385,7 +385,7 @@ class WithdrawalController extends Controller
 
         $resellers = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
-            'r_level' => Reseller::LEVEL['RESELLER'],
+            'r_level' => Reseller::LEVEL['AGENT'],
             'r_payout_status' => ResellerPayOut::STATUS['ACTIVE'],
             'mw_status' => MerchantWithdrawal::STATUS['PENDING'],
             'md_status_0' => MerchantDeposit::STATUS['APPROVED'],
