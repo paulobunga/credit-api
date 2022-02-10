@@ -17,8 +17,8 @@ class ActivityLog extends Model
       'updated_at'  => 'datetime:Y-m-d H:i:s',
     ];
 
-    public function admin()
+    public function causer()
     {
-        return $this->belongsTo(Admin::class, 'causer_id', 'id');
+        return $this->morphTo();
     }
 }

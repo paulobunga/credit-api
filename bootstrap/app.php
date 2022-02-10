@@ -69,6 +69,7 @@ $app->configure('query-builder');
 $app->configure('view');
 $app->configure('broadcasting');
 $app->configure('settings');
+$app->configure('activitylog');
 /*
 |--------------------------------------------------------------------------
 | Register Middleware

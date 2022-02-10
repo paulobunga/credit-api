@@ -14,7 +14,7 @@ class ActivityLogTransformer extends TransformerAbstract
             'log_name' => $m->log_name,
             'description' => $m->description,
             'event' => $m->event,
-            'causer' => $m->admin,
+            'causer' => $m->causer,
             'properties' => $m->properties,
             'created_at' => (string)$m->created_at,
         ];

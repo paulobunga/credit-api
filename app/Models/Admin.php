@@ -61,4 +61,9 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
     {
         return $this->morphMany(Device::class, 'user');
     }
+
+    public function activityLog()
+    {
+        return $this->morphMany(ActivityLog::class, 'causer');
+    }
 }
