@@ -66,4 +66,9 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
     {
         return $this->morphMany(ActivityLog::class, 'causer');
     }
+
+    public function receivesBroadcastNotificationsOn()
+    {
+        return 'App.Models.Admin.Notify';
+    }
 }

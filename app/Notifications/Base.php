@@ -62,11 +62,16 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
      */
     public function via($notifiable)
     {
-        return [
-            'database',
-            'broadcast',
-            OneSignal::class
-        ];
+        $channels = [ 'database', OneSignal::class ];
+        if ($notifiable->getMorphClass() === 'admin') {
+            return $channels;
+        }
+        return array_merge(
+            $channels,
+            [
+                'broadcast'
+            ]
+        );
     }
 
     /**

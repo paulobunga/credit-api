@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\AdminNotification;
+use App\Listeners\AdminNotificationListener;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Log\Events\MessageLogged;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
@@ -14,7 +16,11 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $listen = [];
+    protected $listen = [
+        AdminNotification::class => [
+            AdminNotificationListener::class
+        ],
+    ];
 
     protected $model;
 

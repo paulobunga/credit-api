@@ -156,6 +156,6 @@ class AuthController extends Controller
      */
     public function channel(Request $request)
     {
-      return Broadcast::auth($request);
+        return Broadcast::auth($request);
     }
 }
