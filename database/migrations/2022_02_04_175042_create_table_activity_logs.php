@@ -6,14 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateTableActivityLogs extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-    Schema::connection(config('activitylog.database_connection'))->create(config('activitylog.table_name'), function (Blueprint $table) {
+  /**
+   * Run the migrations.
+   *
+   * @return void
+   */
+  public function up()
+  {
+    Schema::connection(config('activitylog.database_connection'))
+      ->create(config('activitylog.table_name'), function (Blueprint $table) {
         $table->bigIncrements('id');
         $table->string('log_name')->nullable();
         $table->text('description');
@@ -25,15 +26,15 @@ class CreateTableActivityLogs extends Migration
         $table->timestamps();
         $table->index('log_name');
       });
-    }
+  }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-      Schema::connection(config('activitylog.database_connection'))->dropIfExists(config('activitylog.table_name'));
-    }
+  /**
+   * Reverse the migrations.
+   *
+   * @return void
+   */
+  public function down()
+  {
+    Schema::connection(config('activitylog.database_connection'))->dropIfExists(config('activitylog.table_name'));
+  }
 }

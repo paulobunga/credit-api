@@ -6,14 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use App\Observers\MerchantSettlementObserver;
 use App\Trait\UserTimezone;
 use App\Trait\HasNumFormat;
-use App\Trait\UserLogsActivity;
 
 class MerchantSettlement extends Model
 {
     use MerchantSettlementObserver;
     use UserTimezone;
     use HasNumFormat;
-    use UserLogsActivity;
 
     protected $fillable = [
         'merchant_id',

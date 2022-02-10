@@ -7,13 +7,11 @@ use App\DTO\PaymentChannelPayIn;
 use App\DTO\PaymentChannelPayOut;
 use App\Observers\PaymentChannelObserver;
 use App\Trait\UserTimezone;
-use App\Trait\UserLogsActivity;
 
 class PaymentChannel extends Model
 {
     use PaymentChannelObserver;
     use UserTimezone;
-    use UserLogsActivity;
 
     public $timestamps = false;
 

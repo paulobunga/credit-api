@@ -4,12 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Trait\UserTimezone;
-use App\Trait\UserLogsActivity;
 
 class ReportDailyMerchant extends Model
 {
     use UserTimezone;
-    use UserLogsActivity;
 
     public $timestamps = false;
 
@@ -30,7 +28,7 @@ class ReportDailyMerchant extends Model
         'end_at'  => 'datetime:Y-m-d H:i:s',
         'created_at'  => 'datetime:Y-m-d H:i:s',
     ];
-    
+
     public function merchant()
     {
         return $this->belongsTo(Merchant::class);

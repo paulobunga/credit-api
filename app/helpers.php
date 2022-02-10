@@ -189,3 +189,30 @@ if (!function_exists('escape_like')) {
         );
     }
 }
+
+if (!function_exists('routeModel')) {
+    /**
+     * Get model from request route by id.
+     *
+     * @param string $id
+     *
+     * @return object|null
+     */
+    function routeModel($id)
+    {
+        if (!is_numeric($id)) {
+            return null;
+        }
+        $route = request()->route();
+        $routes = explode('.', $route[1]['as'])[1];
+        $model = '';
+        foreach (explode('_', $routes) as $r) {
+            $model .= ucfirst(Str::singular($r));
+        }
+        $model =  "\\App\\Models\\{$model}";
+        if (!class_exists($model)) {
+            return null;
+        }
+        return $model::find($id);
+    }
+}

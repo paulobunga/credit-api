@@ -6,6 +6,7 @@ $api->group([
     'as' => 'admin',
     'middleware' => [
         "domain:" . env('PRIVATE_DOMAIN'),
+        'activity_log:admin'
     ],
 ], function ($api) {
     $api->post('/auth/login', ['as' => 'auth.login', 'uses' => 'AuthController@login']);

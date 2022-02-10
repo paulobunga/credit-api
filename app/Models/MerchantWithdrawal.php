@@ -9,14 +9,12 @@ use App\Observers\MerchantWithdrawalObserver;
 use App\Trait\SignValidator;
 use App\Trait\UserTimezone;
 use App\Trait\HasNumFormat;
-use App\Trait\UserLogsActivity;
 
 class MerchantWithdrawal extends Model
 {
     use MerchantWithdrawalObserver;
     use SignValidator;
     use UserTimezone;
-    use UserLogsActivity;
     use HasNumFormat;
 
     protected $fillable = [
@@ -113,11 +111,13 @@ class MerchantWithdrawal extends Model
 
     public function getSlipUrlAttribute()
     {
-        if (!in_array($this->attributes['status'], [
-            self::STATUS['FINISHED'],
-            self::STATUS['APPROVED'],
-            self::STATUS['CANCELED'],
-        ])) {
+        if (
+            !in_array($this->attributes['status'], [
+                self::STATUS['FINISHED'],
+                self::STATUS['APPROVED'],
+                self::STATUS['CANCELED'],
+            ])
+        ) {
             return null;
         }
         return  Storage::disk('s3')->temporaryUrl(

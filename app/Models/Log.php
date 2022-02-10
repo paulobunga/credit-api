@@ -8,12 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Query\Expression;
 use App\Trait\UserTimezone;
-use App\Trait\UserLogsActivity;
 
 class Log extends Model
 {
     use UserTimezone;
-    use UserLogsActivity;
 
     public $timestamps = false;
 

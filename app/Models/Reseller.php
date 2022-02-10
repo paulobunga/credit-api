@@ -8,7 +8,6 @@ use App\DTO\ResellerPayIn;
 use App\DTO\ResellerPayOut;
 use App\Trait\UserTimezone;
 use App\Trait\HasJWTSubject;
-use App\Trait\UserLogsActivity;
 use App\Observers\ResellerObserver;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +20,9 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 class Reseller extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
-    use Authenticatable, Authorizable, HasJWTSubject;
+    use Authenticatable;
+    use Authorizable;
+    use HasJWTSubject;
     use Notifiable;
     use UserTimezone;
     use HasOnline;
@@ -30,7 +31,6 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         syncTeams as _syncTeams;
         removeTeam as _removeTeam;
     }
-    use UserLogsActivity;
     use ResellerObserver;
 
     public $pushNotificationType = 'users';

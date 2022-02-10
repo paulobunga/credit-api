@@ -5,13 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Observers\ResellerBankCardObserver;
 use App\Trait\UserTimezone;
-use App\Trait\UserLogsActivity;
 
 class ResellerBankCard extends Model
 {
     use ResellerBankCardObserver;
     use UserTimezone;
-    use UserLogsActivity;
 
     protected $fillable = [
         'reseller_id',
