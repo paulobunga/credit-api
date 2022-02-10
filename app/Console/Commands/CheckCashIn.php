@@ -47,12 +47,7 @@ class CheckCashIn extends Command
         foreach ($setting as $currency => $s) {
             $expired_minutes = $s['expired_minutes'];
 
-            $k = MerchantDeposit::where('status', MerchantDeposit::STATUS['PENDING'])
-              ->where('currency', $currency)
-              ->where('created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
-              ->update(['status' => MerchantDeposit::STATUS['EXPIRED']]);
-
-            $o = MerchantDeposit::where('merchant_deposits.status', MerchantDeposit::STATUS['EXPIRED'])
+            $o = MerchantDeposit::where('merchant_deposits.status', MerchantDeposit::STATUS['PENDING'])
               ->join('reseller_bank_cards', 'reseller_bank_cards.id', 'merchant_deposits.reseller_bank_card_id')
               ->join('resellers', 'resellers.id', 'reseller_bank_cards.reseller_id')
               ->where('merchant_deposits.currency', $currency)
@@ -62,7 +57,12 @@ class CheckCashIn extends Command
               ->groupBy('resellers.name', 'merchant_deposits.currency')
               ->get();
 
-            if (!empty($o->toArray()) && $k > 0) {
+            MerchantDeposit::where('status', MerchantDeposit::STATUS['PENDING'])
+              ->where('currency', $currency)
+              ->where('created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
+              ->update(['status' => MerchantDeposit::STATUS['EXPIRED']]);
+
+            if (!empty($o->toArray())) {
                 $reports[$currency] = [];
                 foreach ($o as $k => $v) {
                     $reports[$currency][$v->name] = $v->total_expired;
