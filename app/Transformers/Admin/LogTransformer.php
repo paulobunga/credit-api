@@ -14,7 +14,7 @@ class LogTransformer extends TransformerAbstract
             'channel' => $m->channel,
             'level' => $m->level,
             'message' => $m->message,
-            'context' => is_array($m->context) ? json_encode($m->context, JSON_UNESCAPED_SLASHES) : $m->context,
+            'context' => json_encode($m->context, JSON_UNESCAPED_SLASHES),
             'created_at' => (string)$m->created_at
         ];
     }
