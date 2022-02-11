@@ -8,6 +8,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Str;
 use App\Models\MerchantCredit;
+use App\Rules\ExistCurrency;
 
 class MerchantController extends Controller
 {
@@ -58,7 +59,7 @@ class MerchantController extends Controller
             'password' => 'required|confirmed',
             'phone' => 'required',
             'currency' => 'required|array',
-            'currency.*.label' => 'required|distinct',
+            'currency.*.label' => ['required', 'distinct', new ExistCurrency()],
             'currency.*.value' => 'required|boolean',
             'currency.*.transaction_fee' => 'required|numeric',
             'status' => 'required|boolean'
@@ -184,8 +185,7 @@ class MerchantController extends Controller
         $merchant = $this->model::findOrFail($this->parameters('merchant'));
         $this->validate($request, [
             'currency' => 'required|array',
-            'currency.*.currency' => 'required|distinct|in:' .
-                implode(',', array_keys(app(\App\Settings\CurrencySetting::class)->currency)),
+            'currency.*.currency' => ['required', 'distinct', new ExistCurrency()],
             'currency.*.transaction_fee' => 'required|numeric',
         ]);
         foreach ($request->currency as $c) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
+use App\Rules\ExistCurrency;
 
 class SettingController extends Controller
 {
@@ -19,7 +20,7 @@ class SettingController extends Controller
         $key = ucwords($key);
         return app("\App\Settings\\{$key}Setting");
     }
-    
+
     /**
      * Get setting list
      *
@@ -45,7 +46,7 @@ class SettingController extends Controller
             ];
         }
     }
-    
+
     /**
      * update setting by key
      *
@@ -66,7 +67,7 @@ class SettingController extends Controller
                 'max_downline_slot' => 'required|numeric|gte:default_downline_slot',
             ],
             'currency' => [
-                'currency' => 'array',
+                'currency' => ['array', new ExistCurrency()],
                 'currency.*.agent_percentage' => 'required|numeric',
                 'currency.*.master_agent_percentage' => 'required|numeric',
                 'currency.*.referrer_percentage' => 'required|numeric',

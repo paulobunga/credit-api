@@ -10,6 +10,7 @@ use App\Transformers\Reseller\AuthTransformer;
 use App\Models\Reseller;
 use App\Models\ResellerActivateCode;
 use App\Settings\CurrencySetting;
+use App\Rules\ExistCurrency;
 
 class AuthController extends Controller
 {
@@ -67,7 +68,7 @@ class AuthController extends Controller
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
             'phone' => 'required|unique:resellers,phone',
-            'currency' => 'required|in:' . implode(',', array_keys($cs->currency)),
+            'currency' => ['required', new ExistCurrency()],
             'password' => 'required|confirmed',
         ]);
         $currency_setting = app(\App\Settings\CurrencySetting::class);

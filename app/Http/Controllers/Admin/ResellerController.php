@@ -15,6 +15,7 @@ use App\Models\Transaction;
 use App\Filters\ExcludeFilter;
 use App\Filters\JsonColumnFilter;
 use App\Http\Controllers\Controller;
+use App\Rules\ExistCurrency;
 
 /**
  * Reseller Endpoint
@@ -83,7 +84,7 @@ class ResellerController extends Controller
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
             'phone' => 'required',
-            'currency' => 'required_if:level,' . Reseller::LEVEL['HOME'],
+            'currency' => ['required_if:level,' . Reseller::LEVEL['HOME'], new ExistCurrency()],
             'password' => 'required|confirmed',
         ]);
 

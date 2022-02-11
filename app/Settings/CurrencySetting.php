@@ -38,4 +38,11 @@ class CurrencySetting extends Settings
         $c = $this->currency[$currency] ?? null;
         return isset($c) ? $c['expired_minutes'] : 0;
     }
+
+    public function checkExsit($currency)
+    {
+        $c = $this->currency[$currency] ?? null;
+
+        return isset($c);
+    }
 }

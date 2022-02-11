@@ -8,13 +8,14 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
 use App\Models\PaymentChannel;
+use App\Rules\ExistCurrency;
 
 class PaymentChannelController extends Controller
 {
     protected $model = \App\Models\PaymentChannel::class;
 
     protected $transformer = \App\Transformers\Admin\PaymentChannelTransformer::class;
-    
+
     /**
      * Get payment channel list
      *
@@ -51,8 +52,7 @@ class PaymentChannelController extends Controller
             ],
             'payment_methods' => 'required|array',
             'payment_methods.*' => 'in:' . implode(',', PaymentChannel::METHOD),
-            'currency' => 'required|in:' .
-                implode(',', array_keys(app(\App\Settings\CurrencySetting::class)->currency)),
+            'currency' => ['required', new ExistCurrency()],
             'banks' => 'array',
             'banks.*' => 'exists:banks,id',
             'attributes' => 'required|array',
@@ -86,8 +86,7 @@ class PaymentChannelController extends Controller
             ],
             'payment_methods' => 'required|array',
             'payment_methods.*' => 'in:' . implode(',', PaymentChannel::METHOD),
-            'currency' => 'required|in:' .
-                implode(',', array_keys(app(\App\Settings\CurrencySetting::class)->currency)),
+            'currency' => ['required', new ExistCurrency()],
             'banks' => 'array',
             'banks.*' => 'exists:banks,id',
             'attributes' => 'required|array',

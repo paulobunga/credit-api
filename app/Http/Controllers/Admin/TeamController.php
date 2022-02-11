@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use App\Http\Controllers\Controller;
+use App\Rules\ExistCurrency;
 
 class TeamController extends Controller
 {
@@ -77,8 +78,7 @@ class TeamController extends Controller
             'name' => 'required',
             'type' => 'required|in:' .
                 implode(',', $this->model::TYPE),
-            'currency' => 'required|in:' .
-                implode(',', array_keys(app('settings.currency')->currency)),
+            'currency' => ['required', new ExistCurrency()],
             'description' => 'required',
         ]);
 
