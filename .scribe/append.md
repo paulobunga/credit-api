@@ -33,3 +33,11 @@
 |BDT       |NAGAD      |500   |30000 |
 |BDT       |ROCKET     |500   |30000 |
 |BDT       |UPAY       |500   |30000 |
+
+# Class List
+
+|Currency | Class            |
+|:--------|------------------|
+|VND      | Default          |
+|INR      | Default          |
+|BDT      | Default          |

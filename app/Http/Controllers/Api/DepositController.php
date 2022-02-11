@@ -177,6 +177,8 @@ class DepositController extends Controller
      * @bodyParam player_id string required Unique id of player. Example: 1
      * @bodyParam currency string required The currency of the deposit. Example: INR
      * @bodyParam channel string required Payment Channel of the deposit. Example: UPI
+     * @bodyParam class string specific name of agent group. Defaults to 'Default'.
+     * refer to [class list](/#class-list). Example: Default
      * @bodyParam method string required Payment method supported by selected Payment channel.
      * Example: QRCODE
      * @bodyParam uuid string required The Merchant UUID. Example: 224d4a1f-6fc5-4039-bd81-fcbc7f88c659
