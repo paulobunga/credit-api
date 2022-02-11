@@ -69,12 +69,14 @@ class CheckOnline extends Command
 
         $agents = Reseller::where([
             'level' => Reseller::LEVEL['AGENT'],
-            'currency' => 'BDT',
             'payin->status' => true
-        ])->whereIn('id', $reseller_ids['offline'])->get();
+        ])
+        ->whereIn('currency', ['BDT', 'INR'])
+        ->whereIn('id', $reseller_ids['offline'])->get();
         # TODO replace with broadcast function
         foreach ($agents as $agent) {
             $agent->payin->status = false;
+            $agent->payout->status = false;
             $agent->save();
             foreach (Admin::all() as $admin) {
                 $admin->notify(new PayinOff($agent));
