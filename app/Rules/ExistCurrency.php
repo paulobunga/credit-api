@@ -3,6 +3,7 @@
 namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 
 class ExistCurrency implements Rule
 {
@@ -18,8 +19,11 @@ class ExistCurrency implements Rule
         $settings = app(\App\Settings\CurrencySetting::class);
         if (is_array($value)) {
             foreach ($value as $k => $v) {
-                return $settings->checkExsit($k);
+                if (!$settings->checkExsit($k)) {
+                    return false;
+                }
             }
+            return true;
         }
         return $settings->checkExsit($value);
     }
