@@ -42,23 +42,6 @@ use App\Http\Controllers\Controller;
  * <td>5</td>
  * </tr>
  * </table>
- * <h3>Callback Status</h3>
- * <table>
- * <thead>
- * <tr>
- * <td>Created</td>
- * <td>Pending</td>
- * <td>Finished</td>
- * <td>Failed</td>
- * </tr>
- * </thead>
- * <tr>
- * <td>0</td>
- * <td>1</td>
- * <td>2</td>
- * <td>3</td>
- * </tr>
- * </table>
  *
  */
 class DepositController extends Controller
