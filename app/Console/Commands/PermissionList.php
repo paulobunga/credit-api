@@ -46,7 +46,11 @@ class PermissionList extends Command
             if ($prefix != 'admin') {
                 continue;
             }
-            if (Str::contains($route, '.auth.')) {
+            $allow_permission = [
+                '.auth.',
+                '.notifications.'
+            ];
+            if (preg_match('(' . implode('|', $allow_permission) . ')', $route)) {
                 continue;
             }
             Permission::firstOrCreate(['name' => $route]);
