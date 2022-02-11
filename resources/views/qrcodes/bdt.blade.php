@@ -68,7 +68,7 @@
                     </div>
                 </div>
                 <div class="py-4 grid grid-flow-col grid-cols-3 gap-x-2 items-center">
-                    <div class="col-span-1">BKash Agent</div>
+                    <div class="col-span-1">{{ $channel->name }} Agent</div>
                     <div class="font-bold col-span-1">
                         {{ $attributes['wallet_number'] }}
                     </div>
