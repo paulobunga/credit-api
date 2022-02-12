@@ -75,20 +75,20 @@ class ResellerController extends Controller
     {
         $this->validate($request, [
             'level' => 'required|between:' . implode(',', [
-                Reseller::LEVEL['HOME'],
+                Reseller::LEVEL['HOUSE'],
                 Reseller::LEVEL['AGENT'],
             ]),
             'upline' => [
-                'required_unless:level,' . Reseller::LEVEL['HOME'],
+                'required_unless:level,' . Reseller::LEVEL['HOUSE'],
             ],
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
             'phone' => 'required',
-            'currency' => ['required_if:level,' . Reseller::LEVEL['HOME'], new ExistCurrency()],
+            'currency' => ['required_if:level,' . Reseller::LEVEL['HOUSE'], new ExistCurrency()],
             'password' => 'required|confirmed',
         ]);
 
-        if ($request->level != Reseller::LEVEL['HOME']) {
+        if ($request->level != Reseller::LEVEL['HOUSE']) {
             $upline = Reseller::findOrFail($request->upline);
             $uplines = array_merge($upline->uplines, [$upline->id]);
             $currency = $upline->currency;

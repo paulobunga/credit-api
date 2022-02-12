@@ -35,8 +35,8 @@ class ResellerSeeder extends Seeder
                     'name' => $this->getName($currency, $level),
                     'username' => $this->getUserName($currency, $level),
                     'phone' => $this->faker->phoneNumber,
-                    'upline_id' => $level == Reseller::LEVEL['HOME'] ? 0 : $agent->id,
-                    'uplines' => $level == Reseller::LEVEL['HOME'] ?
+                    'upline_id' => $level == Reseller::LEVEL['HOUSE'] ? 0 : $agent->id,
+                    'uplines' => $level == Reseller::LEVEL['HOUSE'] ?
                         [] :
                         array_merge($agent->uplines, [$agent->id]),
                     'level' =>  $level,
@@ -141,7 +141,7 @@ class ResellerSeeder extends Seeder
         $name = '';
         $currency = strtolower($currency);
         switch ($level) {
-            case Reseller::LEVEL['HOME']:
+            case Reseller::LEVEL['HOUSE']:
                 $name = 'House';
                 break;
             case Reseller::LEVEL['SUPER_AGENT']:
@@ -161,7 +161,7 @@ class ResellerSeeder extends Seeder
     {
         $currency = strtolower($currency);
         switch ($level) {
-            case Reseller::LEVEL['HOME']:
+            case Reseller::LEVEL['HOUSE']:
                 return  "{$currency}_house@gmail.com";
             case Reseller::LEVEL['SUPER_AGENT']:
                 return  "{$currency}_super_agent@gmail.com";

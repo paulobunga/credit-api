@@ -66,7 +66,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     ];
 
     public const LEVEL = [
-        'HOME' => 0,
+        'HOUSE' => 0,
         'SUPER_AGENT' => 1,
         'MASTER_AGENT' => 2,
         'AGENT' => 3
