@@ -8,7 +8,6 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Dingo\Api\Http\Request;
 use App\Models\PaymentChannel;
-use App\Rules\ExistCurrency;
 
 class PaymentChannelController extends Controller
 {
@@ -52,7 +51,7 @@ class PaymentChannelController extends Controller
             ],
             'payment_methods' => 'required|array',
             'payment_methods.*' => 'in:' . implode(',', PaymentChannel::METHOD),
-            'currency' => ['required', new ExistCurrency()],
+            'currency' => 'required|currency',
             'banks' => 'array',
             'banks.*' => 'exists:banks,id',
             'attributes' => 'required|array',
@@ -86,7 +85,7 @@ class PaymentChannelController extends Controller
             ],
             'payment_methods' => 'required|array',
             'payment_methods.*' => 'in:' . implode(',', PaymentChannel::METHOD),
-            'currency' => ['required', new ExistCurrency()],
+            'currency' => 'required|currency',
             'banks' => 'array',
             'banks.*' => 'exists:banks,id',
             'attributes' => 'required|array',

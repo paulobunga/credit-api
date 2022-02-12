@@ -33,16 +33,29 @@ class CurrencySetting extends Settings
         return 0;
     }
 
-    public function getExpiredMinutes($currency)
+    public function getExpiredMinutes(string $currency)
     {
-        $c = $this->currency[$currency] ?? null;
-        return isset($c) ? $c['expired_minutes'] : 0;
+        return $this->has($currency) ? $this->currency[$currency]['expired_minutes'] : 0;
     }
 
-    public function checkExsit($currency)
+    /**
+     * has currency
+     *
+     * @param  string $currency
+     * @return bool
+     */
+    public function has(string $currency): bool
     {
-        $c = $this->currency[$currency] ?? null;
+        return isset($this->currency[$currency]);
+    }
 
-        return isset($c);
+    /**
+     * Get supported currency list
+     *
+     * @return array
+     */
+    public function getCurrency(): array
+    {
+        return array_keys($this->currency);
     }
 }

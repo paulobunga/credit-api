@@ -5,6 +5,7 @@ namespace App\Providers;
 use Knuckles\Scribe\Scribe;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -58,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
             });
         }
         $this->bootBladeComponents();
+        $this->registerValidationRules();
     }
 
     protected function bootBladeComponents()
@@ -66,5 +68,13 @@ class AppServiceProvider extends ServiceProvider
         Blade::component('x-stepper', \App\View\Components\Stepper::class);
         Blade::component('x-alert', \App\View\Components\Alert::class);
         Blade::component('x-timer', \App\View\Components\Timer::class);
+    }
+
+    protected function registerValidationRules()
+    {
+        Validator::extend('currency', '\App\Rules\Currency@passes');
+        Validator::extend('keysin', function ($attribute, $value, $parameters, $validator) {
+            return (new \App\Rules\KeysIn($parameters))->passes($attribute, $value);
+        });
     }
 }

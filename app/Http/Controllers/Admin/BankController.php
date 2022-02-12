@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Rules\ExistCurrency;
 
 /**
  * Controller of CRUD bank
@@ -55,7 +54,7 @@ class BankController extends Controller
         $this->validate($request, [
             'ident' => 'required|unique:banks',
             'name' => 'required',
-            'currency' => ['required', new ExistCurrency()],
+            'currency' => 'required|currency',
             'status' => 'boolean',
         ]);
         $bank = $this->model::create([
@@ -79,7 +78,7 @@ class BankController extends Controller
         $this->validate($request, [
             'ident' => "required|unique:banks,ident,{$bank->id}",
             'name' => 'required',
-            'currency' => ['required', new ExistCurrency()],
+            'currency' => 'required|currency',
             'status' => 'boolean',
         ]);
 

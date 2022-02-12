@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
-use App\Rules\ExistCurrency;
 
 class SettingController extends Controller
 {
@@ -67,7 +66,7 @@ class SettingController extends Controller
                 'max_downline_slot' => 'required|numeric|gte:default_downline_slot',
             ],
             'currency' => [
-                'currency' => ['array', new ExistCurrency()],
+                'currency' => 'array|keysin:' . implode(',', app('settings.currency')->getCurrency()),
                 'currency.*.agent_percentage' => 'required|numeric',
                 'currency.*.master_agent_percentage' => 'required|numeric',
                 'currency.*.referrer_percentage' => 'required|numeric',
