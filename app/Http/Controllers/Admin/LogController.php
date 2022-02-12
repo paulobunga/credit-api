@@ -68,7 +68,7 @@ class LogController extends Controller
         $query_str = $request->get('queryStr', null) ? escape_like($request->queryStr) : null;
 
         $logs = QueryBuilder::for($this->model->setTable($table)->newQuery())
-            ->when($request->get('level', null), function ($query) use ($request) {
+            ->when($request->level != "total", function ($query) use ($request) {
                 $query->where('level', $request->level);
             })
             ->when($query_str, function ($query) use ($query_str) {
