@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class MerchantWhiteList extends Model
 {
     public $timestamps = false;
-    
+
     protected $fillable = [
         'merchant_id',
         'api',

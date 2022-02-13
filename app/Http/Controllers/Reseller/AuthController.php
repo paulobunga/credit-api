@@ -67,7 +67,7 @@ class AuthController extends Controller
             'name' => 'required|unique:resellers,name',
             'username' => 'required|unique:resellers,username',
             'phone' => 'required|unique:resellers,phone',
-            'currency' => 'required|in:' . implode(',', array_keys($cs->currency)),
+            'currency' => 'required|currency',
             'password' => 'required|confirmed',
         ]);
         $currency_setting = app(\App\Settings\CurrencySetting::class);
@@ -76,7 +76,7 @@ class AuthController extends Controller
         $cs = $currency_setting->currency[$request->currency];
 
         Reseller::create([
-            'level' => Reseller::LEVEL['RESELLER'],
+            'level' => Reseller::LEVEL['AGENT'],
             'upline' => 0,
             'uplines' => [],
             'name' => $request->name,
@@ -87,9 +87,9 @@ class AuthController extends Controller
             'payin' => [
                 'commission_percentage' => $currency_setting->getCommissionPercentage(
                     $request->currency,
-                    Reseller::LEVEL['RESELLER']
+                    Reseller::LEVEL['AGENT']
                 ),
-                'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
+                'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['AGENT']),
                 'status' => true,
                 'auto_sms_approval' => false,
                 'min' => $cs['payin']['min'],
@@ -98,15 +98,15 @@ class AuthController extends Controller
             'payout' => [
                 'commission_percentage' => $currency_setting->getCommissionPercentage(
                     $request->currency,
-                    Reseller::LEVEL['RESELLER']
+                    Reseller::LEVEL['AGENT']
                 ),
-                'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['RESELLER']),
+                'pending_limit' => $reseller_setting->getDefaultPendingLimit(Reseller::LEVEL['AGENT']),
                 'status' => true,
                 'daily_amount_limit' => 50000,
                 'min' => $cs['payout']['min'],
                 'max' => $cs['payout']['max'],
             ],
-            'downline_slot' => $agent_setting->getDefaultDownLineSlot(Reseller::LEVEL['RESELLER']),
+            'downline_slot' => $agent_setting->getDefaultDownLineSlot(Reseller::LEVEL['AGENT']),
             'status' =>  Reseller::STATUS['INACTIVE'],
         ]);
 

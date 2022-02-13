@@ -19,6 +19,13 @@ class LogController extends Controller
         $this->model = new LogModel();
     }
 
+    /**
+     * Get log list
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @method GET
+     * @return json
+     */
     public function index(Request $request)
     {
         $tables = LogModel::getAllTables();
@@ -40,12 +47,13 @@ class LogController extends Controller
 
         return ['data' => $results];
     }
-    
+
     /**
      * Return the detail logs by date
      *
      * @param  mixed $request
-     * @return array
+     * @method GET
+     * @return json
      */
     public function show(Request $request)
     {
@@ -57,21 +65,23 @@ class LogController extends Controller
             'level' => 'required|in:' . implode(',', LogModel::LEVELS),
         ]);
 
-        $query_str = escape_like($request->queryStr);
+        $query_str = $request->get('queryStr', null) ? escape_like($request->queryStr) : null;
 
         $logs = QueryBuilder::for($this->model->setTable($table)->newQuery())
             ->when($request->level != "total", function ($query) use ($request) {
                 $query->where('level', $request->level);
             })
-            ->when($request->get('queryStr', null), function ($query) use ($query_str) {
-                $query->where('message', 'like', '%' . $query_str . '%');
-                $query->orWhere('context', 'like', '%' . $query_str . '%');
+            ->when($query_str, function ($query) use ($query_str) {
+                $query->where(function ($query) use ($query_str) {
+                    $query->where('message', 'like', '%' . $query_str . '%')
+                        ->orWhere('context', 'like', '%' . $query_str . '%');
+                });
             })
             ->orderBy('created_at', 'desc');
 
         if ($query_str) {
             $stats = QueryBuilder::for($this->model->setTable($table)->newQuery())
-                ->when($request->get('queryStr', null), function ($query) use ($query_str) {
+                ->when($query_str, function ($query) use ($query_str) {
                     $query->where('message', 'like', '%' . $query_str . '%');
                     $query->orWhere('context', 'like', '%' . $query_str . '%');
                 })
@@ -88,12 +98,19 @@ class LogController extends Controller
                 ")
                 ->first();
 
-            return $this->paginate($logs, $this->transformer, [ "levels" => $stats ]);
+            return $this->paginate($logs, $this->transformer, ["levels" => $stats]);
         }
 
         return $this->paginate($logs, $this->transformer);
     }
 
+    /**
+     * Delete log table by name
+     *
+     * @param  \Dingo\Api\Http\Request $request
+     * @method DELETE
+     * @return json
+     */
     public function destroy(Request $request)
     {
         $table = $this->parameters('log');

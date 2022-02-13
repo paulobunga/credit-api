@@ -21,21 +21,41 @@ class CurrencySetting extends Settings
             return 0;
         }
         switch ($level) {
-            case Reseller::LEVEL['REFERRER']:
+            case Reseller::LEVEL['HOUSE']:
                 return $c['referrer_percentage'];
-            case Reseller::LEVEL['AGENT_MASTER']:
+            case Reseller::LEVEL['SUPER_AGENT']:
                 return $c['master_agent_percentage'];
-            case Reseller::LEVEL['AGENT']:
+            case Reseller::LEVEL['MASTER_AGENT']:
                 return $c['agent_percentage'];
-            case Reseller::LEVEL['RESELLER']:
+            case Reseller::LEVEL['AGENT']:
                 return $c['reseller_percentage'];
         }
         return 0;
     }
 
-    public function getExpiredMinutes($currency)
+    public function getExpiredMinutes(string $currency)
     {
-        $c = $this->currency[$currency] ?? null;
-        return isset($c) ? $c['expired_minutes'] : 0;
+        return $this->has($currency) ? $this->currency[$currency]['expired_minutes'] : 0;
+    }
+
+    /**
+     * has currency
+     *
+     * @param  string $currency
+     * @return bool
+     */
+    public function has(string $currency): bool
+    {
+        return isset($this->currency[$currency]);
+    }
+
+    /**
+     * Get supported currency list
+     *
+     * @return array
+     */
+    public function getCurrency(): array
+    {
+        return array_keys($this->currency);
     }
 }

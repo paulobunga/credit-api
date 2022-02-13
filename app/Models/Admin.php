@@ -20,8 +20,11 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class Admin extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
-    use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
+    use Authenticatable;
+    use Authorizable;
     use Notifiable;
+    use HasFactory;
+    use HasJWTSubject;
     use HasRoles;
 
     protected $fillable = [
@@ -58,5 +61,10 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
     public function devices()
     {
         return $this->morphMany(Device::class, 'user');
+    }
+
+    public function receivesBroadcastNotificationsOn()
+    {
+        return 'App.Models.Admin.Notify';
     }
 }

@@ -238,7 +238,7 @@ class ExecuteSql extends Command
                     'commission_percentage' => $r->commission_percentage ??
                         $cs->getCommissionPercentage($r->currency, $r->level),
                     'pending_limit' => $r->pending_limit ?? $rs->getDefaultPendingLimit($r->level),
-                    'status' => $r->level == Reseller::LEVEL['RESELLER']
+                    'status' => $r->level == Reseller::LEVEL['AGENT']
                 ];
                 $r->save();
             }
@@ -252,7 +252,7 @@ class ExecuteSql extends Command
                     'commission_percentage' => $r->commission_percentage ??
                         $cs->getCommissionPercentage($r->currency, $r->level),
                     'pending_limit' => $r->pending_limit ?? $rs->getDefaultPendingLimit($r->level),
-                    'status' => $r->level == Reseller::LEVEL['RESELLER'],
+                    'status' => $r->level == Reseller::LEVEL['AGENT'],
                 ];
                 $r->save();
             }
@@ -659,7 +659,7 @@ class ExecuteSql extends Command
             }
         }
         // assign agent to default groups
-        foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $agent) {
+        foreach (Reseller::where('level', Reseller::LEVEL['AGENT'])->get() as $agent) {
             $agent->assignTeams([
                 'name' => 'Default',
                 'type' => Team::TYPE['PAYIN'],
@@ -684,5 +684,10 @@ class ExecuteSql extends Command
                 ]);
             }
         }
+    }
+
+    protected function addActivityLogTable()
+    {
+        (new \CreateTableActivityLogs())->up();
     }
 }

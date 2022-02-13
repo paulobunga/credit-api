@@ -18,12 +18,6 @@ class BDT extends Base
                 r.currency AS currency,
                 COUNT(md.id) AS pending,
                 COALESCE(SUM(md.amount),0) AS pending_amount,
-                SUM(
-                    CASE
-                        WHEN md.amount = {$request->amount} THEN 1
-                        ELSE 0 
-                    END 
-                ) AS same_amount,
                 r.payin->>'$.pending_limit' AS pending_limit 
             FROM
                 reseller_bank_cards AS rbc
@@ -64,8 +58,7 @@ class BDT extends Base
                 JOIN reseller_pending USING ( reseller_id ) 
             WHERE total_pending < pending_limit
                 AND total_pending_amount + {$request->amount} <= credit
-                AND channel = '{$request->channel}' 
-                AND same_amount = 0";
+                AND channel = '{$request->channel}'";
     }
 
     public static function matchPayin($deposit, $channel)

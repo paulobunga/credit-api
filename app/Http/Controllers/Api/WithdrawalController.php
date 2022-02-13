@@ -42,23 +42,6 @@ use App\Transformers\Api\WithdrawalTransformer;
  * <td>5</td>
  * </tr>
  * </table>
- * <h3>Callback Status</h3>
- * <table>
- * <thead>
- * <tr>
- * <td>Created</td>
- * <td>Pending</td>
- * <td>Finished</td>
- * <td>Failed</td>
- * </tr>
- * </thead>
- * <tr>
- * <td>0</td>
- * <td>1</td>
- * <td>2</td>
- * <td>3</td>
- * </tr>
- * </table>
  *
  */
 class WithdrawalController extends Controller
@@ -385,7 +368,7 @@ class WithdrawalController extends Controller
 
         $resellers = DB::select($sql, [
             'r_status' => Reseller::STATUS['ACTIVE'],
-            'r_level' => Reseller::LEVEL['RESELLER'],
+            'r_level' => Reseller::LEVEL['AGENT'],
             'r_payout_status' => ResellerPayOut::STATUS['ACTIVE'],
             'mw_status' => MerchantWithdrawal::STATUS['PENDING'],
             'md_status_0' => MerchantDeposit::STATUS['APPROVED'],

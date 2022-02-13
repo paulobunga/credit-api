@@ -17,7 +17,10 @@ use App\Trait\HasTeams;
 
 class Merchant extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
-    use Authenticatable, Authorizable, HasFactory, HasJWTSubject;
+    use Authenticatable;
+    use Authorizable;
+    use HasFactory;
+    use HasJWTSubject;
     use Notifiable;
     use HasTeams;
     use MerchantObserver;

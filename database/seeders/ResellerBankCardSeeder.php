@@ -21,7 +21,7 @@ class ResellerBankCardSeeder extends Seeder
      */
     public function run()
     {
-        foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
+        foreach (Reseller::where('level', Reseller::LEVEL['AGENT'])->get() as $reseller) {
             foreach (PaymentChannel::where('currency', $reseller->currency)->get() as $ch) {
                 $card = new ResellerBankCard([
                     'reseller_id' => $reseller->id,

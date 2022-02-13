@@ -2,25 +2,27 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Lumen\Auth\Authorizable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use App\Trait\HasJWTSubject;
-use App\DTO\ResellerPayIn;
-use App\DTO\ResellerPayOut;
 use App\Trait\HasTeams;
 use App\Trait\HasOnline;
+use App\DTO\ResellerPayIn;
+use App\DTO\ResellerPayOut;
 use App\Trait\UserTimezone;
+use App\Trait\HasJWTSubject;
 use App\Observers\ResellerObserver;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Lumen\Auth\Authorizable;
+use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 class Reseller extends Model implements AuthenticatableContract, AuthorizableContract, JWTSubject
 {
-    use Authenticatable, Authorizable, HasJWTSubject;
+    use Authenticatable;
+    use Authorizable;
+    use HasJWTSubject;
     use Notifiable;
     use UserTimezone;
     use HasOnline;
@@ -64,10 +66,10 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
     ];
 
     public const LEVEL = [
-        'REFERRER' => 0,
-        'AGENT_MASTER' => 1,
-        'AGENT' => 2,
-        'RESELLER' => 3
+        'HOUSE' => 0,
+        'SUPER_AGENT' => 1,
+        'MASTER_AGENT' => 2,
+        'AGENT' => 3
     ];
 
     public const STATUS = [
@@ -103,7 +105,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     public function assignTeams(...$teams)
     {
-        if ($this->level != static::LEVEL['RESELLER']) {
+        if ($this->level != static::LEVEL['AGENT']) {
             return;
         }
         return $this->_assignTeams(...$teams);
@@ -111,7 +113,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     public function syncTeams(...$teams)
     {
-        if ($this->level != static::LEVEL['RESELLER']) {
+        if ($this->level != static::LEVEL['AGENT']) {
             return;
         }
         return $this->_syncTeams(...$teams);
@@ -119,7 +121,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     public function removeTeam($team)
     {
-        if ($this->level != static::LEVEL['RESELLER']) {
+        if ($this->level != static::LEVEL['AGENT']) {
             return;
         }
         return $this->_removeTeam($team);

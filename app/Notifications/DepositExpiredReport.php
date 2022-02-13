@@ -2,17 +2,20 @@
 
 namespace App\Notifications;
 
+use App\Models\MerchantDeposit;
 use Carbon\Carbon;
 
 class DepositExpiredReport extends Base
 {
     protected $reports = [];
+    protected $notify_time;
 
-    public function __construct($reports)
+    public function __construct($reports, $notify_time)
     {
         parent::__construct();
 
         $this->reports = $reports;
+        $this->notify_time = $notify_time;
     }
 
     /**
@@ -32,7 +35,7 @@ class DepositExpiredReport extends Base
      */
     protected function getLink(): string
     {
-        return admin_url('/notifications?id=' . $this->getNotifyId());
+        return admin_url('/merchant_deposits?status=' . MerchantDeposit::STATUS['EXPIRED'] . '&updated_at_between=' . $this->notify_time . ',' . $this->notify_time);
     }
 
     /**
@@ -55,10 +58,10 @@ class DepositExpiredReport extends Base
         }
 
         return [
-          'id' => $this->getNotifyId(),
-          'title' => 'Payin Expired',
-          'body' => $body,
-          'time' => Carbon::now()->toDateTimeString(),
+            'id'    => \Illuminate\Support\Str::uuid(),
+            'title' => 'Payin Expired',
+            'body'  => $body,
+            'time'  => Carbon::now()->toDateTimeString()
         ];
     }
 }

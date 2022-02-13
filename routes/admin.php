@@ -1,10 +1,12 @@
 <?php
+
 $api->group([
     'namespace' => 'App\Http\Controllers\Admin',
     'prefix' => 'admin',
     'as' => 'admin',
     'middleware' => [
         "domain:" . env('PRIVATE_DOMAIN'),
+        'activity_log:admin'
     ],
 ], function ($api) {
     $api->post('/auth/login', ['as' => 'auth.login', 'uses' => 'AuthController@login']);
@@ -21,6 +23,8 @@ $api->group([
         $api->put('/auth/reset_password', ['as' => 'auth.reset_password', 'uses' => 'AuthController@resetPassword']);
         $api->post('/auth/onesignal', ['as' => 'auth.onesignal', 'uses' => 'AuthController@onesignal']);
         $api->post('/auth/channel', ['as' => 'auth.channel', 'uses' => 'AuthController@channel']);
+        $api->resource('notifications', 'NotificationController', ['only' => ['index', 'destroy']]);
+        $api->post("/notifications/mark", ['uses' => "NotificationController@mark", 'as' => "notifications.mark"]);
 
         $api->group([
             'middleware' => [
@@ -113,9 +117,7 @@ $api->group([
             $api->get('/teams/index/genre', ['uses' => "TeamController@genre", 'as' => "teams.genre"]);
             $api->put('/teams/member/{team}', ['uses' => "TeamController@member", 'as' => "teams.member"]);
 
-            $api->resource('notifications', 'NotificationController', ['only' => ['index', 'destroy']]);
-            $api->get("/notifications/unread", ['uses' => "NotificationController@unread", 'as' => "notifications.unread"]);
-            $api->post("/notifications/mark", ['uses' => "NotificationController@mark", 'as' => "notifications.mark"]);
+            $api->resource('activity_logs', 'ActivityLogController', ['only' => ['index', 'destroy']]);
         });
     });
 });

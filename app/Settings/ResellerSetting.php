@@ -19,7 +19,7 @@ class ResellerSetting extends Settings
     public function getDefaultPendingLimit($level)
     {
         switch ($level) {
-            case Reseller::LEVEL['RESELLER']:
+            case Reseller::LEVEL['AGENT']:
                 return $this->default_pending_limit;
             default:
                 return 0;

@@ -77,8 +77,7 @@ class TeamController extends Controller
             'name' => 'required',
             'type' => 'required|in:' .
                 implode(',', $this->model::TYPE),
-            'currency' => 'required|in:' .
-                implode(',', array_keys(app('settings.currency')->currency)),
+            'currency' => 'required|currency',
             'description' => 'required',
         ]);
 

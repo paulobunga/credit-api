@@ -111,11 +111,13 @@ class MerchantWithdrawal extends Model
 
     public function getSlipUrlAttribute()
     {
-        if (!in_array($this->attributes['status'], [
-            self::STATUS['FINISHED'],
-            self::STATUS['APPROVED'],
-            self::STATUS['CANCELED'],
-        ])) {
+        if (
+            !in_array($this->attributes['status'], [
+                self::STATUS['FINISHED'],
+                self::STATUS['APPROVED'],
+                self::STATUS['CANCELED'],
+            ])
+        ) {
             return null;
         }
         return  Storage::disk('s3')->temporaryUrl(

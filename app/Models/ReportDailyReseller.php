@@ -10,7 +10,7 @@ class ReportDailyReseller extends Model
     use UserTimezone;
 
     public $timestamps = false;
-    
+
     protected $fillable = [
         'reseller_id',
         'start_at',

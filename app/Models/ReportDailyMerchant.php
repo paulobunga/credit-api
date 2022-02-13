@@ -28,7 +28,7 @@ class ReportDailyMerchant extends Model
         'end_at'  => 'datetime:Y-m-d H:i:s',
         'created_at'  => 'datetime:Y-m-d H:i:s',
     ];
-    
+
     public function merchant()
     {
         return $this->belongsTo(Merchant::class);

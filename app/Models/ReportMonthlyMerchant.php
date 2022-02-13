@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class ReportMonthlyMerchant extends Model
 {
     use HasFactory;
-    
+
     public $timestamps = false;
 
     protected $fillable = [

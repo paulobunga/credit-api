@@ -35,8 +35,8 @@ class ResellerSeeder extends Seeder
                     'name' => $this->getName($currency, $level),
                     'username' => $this->getUserName($currency, $level),
                     'phone' => $this->faker->phoneNumber,
-                    'upline_id' => $level == Reseller::LEVEL['REFERRER'] ? 0 : $agent->id,
-                    'uplines' => $level == Reseller::LEVEL['REFERRER'] ?
+                    'upline_id' => $level == Reseller::LEVEL['HOUSE'] ? 0 : $agent->id,
+                    'uplines' => $level == Reseller::LEVEL['HOUSE'] ?
                         [] :
                         array_merge($agent->uplines, [$agent->id]),
                     'level' =>  $level,
@@ -68,13 +68,13 @@ class ResellerSeeder extends Seeder
         $setting = $c->currency['VND'];
         $vnd_agent = Reseller::where([
             'currency' => 'VND',
-            'level' => Reseller::LEVEL['AGENT']
+            'level' => Reseller::LEVEL['MASTER_AGENT']
         ])->first();
         // create test VND
         $agent = \App\Models\Reseller::create([
             'upline_id' => $vnd_agent->id,
             'uplines' => array_merge($vnd_agent->uplines, [$vnd_agent->id]),
-            'level' => Reseller::LEVEL['RESELLER'],
+            'level' => Reseller::LEVEL['AGENT'],
             'name' => 'Test Reseller',
             'username' => 'reseller@gmail.com',
             'password' => 'P@ssw0rd',
@@ -83,7 +83,7 @@ class ResellerSeeder extends Seeder
             'credit' => 0,
             'coin' => 0,
             'payin' => [
-                'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['RESELLER']),
+                'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['AGENT']),
                 'pending_limit' => $rs->default_pending_limit,
                 'status' => true,
                 'auto_sms_approval' => false,
@@ -91,7 +91,7 @@ class ResellerSeeder extends Seeder
                 'min' => $setting['payin']['min']
             ],
             'payout' => [
-                'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['RESELLER']),
+                'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['AGENT']),
                 'pending_limit' => $rs->default_pending_limit,
                 'status' => true,
                 'daily_amount_limit' => 50000,
@@ -104,7 +104,7 @@ class ResellerSeeder extends Seeder
         $this->assignTeam($agent);
 
         // create reseller deposit
-        foreach (Reseller::where('level', Reseller::LEVEL['RESELLER'])->get() as $reseller) {
+        foreach (Reseller::where('level', Reseller::LEVEL['AGENT'])->get() as $reseller) {
             ResellerDeposit::create([
                 'reseller_id' => $reseller->id,
                 'audit_admin_id' => 1,
@@ -141,16 +141,16 @@ class ResellerSeeder extends Seeder
         $name = '';
         $currency = strtolower($currency);
         switch ($level) {
-            case Reseller::LEVEL['REFERRER']:
+            case Reseller::LEVEL['HOUSE']:
                 $name = 'House';
                 break;
-            case Reseller::LEVEL['AGENT_MASTER']:
+            case Reseller::LEVEL['SUPER_AGENT']:
                 $name = 'Super Agent';
                 break;
-            case Reseller::LEVEL['AGENT']:
+            case Reseller::LEVEL['MASTER_AGENT']:
                 $name = 'Master Agent';
                 break;
-            case Reseller::LEVEL['RESELLER']:
+            case Reseller::LEVEL['AGENT']:
                 $name = 'Agent';
                 break;
         }
@@ -161,11 +161,11 @@ class ResellerSeeder extends Seeder
     {
         $currency = strtolower($currency);
         switch ($level) {
-            case Reseller::LEVEL['REFERRER']:
+            case Reseller::LEVEL['HOUSE']:
                 return  "{$currency}_house@gmail.com";
-            case Reseller::LEVEL['AGENT_MASTER']:
+            case Reseller::LEVEL['SUPER_AGENT']:
                 return  "{$currency}_super_agent@gmail.com";
-            case Reseller::LEVEL['AGENT']:
+            case Reseller::LEVEL['MASTER_AGENT']:
                 return  "{$currency}_master_agent@gmail.com";
             default:
                 return  "{$currency}_agent@gmail.com";

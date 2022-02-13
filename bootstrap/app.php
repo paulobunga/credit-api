@@ -69,6 +69,7 @@ $app->configure('query-builder');
 $app->configure('view');
 $app->configure('broadcasting');
 $app->configure('settings');
+$app->configure('activitylog');
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -88,6 +89,7 @@ $app->routeMiddleware([
     'domain' =>  \App\Http\Middleware\CheckDomain::class,
     'whitelist' =>  \App\Http\Middleware\WhiteList::class,
     'role_or_permission' => \App\Http\Middleware\RoleOrPermissionMiddleware::class,
+    'activity_log' => \App\Http\Middleware\ActivityLog::class,
 ]);
 
 /*
@@ -104,9 +106,10 @@ $app->routeMiddleware([
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 $app->register(Spatie\Permission\PermissionServiceProvider::class);
+$app->register(Spatie\Activitylog\ActivitylogServiceProvider::class);
+$app->register(Spatie\QueryBuilder\QueryBuilderServiceProvider::class);
 $app->register(Spatie\LaravelSettings\LaravelSettingsServiceProvider::class);
 $app->register(Fruitcake\Cors\CorsServiceProvider::class);
-$app->register(Spatie\QueryBuilder\QueryBuilderServiceProvider::class);
 $app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
 $app->register(SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);

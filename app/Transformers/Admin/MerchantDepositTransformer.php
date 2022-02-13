@@ -30,7 +30,7 @@ class MerchantDepositTransformer extends TransformerAbstract
             'callback_url' => $m->callback_url,
             'attempts' => $m->attempts,
             'callback_status' => $m->callback_status,
-            'created_at' => (string )$m->created_at,
+            'created_at' => (string) $m->created_at,
             'updated_at' => (string) $m->updated_at,
         ];
     }

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Dingo\Api\Http\Request;
 use Carbon\Carbon;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Database\Eloquent\Builder;
 
 class NotificationController extends Controller
 {
@@ -20,19 +23,19 @@ class NotificationController extends Controller
      */
     public function index(Request $request)
     {
-      return $this->response->collection(auth()->user()->notifications, $this->transformer);
-    }
-
-
-  /**
-   * Get unread notification list
-   * @param \Dingo\Api\Http\Request $request
-   * @method GET
-   * @return json
-   */
-    public function unread(Request $request)
-    {
-      return $this->response->collection(auth()->user()->unreadNotifications, $this->transformer);
+        $notification = QueryBuilder::for($this->model)
+        ->allowedFilters([
+          AllowedFilter::callback('unread', function (Builder $query, $value) {
+            if ($value) {
+                $query->whereNull('read_at');
+            } else {
+                $query->whereNotNull('read_at');
+            }
+          })
+        ])
+        ->where('notifiable_id', auth()->id())
+        ->where('notifiable_type', 'admin');
+        return $this->paginate($notification, $this->transformer);
     }
 
 
@@ -54,7 +57,7 @@ class NotificationController extends Controller
         } else {
             $notifications->update(['read_at' => null]);
         }
-        
+
         return $this->response->collection($notifications->get(), $this->transformer);
     }
 
@@ -67,7 +70,7 @@ class NotificationController extends Controller
     {
         $notification = auth()->user()->notifications()->where('id', $this->parameters('notification'))->first();
         if ($notification->count() === 0) {
-          throw new \Exception("Notification not found!");
+            throw new \Exception("Notification not found!");
         }
         $notification->delete();
 
