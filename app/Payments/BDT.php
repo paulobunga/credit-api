@@ -2,6 +2,7 @@
 
 namespace App\Payments;
 
+use Carbon\Carbon;
 use App\Models\ResellerSms;
 use App\Models\MerchantDeposit;
 
@@ -66,12 +67,13 @@ class BDT extends Base
         $sms = ResellerSms::where(
             [
                 'reseller_id' => $deposit->reseller->id,
-                'status' => ResellerSms::STATUS['PENDING']
+                'status' => ResellerSms::STATUS['PENDING'],
             ],
         )->whereIn(
             'address',
             $channel->payin->sms_addresses
-        )->orderByDesc('id')->get();
+        )->where('created_at', '>=', Carbon::now()->subHours(24))
+        ->orderByDesc('id')->get();
 
         $count = 0;
         $match = null;
