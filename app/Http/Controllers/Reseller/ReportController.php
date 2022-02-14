@@ -44,7 +44,7 @@ class ReportController extends Controller
             \App\Transformers\Reseller\ReportTransformer::class
         );
     }
-    
+
     /**
      * Get Transaction Summary of each bank cards of agent.
      *
@@ -62,7 +62,6 @@ class ReportController extends Controller
             $date_range = explode(',', $request->filter['date_between']);
             $start_date = trim($date_range[0]);
             $end_date = trim($date_range[1]);
-
         } else {
             $start_date = Carbon::now()->startOfDay();
             $end_date = Carbon::now()->endOfDay();
@@ -89,7 +88,7 @@ class ReportController extends Controller
                         AND t.user_type = :user_type
                         AND t.user_id = rbc.reseller_id
                 WHERE
-                    md.status = :md_status
+                    md.status IN (:md_status, :md_status1, :md_status2)
                     AND rbc.reseller_id = :r_id
                     AND CONVERT_TZ(
                         md.created_at,
@@ -199,7 +198,7 @@ class ReportController extends Controller
                 attributes_keys,
                 attributes
         ";
-        
+
         $summary = DB::select($sql, [
             ":tx_type" => Transaction::TYPE["SYSTEM_TOPUP_COMMISSION"],
             ":tx_type_2" => Transaction::TYPE["SYSTEM_TOPUP_COMMISSION"],
@@ -208,6 +207,8 @@ class ReportController extends Controller
             ":r_id" => auth()->id(),
             ":r_id_2" => auth()->id(),
             ":md_status" => MerchantDeposit::STATUS['APPROVED'],
+            ":md_status1" => MerchantDeposit::STATUS['ENFORCED'],
+            ":md_status2" => MerchantDeposit::STATUS['MAKEUP'],
             ":mw_status" => MerchantWithdrawal::STATUS['APPROVED']
         ]);
 
