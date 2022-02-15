@@ -79,6 +79,7 @@ class CreateTableResellers extends Migration
             $table->string('platform', 10);
             $table->string('address', 30);
             $table->string('trx_id', 20)->default('');
+            $table->decimal('amount', 14, 4);
             $table->string('sim_num', 20)->default('');
             $table->string('body', 1024);
             $table->unsignedTinyInteger('status')->default(0)->comment('0:Pending,1:Match,2:UnMatch');

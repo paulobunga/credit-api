@@ -59,6 +59,7 @@ class MerchantDepositSeeder extends Seeder
                         'platform' => 'Android',
                         'address' => $d->paymentChannel->payin->sms_addresses[0],
                         'trx_id' => $trx_id,
+                        'amount' => $d->amount,
                         'sim_num' => $reseller_bank_card->attributes['wallet_number'],
                         'body' => __('sms.' . $d->paymentChannel->name, [
                             'amount' => $d->amount,

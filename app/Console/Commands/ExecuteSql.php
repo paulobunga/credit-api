@@ -690,4 +690,13 @@ class ExecuteSql extends Command
     {
         (new \CreateTableActivityLogs())->up();
     }
+
+    protected function addSMSAmount()
+    {
+        if (!Schema::hasColumn('reseller_sms', 'amount')) {
+            Schema::table('reseller_sms', function (Blueprint $table) {
+                $table->decimal('amount', 14, 4)->after('trx_id');
+            });
+        }
+    }
 }

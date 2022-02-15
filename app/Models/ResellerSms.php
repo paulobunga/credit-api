@@ -18,6 +18,7 @@ class ResellerSms extends Model
         'platform',
         'address',
         'trx_id',
+        'amount',
         'sim_num',
         'body',
         'status',
@@ -63,7 +64,7 @@ class ResellerSms extends Model
             if (empty($data)) {
                 continue;
             }
-            if (!empty($data['trx_id'])) {
+            if (!empty($data['trx_id']) && !empty($data['amount'])) {
                 break;
             }
         }
