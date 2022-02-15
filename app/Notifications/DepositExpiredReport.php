@@ -33,7 +33,7 @@ class DepositExpiredReport extends Base
      */
     protected function getLink(): string
     {
-        return admin_url('/merchant_deposits?status=' . MerchantDeposit::STATUS['EXPIRED'] . '&reseller_name=' . $this->reports["agent"] . '&updated_at_between=' . $this->reports["expiry_time"]["from"] . ',' . $this->reports["expiry_time"]["to"]);
+        return admin_url('/merchant_deposits?status=' . MerchantDeposit::STATUS['EXPIRED'] . '&reseller_name=' . $this->reports["agent"]);
     }
 
     /**

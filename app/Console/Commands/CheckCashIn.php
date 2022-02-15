@@ -83,11 +83,7 @@ class CheckCashIn extends Command
                             "amount" => 0,
                             "agent" => "",
                             "currency" => $currency,
-                            "merchant_order_id" => [],
-                            "expiry_time" => [
-                                "from" => Carbon::now()->toDateTimeString(),
-                                "to" => ""
-                            ]
+                            "merchant_order_id" => []
                         ];
                     }
 
@@ -99,12 +95,10 @@ class CheckCashIn extends Command
                         "merchant_order_id" => array_merge(
                             $redis_data["merchant_order_id"],
                             explode(",", $val["merchant_order_id"])
-                        ),
-                        "expiry_time" => $redis_data["expiry_time"]
+                        )
                     ];
 
                     if ($reports["count"] >= $expired_limit) {
-                        $reports["expiry_time"]["to"] = Carbon::now()->toDateTimeString();
                         $notifyModel = new \App\Notifications\DepositExpiredReport($reports);
                         broadcast(new \App\Events\AdminNotification($notifyModel->toArray($reports), $notifyModel));
                         $redis->del($redis_key);
