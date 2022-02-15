@@ -46,17 +46,12 @@ class DepositExpiredReport extends Base
      */
     protected function getData($notifiable)
     {
-        $body = "Total payin expired ";
-        foreach ($this->reports as $report => $rs) {
-            foreach ($rs as $r => $v) {
-                if ($r != "Total Amount") {
-                    $body .= "\n" . $r . " (" . $report . "): " . $v . " orders";
-                } else {
-                    $body .= ", " . $r . ": " . $v;
-                }
+        $body = "Total payin expired";
+        foreach ($this->reports as $currency => $rs) {
+            foreach ($rs as $agent => $v) {
+                $body .= "\n" . $agent . "(" . $currency . "):" . $v["total_expired"] . " orders, Total Amount: " . $v["total_amount"];
             }
         }
-
         return [
             'id'    => \Illuminate\Support\Str::uuid(),
             'title' => 'Payin Expired',

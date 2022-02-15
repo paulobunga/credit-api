@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\MerchantDeposit;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class CheckCashIn extends Command
 {
@@ -44,32 +45,67 @@ class CheckCashIn extends Command
         $expired_limit = app(\App\Settings\AdminSetting::class)->expired_payin_limit_notify;
         $reports = [];
 
+        $redis_table = "payin_expired_records";
+        $redis = Redis::connection();
+        $redis_data = json_decode($redis->get($redis_table), true);
+
         foreach ($setting as $currency => $s) {
             $expired_minutes = $s['expired_minutes'];
 
             $o = MerchantDeposit::where('merchant_deposits.status', MerchantDeposit::STATUS['PENDING'])
-              ->join('reseller_bank_cards', 'reseller_bank_cards.id', 'merchant_deposits.reseller_bank_card_id')
-              ->join('resellers', 'resellers.id', 'reseller_bank_cards.reseller_id')
-              ->where('merchant_deposits.currency', $currency)
-              ->where('merchant_deposits.created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
-              ->having(DB::raw('COUNT(resellers.name)'), '>=', $expired_limit)
-              ->select('resellers.name', DB::raw('COUNT(resellers.name) AS total_expired'), DB::raw('TRUNCATE(SUM(merchant_deposits.amount), 2) AS total_amount'), 'merchant_deposits.currency')
-              ->groupBy('resellers.name', 'merchant_deposits.currency')
-              ->get();
+                ->join('reseller_bank_cards', 'reseller_bank_cards.id', 'merchant_deposits.reseller_bank_card_id')
+                ->join('resellers', 'resellers.id', 'reseller_bank_cards.reseller_id')
+                ->where('merchant_deposits.currency', $currency)
+                ->where('merchant_deposits.created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
+                ->select(
+                    'resellers.name',
+                    'merchant_deposits.currency',
+                    DB::raw('COUNT(resellers.name) AS total_expired'),
+                    DB::raw('TRUNCATE(SUM(merchant_deposits.amount), 2) AS total_amount')
+                )
+                ->groupBy('resellers.name', 'merchant_deposits.currency')
+                ->get();
 
             MerchantDeposit::where('status', MerchantDeposit::STATUS['PENDING'])
-              ->where('currency', $currency)
-              ->where('created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
-              ->update(['status' => MerchantDeposit::STATUS['EXPIRED']]);
+                ->where('currency', $currency)
+                ->where('created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
+                ->update(['status' => MerchantDeposit::STATUS['EXPIRED']]);
 
             if (!empty($o->toArray())) {
-                $reports[$currency] = [];
-                foreach ($o as $k => $v) {
-                    $reports[$currency][$v->name] = $v->total_expired;
-                    $reports[$currency]['Total Amount'] = $v->total_amount;
+                foreach ($o->toArray() as $val) {
+                    $agent_name = $val["name"];
+                    $p = [ "total_amount" => 0, "total_expired" => 0 ];
+
+                    if (!is_null($redis_data)) {
+                        if (!empty($redis_data[$currency])) {
+                            $p = isset($redis_data[$currency][$agent_name]) ? $redis_data[$currency][$agent_name] : $p;
+                        }
+                    }
+
+                    $total_amount = (float) $p["total_amount"] + (float) $val["total_amount"];
+                    $total_expired = (int) $p["total_expired"] + $val["total_expired"];
+
+                    if ($total_expired >= $expired_limit) {
+                        $reports[$currency][$val["name"]] = [];
+                        $reports[$currency][$val["name"]] = [
+                            "total_amount" => $total_amount,
+                            "total_expired" => $total_expired,
+                        ];
+
+                        if (isset($redis_data[$currency][$val["name"]])) {
+                            unset($redis_data[$currency][$val["name"]]);
+                        }
+                    } else {
+                        $redis_data[$currency][$val["name"]] = [];
+                        $redis_data[$currency][$val["name"]] = [
+                            "total_amount" => $total_amount,
+                            "total_expired" => $total_expired,
+                        ];
+                    }
                 }
             }
         }
+        $redis->set($redis_table, json_encode($redis_data));
 
         if (!empty($reports)) {
             $notifyModel = new \App\Notifications\DepositExpiredReport($reports, Carbon::now()->toDateTimeString());
