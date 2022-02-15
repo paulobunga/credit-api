@@ -8,14 +8,12 @@ use Carbon\Carbon;
 class DepositExpiredReport extends Base
 {
     protected $reports = [];
-    protected $notify_time;
 
-    public function __construct($reports, $notify_time)
+    public function __construct($reports)
     {
         parent::__construct();
 
         $this->reports = $reports;
-        $this->notify_time = $notify_time;
     }
 
     /**
@@ -35,7 +33,7 @@ class DepositExpiredReport extends Base
      */
     protected function getLink(): string
     {
-        return admin_url('/merchant_deposits?status=' . MerchantDeposit::STATUS['EXPIRED'] . '&updated_at_between=' . $this->notify_time . ',' . $this->notify_time);
+        return admin_url('/merchant_deposits?status=' . MerchantDeposit::STATUS['EXPIRED'] . '&reseller_name=' . $this->reports["agent"] . '&updated_at_between=' . $this->reports["expiry_time"]["from"] . ',' . $this->reports["expiry_time"]["to"]);
     }
 
     /**
@@ -46,15 +44,17 @@ class DepositExpiredReport extends Base
      */
     protected function getData($notifiable)
     {
-        $body = "Total payin expired";
-        foreach ($this->reports as $currency => $rs) {
-            foreach ($rs as $agent => $v) {
-                $body .= "\n" . $agent . "(" . $currency . "):" . $v["total_expired"] . " orders, Total Amount: " . $v["total_amount"];
-            }
-        }
+        $body = "Payin Order Expired for {$this->reports["agent"]} ({$this->reports["currency"]})
+
+Total Order: {$this->reports["count"]}
+Total Amount: {$this->reports["amount"]}
+
+Merchant Order:\n";
+        $body .= implode("\n", $this->reports["merchant_order_id"]);
+
         return [
             'id'    => \Illuminate\Support\Str::uuid(),
-            'title' => 'Payin Expired',
+            'title' => 'Payin Order Expired',
             'body'  => $body,
             'time'  => Carbon::now()->toDateTimeString()
         ];
