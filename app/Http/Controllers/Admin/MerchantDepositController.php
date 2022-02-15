@@ -105,14 +105,16 @@ class MerchantDepositController extends Controller
                     'reference_id' => $request->reference_id
                 ]
             ]);
-
-            ResellerSms::where([
-              ['reseller_id', $m->reseller->id],
-              ['trx_id', $request->reference_id],
-              ['amount', $m->amount]
-            ])
-            ->whereIn('address', $m->paymentChannel->payin->sms_addresses)
-            ->update(['status' => ResellerSms::STATUS['MATCH']]);
+            if (in_array($m->currency, ['BDT'])) {
+                ResellerSms::where([
+                    ['reseller_id', $m->reseller->id],
+                    ['trx_id', $request->reference_id],
+                    ['amount', $m->amount],
+                    ['status', ResellerSms::STATUS['PENDING']]
+                ])
+                    ->whereIn('address', $m->paymentChannel->payin->sms_addresses)
+                    ->update(['status' => ResellerSms::STATUS['MATCH']]);
+            }
         } else {
             $m->update([
                 'status' => $request->status,

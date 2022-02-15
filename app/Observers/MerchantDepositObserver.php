@@ -41,11 +41,13 @@ trait MerchantDepositObserver
      */
     protected static function onStatusChangeEvent($status, MerchantDeposit $m)
     {
-        if (in_array($status, [
-            MerchantDeposit::STATUS['APPROVED'],
-            MerchantDeposit::STATUS['ENFORCED'],
-            MerchantDeposit::STATUS['MAKEUP'],
-        ])) {
+        if (
+            in_array($status, [
+                MerchantDeposit::STATUS['APPROVED'],
+                MerchantDeposit::STATUS['ENFORCED'],
+                MerchantDeposit::STATUS['MAKEUP'],
+            ])
+        ) {
             if ($m->reseller->credit < $m->amount && $status == MerchantDeposit::STATUS['APPROVED']) {
                 throw new \Exception('Amount exceed credit of agent', 405);
             }
@@ -175,7 +177,7 @@ trait MerchantDepositObserver
                 // push deposit information callback to callback url
                 Queue::push((new \App\Jobs\GuzzleJob(
                     $m,
-                    new \App\Transformers\Api\DepositTransformer,
+                    new \App\Transformers\Api\DepositTransformer(),
                     $m->merchant->api_key
                 )));
                 break;
