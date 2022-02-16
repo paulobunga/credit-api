@@ -33,7 +33,10 @@ class DepositExpiredReport extends Base
      */
     protected function getLink(): string
     {
-        return admin_url('/merchant_deposits?status=' . MerchantDeposit::STATUS['EXPIRED'] . '&reseller_name=' . $this->reports["agent"]);
+        return admin_url('/merchant_deposits?status=' .
+            MerchantDeposit::STATUS['EXPIRED'] .
+            '&reseller_name=' .
+            $this->reports["agent"]);
     }
 
     /**
@@ -44,16 +47,15 @@ class DepositExpiredReport extends Base
      */
     protected function getData($notifiable)
     {
-        $body = "Payin Order Expired for {$this->reports["agent"]} ({$this->reports["currency"]})
-
-Total Order: {$this->reports["count"]}
-Total Amount: {$this->reports["amount"]}
-
-Merchant Order:\n";
-        $body .= implode("\n", $this->reports["merchant_order_id"]);
+        $body = <<<EOT
+                Payin Order Expired for {$this->reports["agent"]} ({$this->reports["currency"]})
+                Total Order: {$this->reports["count"]}
+                Total Amount: {$this->reports["amount"]}
+                Merchant Order:
+                EOT;
+        $body .= implode(PHP_EOL, $this->reports["merchant_order_id"]);
 
         return [
-            'id'    => \Illuminate\Support\Str::uuid(),
             'title' => 'Payin Order Expired',
             'body'  => $body,
             'time'  => Carbon::now()->toDateTimeString()

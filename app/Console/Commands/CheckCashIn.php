@@ -71,40 +71,30 @@ class CheckCashIn extends Command
                 ->where('created_at', '<=', Carbon::now()->subMinutes($expired_minutes))
                 ->update(['status' => MerchantDeposit::STATUS['EXPIRED']]);
 
-            if (!empty($o->toArray())) {
-                foreach ($o->toArray() as $val) {
-                    $redis_key = "payin_expire_order_" . $val["id"];
-                    $redis_data = json_decode($redis->get($redis_key), true);
-
-                    // If redis data is not found reset the value to calculate.
-                    if (is_null($redis_data)) {
-                        $redis_data = [
-                            "count" => 0,
-                            "amount" => 0,
-                            "agent" => "",
-                            "currency" => $currency,
-                            "merchant_order_id" => []
-                        ];
-                    }
-
-                    $reports = [
-                        "count" => (int) $redis_data["count"] + $val["count"],
-                        "amount" => (float) $redis_data["amount"] + (float) $val["amount"],
+            foreach ($o->toArray() as $val) {
+                $redis_key = "payin_expire_order_" . $val["id"];
+                $redis_data = json_decode($redis->get($redis_key), true) ??
+                    $redis_data = [
+                        "count" => 0,
+                        "amount" => 0,
                         "agent" => $val["name"],
                         "currency" => $currency,
-                        "merchant_order_id" => array_merge(
-                            $redis_data["merchant_order_id"],
-                            explode(",", $val["merchant_order_id"])
-                        )
+                        "merchant_order_id" => []
                     ];
 
-                    if ($reports["count"] >= $expired_limit) {
-                        $notifyModel = new \App\Notifications\DepositExpiredReport($reports);
-                        broadcast(new \App\Events\AdminNotification($notifyModel->toArray($reports), $notifyModel));
-                        $redis->del($redis_key);
-                    } else {
-                        $redis->set($redis_key, json_encode($reports));
-                    }
+                $redis_data["count"] = (int) $redis_data["count"] + $val["count"];
+                $redis_data["amount"] = (float) $redis_data["amount"] + (float)$val["amount"];
+                $redis_data["merchant_order_id"] = array_merge(
+                    $redis_data["merchant_order_id"],
+                    explode(",", $val["merchant_order_id"])
+                );
+
+                if ($redis_data["count"] >= $expired_limit) {
+                    $notifyModel = new \App\Notifications\DepositExpiredReport($redis_data);
+                    broadcast(new \App\Events\AdminNotification($notifyModel->toArray($redis_data), $notifyModel));
+                    $redis->del($redis_key);
+                } else {
+                    $redis->set($redis_key, json_encode($redis_data));
                 }
             }
         }
