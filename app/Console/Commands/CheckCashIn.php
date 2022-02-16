@@ -3,10 +3,11 @@
 namespace App\Console\Commands;
 
 use Carbon\Carbon;
-use App\Models\MerchantDeposit;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
+use App\Models\MerchantDeposit;
+use App\Notifications\Admin\DepositExpired;
 
 class CheckCashIn extends Command
 {
@@ -90,7 +91,7 @@ class CheckCashIn extends Command
                 );
 
                 if ($redis_data["count"] >= $expired_limit) {
-                    $notifyModel = new \App\Notifications\DepositExpiredReport($redis_data);
+                    $notifyModel = new DepositExpired($redis_data);
                     broadcast(new \App\Events\AdminNotification($notifyModel->toArray($redis_data), $notifyModel));
                     $redis->del($redis_key);
                 } else {

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Dingo\Api\Http\Request;
 use Carbon\Carbon;
+use Dingo\Api\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Database\Eloquent\Builder;
+use App\Http\Controllers\Controller;
 
 class NotificationController extends Controller
 {
@@ -24,17 +24,22 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         $notification = QueryBuilder::for($this->model)
-        ->allowedFilters([
-          AllowedFilter::callback('unread', function (Builder $query, $value) {
-            if ($value) {
-                $query->whereNull('read_at');
-            } else {
-                $query->whereNotNull('read_at');
-            }
-          })
-        ])
-        ->where('notifiable_id', auth()->id())
-        ->where('notifiable_type', 'admin');
+            ->allowedFilters([
+                AllowedFilter::callback('unread', function (Builder $query, $value) {
+                    if ($value) {
+                        $query->whereNull('read_at');
+                    } else {
+                        $query->whereNotNull('read_at');
+                    }
+                })
+            ])
+            ->allowedSorts([
+                'id',
+                'created_at',
+            ])
+            ->where('notifiable_id', auth()->id())
+            ->where('notifiable_type', 'admin');
+
         return $this->paginate($notification, $this->transformer);
     }
 
@@ -58,14 +63,18 @@ class NotificationController extends Controller
             $notifications->update(['read_at' => null]);
         }
 
-        return $this->response->collection($notifications->get(), $this->transformer);
+        return $this->paginate(
+            QueryBuilder::for($notifications),
+            $this->transformer,
+            ['notifications' => auth()->user()->unreadNotifications->count()]
+        );
     }
 
-  /**
-   * Destroy notification
-   *
-   * @return \Dingo\Api\Http\JsonResponse
-   */
+    /**
+     * Destroy notification
+     *
+     * @return \Dingo\Api\Http\JsonResponse
+     */
     public function destroy(Request $request)
     {
         $notification = auth()->user()->notifications()->where('id', $this->parameters('notification'))->first();
@@ -74,6 +83,8 @@ class NotificationController extends Controller
         }
         $notification->delete();
 
-        return $this->success();
+        return $this->success([
+            'notifications' => auth()->user()->unreadNotifications->count()
+        ]);
     }
 }

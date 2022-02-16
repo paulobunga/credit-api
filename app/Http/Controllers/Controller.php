@@ -84,13 +84,19 @@ abstract class Controller extends BaseController
 
     /**
      * Default success response
+     * @param array $meta
      * @return \Dingo\Api\Http\Response
      */
-    protected function success()
+    protected function success(array $meta = [])
     {
-        return response()->json([
+        $content = [
             'message' => 'success'
-        ]);
+        ];
+        if (!empty($meta)) {
+            $content['meta'] = $meta;
+        }
+
+        return response()->json($content);
     }
 
     /**

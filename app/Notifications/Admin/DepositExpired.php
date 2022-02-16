@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\Admin;
 
-use App\Models\MerchantDeposit;
 use Carbon\Carbon;
+use App\Models\MerchantDeposit;
 
-class DepositExpiredReport extends Base
+class DepositExpired extends Base
 {
     protected $reports = [];
 
@@ -53,7 +53,7 @@ class DepositExpiredReport extends Base
                 Total Amount: {$this->reports["amount"]}
                 Merchant Order:
                 EOT;
-        $body .= implode(PHP_EOL, $this->reports["merchant_order_id"]);
+        $body .= PHP_EOL . implode(PHP_EOL, $this->reports["merchant_order_id"]);
 
         return [
             'title' => 'Payin Order Expired',

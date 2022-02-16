@@ -16,20 +16,21 @@ class AuthTransformer extends TransformerAbstract
         $this->token = $token;
     }
 
-    public function transform(Model $admin)
+    public function transform(Model $m)
     {
         return [
-            'id' => $admin->id,
-            'name' => $admin->name,
-            'username' => $admin->username,
-            'timezone' => $admin->timezone,
-            'status' => $admin->status,
+            'id' => $m->id,
+            'name' => $m->name,
+            'username' => $m->username,
+            'timezone' => $m->timezone,
+            'status' => $m->status,
             'access_token' => $this->token,
             'token_type' => 'bearer',
             'expires_in' => Auth::factory()->getTTL() * 60,
-            'role' => $admin->roles[0]->name ?? null,
-            'permissions' => $admin->getAllPermissions()->pluck('name'),
+            'role' => $m->roles[0]->name ?? null,
+            'permissions' => $m->getAllPermissions()->pluck('name'),
             'currency' => app(CurrencySetting::class)->toArray(),
+            'notifications' => $m->unreadNotifications->count()
         ];
     }
 }
