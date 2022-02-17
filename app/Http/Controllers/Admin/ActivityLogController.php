@@ -29,10 +29,9 @@ class ActivityLogController extends Controller
         $logs = QueryBuilder::for($this->model)
         ->allowedFilters([
             AllowedFilter::exact('causer_id'),
-            AllowedFilter::partial('log_name'),
             AllowedFilter::partial('description'),
-            AllowedFilter::custom('created_at_between', new DateFilter('activity_log'))
-        ]);
+            AllowedFilter::custom('created_at_between', new DateFilter('activity_logs'))
+        ])->orderByDesc('id');
 
         return $this->paginate($logs, $this->transformer);
     }
