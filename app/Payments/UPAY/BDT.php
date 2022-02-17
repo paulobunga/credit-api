@@ -6,6 +6,10 @@ class BDT
 {
     public $primary = 'wallet_number';
 
+    public $regex = [
+        'payer' => '0\d{10}'
+    ];
+
     public $attributes = [
         'wallet_number'
     ];
@@ -19,7 +23,7 @@ class BDT
         'balance' => 4,
         'trx_id' => 5,
     ];
-    
+
     public function rules()
     {
         return [

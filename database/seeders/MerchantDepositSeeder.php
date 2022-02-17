@@ -52,18 +52,22 @@ class MerchantDepositSeeder extends Seeder
                 ]);
                 if ($d->paymentChannel->isSupportSMS()) {
                     $trx_id = $this->faker->regexify('[a-zA-Z0-9]{10}');
+                    $payer = $this->faker->regexify($d->paymentChannel->getReference()->regex['payer']);
                     ResellerSms::create([
                         'reseller_id' => $reseller_bank_card->reseller_id,
+                        'payment_channel_id' => $d->paymentChannel->id,
                         'model_id' => $d->id,
                         'model_name' => 'merchant.deposit',
                         'platform' => 'Android',
                         'address' => $d->paymentChannel->payin->sms_addresses[0],
+                        'payer' => $payer,
                         'trx_id' => $trx_id,
                         'amount' => $d->amount,
                         'sim_num' => $reseller_bank_card->attributes['wallet_number'],
                         'body' => __('sms.' . $d->paymentChannel->name, [
                             'amount' => $d->amount,
                             'trx_id' => $trx_id,
+                            'payer' => $payer,
                         ]),
                         'status' => ResellerSms::STATUS['MATCH'],
                         'sent_at' => Carbon::now(),

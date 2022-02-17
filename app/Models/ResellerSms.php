@@ -13,10 +13,12 @@ class ResellerSms extends Model
 
     protected $fillable = [
         'reseller_id',
+        'payment_channel_id',
         'model_id',
         'model_name',
         'platform',
         'address',
+        'payer',
         'trx_id',
         'amount',
         'sim_num',
@@ -65,6 +67,7 @@ class ResellerSms extends Model
                 continue;
             }
             if (!empty($data['trx_id']) && !empty($data['amount'])) {
+                $data['channel'] = $ch;
                 break;
             }
         }

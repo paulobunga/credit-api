@@ -111,9 +111,11 @@ class SmsController extends Controller
 
         $m = $this->model::create([
             'reseller_id' => auth()->id(),
+            'payment_channel_id' => $data['channel']->id,
             'platform' => $request->platform,
             'body' => $request->body,
             'address' =>  $request->address,
+            'payer' => $data['payer'],
             'trx_id' => $data['trx_id'],
             'sim_num' => $request->sim_num,
             'amount' => $data['amount'],
@@ -170,9 +172,11 @@ class SmsController extends Controller
             }
             $m = $this->model::create([
                 'reseller_id' => auth()->id(),
+                'payment_channel_id' => $data['channel']->id,
                 'platform' => $sms['platform'],
                 'body' => $sms['body'],
                 'address' =>  $sms['address'],
+                'payer' => $data['payer'],
                 'trx_id' => $data['trx_id'],
                 'sim_num' => $sms['sim_num'],
                 'amount' => $data['amount'],

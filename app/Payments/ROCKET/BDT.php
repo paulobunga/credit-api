@@ -6,6 +6,10 @@ class BDT
 {
     public $primary = 'wallet_number';
 
+    public $regex = [
+        'payer' => '0\d{11}'
+    ];
+
     public $attributes = [
         'wallet_number'
     ];
