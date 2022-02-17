@@ -37,6 +37,23 @@ class ActivityLogController extends Controller
     }
 
     /**
+     * Get activity log type list
+     * @method GET
+     * @return json
+     */
+    public function type()
+    {
+        $types = $this->model::orderBy('description')
+        ->distinct('description')
+        ->pluck('description');
+
+        return [
+          "data" => $types
+        ];
+    }
+
+
+    /**
      * Delete an activity log via id
      *
      * @return \Illuminate\Http\JsonResponse

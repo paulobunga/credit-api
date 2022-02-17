@@ -118,6 +118,7 @@ $api->group([
             $api->put('/teams/member/{team}', ['uses' => "TeamController@member", 'as' => "teams.member"]);
 
             $api->resource('activity_logs', 'ActivityLogController', ['only' => ['index', 'destroy']]);
+            $api->get('/activity_logs/type', ['uses' => "ActivityLogController@type", 'as' => "activity_logs.type"]);
         });
     });
 });
