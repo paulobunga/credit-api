@@ -79,6 +79,7 @@ class ActivityLog
             ->withProperties([
                 'request' => [
                     'url' => $request->path(),
+                    'ip' => $request->ip(),
                     'data' => $request->except([
                         'password',
                         'password_confirmation'

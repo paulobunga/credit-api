@@ -8,6 +8,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use App\Models\MerchantDeposit;
+use App\Models\ResellerSms;
 use App\Http\Controllers\Controller;
 use App\Filters\DateFilter;
 
@@ -104,6 +105,16 @@ class MerchantDepositController extends Controller
                     'reference_id' => $request->reference_id
                 ]
             ]);
+            if (in_array($m->currency, ['BDT'])) {
+                ResellerSms::where([
+                    ['reseller_id', $m->reseller->id],
+                    ['trx_id', $request->reference_id],
+                    ['amount', $m->amount],
+                    ['status', ResellerSms::STATUS['PENDING']]
+                ])
+                    ->whereIn('address', $m->paymentChannel->payin->sms_addresses)
+                    ->update(['status' => ResellerSms::STATUS['MATCH']]);
+            }
         } else {
             $m->update([
                 'status' => $request->status,

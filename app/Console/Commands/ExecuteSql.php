@@ -16,6 +16,7 @@ use App\Models\Team;
 use App\Models\Merchant;
 use App\Models\Reseller;
 use App\Models\PaymentChannel;
+use App\Models\ResellerSms;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
 
@@ -689,5 +690,38 @@ class ExecuteSql extends Command
     protected function addActivityLogTable()
     {
         (new \CreateTableActivityLogs())->up();
+    }
+
+    protected function addSMSAmount()
+    {
+        if (!Schema::hasColumn('reseller_sms', 'amount')) {
+            Schema::table('reseller_sms', function (Blueprint $table) {
+                $table->decimal('amount', 14, 4)->after('trx_id');
+            });
+        }
+        if (!Schema::hasColumn('reseller_sms', 'payer')) {
+            Schema::table('reseller_sms', function (Blueprint $table) {
+                $table->string('payer', 30)->after('address')->default('');
+            });
+        }
+        if (!Schema::hasColumn('reseller_sms', 'payment_channel_id')) {
+            Schema::table('reseller_sms', function (Blueprint $table) {
+                $table->unsignedBigInteger('payment_channel_id')->after('reseller_id')->default(0);
+            });
+        }
+        foreach (ResellerSms::all() as $sms) {
+            $channels = PaymentChannel::where('currency', $sms->reseller->currency)->get();
+            $data = ResellerSms::parse($sms->toArray(), $channels);
+            if (!empty($data['payer'])) {
+                $sms->payer = $data['payer'];
+            }
+            if (!empty($data['amount'])) {
+                $sms->amount = $data['amount'];
+            }
+            if (!empty($data['channel'])) {
+                $sms->payment_channel_id = $data['channel']->id;
+            }
+            $sms->save();
+        }
     }
 }

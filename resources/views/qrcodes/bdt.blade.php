@@ -45,7 +45,7 @@
                     <p class="mt-4">Failed</p>
                 </template>
                 <template x-if="status == 6">
-                    <p class="mt-4">Waiting Approval</p>
+                    <p class="mt-4">Expired</p>
                 </template>
 
             </div>

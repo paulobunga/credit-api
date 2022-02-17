@@ -66,6 +66,7 @@ class BDT extends Base
     {
         $sms = ResellerSms::where(
             [
+                'payment_channel_id' => $channel->id,
                 'reseller_id' => $deposit->reseller->id,
                 'status' => ResellerSms::STATUS['PENDING'],
             ],

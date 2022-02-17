@@ -74,11 +74,14 @@ class CreateTableResellers extends Migration
         Schema::create('reseller_sms', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('reseller_id');
+            $table->unsignedBigInteger('payment_channel_id')->default(0);
             $table->unsignedBigInteger('model_id')->default(0);
             $table->string('model_name', 20)->default('');
             $table->string('platform', 10);
             $table->string('address', 30);
+            $table->string('payer', 30)->default('');
             $table->string('trx_id', 20)->default('');
+            $table->decimal('amount', 14, 4);
             $table->string('sim_num', 20)->default('');
             $table->string('body', 1024);
             $table->unsignedTinyInteger('status')->default(0)->comment('0:Pending,1:Match,2:UnMatch');

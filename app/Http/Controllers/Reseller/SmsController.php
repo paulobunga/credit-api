@@ -96,7 +96,7 @@ class SmsController extends Controller
             PaymentChannel::where('currency', auth()->user()->currency)->get()
         );
 
-        if (empty($data['trx_id'])) {
+        if (empty($data['trx_id']) || empty($data['amount'])) {
             throw new \Exception('invalid SMS!', ResellerSms::STATUS['INVALID']);
         }
 
@@ -111,11 +111,14 @@ class SmsController extends Controller
 
         $m = $this->model::create([
             'reseller_id' => auth()->id(),
+            'payment_channel_id' => $data['channel']->id,
             'platform' => $request->platform,
             'body' => $request->body,
             'address' =>  $request->address,
+            'payer' => $data['payer'],
             'trx_id' => $data['trx_id'],
             'sim_num' => $request->sim_num,
+            'amount' => $data['amount'],
             'status' => ResellerSms::STATUS['PENDING'],
             'sent_at' => ($request->date_sent / 1000),
             'received_at' => ($request->date / 1000),
@@ -152,7 +155,7 @@ class SmsController extends Controller
                 'sim_num' =>  $sms['address'],
             ], $channels);
 
-            if (empty($data['trx_id'])) {
+            if (empty($data['trx_id']) || empty($data['amount'])) {
                 $response[$k]['status'] = ResellerSms::STATUS['INVALID'];
                 $response[$k]['message'] = 'invalid SMS!';
                 continue;
@@ -169,11 +172,14 @@ class SmsController extends Controller
             }
             $m = $this->model::create([
                 'reseller_id' => auth()->id(),
+                'payment_channel_id' => $data['channel']->id,
                 'platform' => $sms['platform'],
                 'body' => $sms['body'],
                 'address' =>  $sms['address'],
+                'payer' => $data['payer'],
                 'trx_id' => $data['trx_id'],
                 'sim_num' => $sms['sim_num'],
+                'amount' => $data['amount'],
                 'status' => ResellerSms::STATUS['PENDING'],
                 'sent_at' => ($sms['date_sent'] / 1000),
                 'received_at' => ($sms['date'] / 1000),

@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -62,16 +61,11 @@ abstract class Base extends Notification implements ShouldBroadcast, ShouldQueue
      */
     public function via($notifiable)
     {
-        $channels = [ 'database', OneSignal::class ];
-        if ($notifiable->getMorphClass() === 'admin') {
-            return $channels;
-        }
-        return array_merge(
-            $channels,
-            [
-                'broadcast'
-            ]
-        );
+        return [
+            'database',
+            'broadcast',
+            OneSignal::class
+        ];
     }
 
     /**

@@ -2,10 +2,9 @@
 
 namespace App\Notifications\Admin;
 
-use App\Notifications\Base;
 use Carbon\Carbon;
 
-class PayinOff extends Base
+class PayInOutOff extends Base
 {
     /**
      * Get icon path
@@ -35,9 +34,8 @@ class PayinOff extends Base
     protected function getData($notifiable)
     {
         return [
-            'id' => $this->model->id,
             'title' => 'Agent offline',
-            'body' => "Automatically turn off payin status of {$this->model->name}.",
+            'body' => "Automatically turn off payin and payout status of {$this->model->name}.",
             'time' => Carbon::now()->toDateTimeString(),
         ];
     }

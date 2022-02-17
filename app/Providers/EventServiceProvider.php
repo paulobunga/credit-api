@@ -51,6 +51,9 @@ class EventServiceProvider extends ServiceProvider
                 ],
                 'context' => $msg->context,
             ];
+            if (empty($msg->message) || empty($context)) {
+                return;
+            }
             $this->model->create([
                 'message'       => $msg->message,
                 'channel'       => Log::getName(),

@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
-use App\Models\Admin;
 use App\Models\Online;
 use App\Models\Reseller;
-use App\Notifications\Admin\PayinOff;
-use Carbon\Carbon;
+use App\Notifications\Admin\PayInOutOff;
 
 class CheckOnline extends Command
 {
@@ -69,18 +68,20 @@ class CheckOnline extends Command
 
         $agents = Reseller::where([
             'level' => Reseller::LEVEL['AGENT'],
-            'payin->status' => true
         ])
-        ->whereIn('currency', ['BDT', 'INR'])
-        ->whereIn('id', $reseller_ids['offline'])->get();
-        # TODO replace with broadcast function
+            ->where(function ($query) {
+                $query->where('payin->status', true)
+                    ->orWhere('payout->status', true);
+            })
+            ->whereIn('currency', ['BDT', 'INR'])
+            ->whereIn('id', $reseller_ids['offline'])->get();
+
         foreach ($agents as $agent) {
             $agent->payin->status = false;
             $agent->payout->status = false;
             $agent->save();
-            foreach (Admin::all() as $admin) {
-                $admin->notify(new PayinOff($agent));
-            }
+            $notification = new PayInOutOff($agent);
+            broadcast(new \App\Events\AdminNotification($notification->toArray($agent), $notification));
         }
     }
 }
