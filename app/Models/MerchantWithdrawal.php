@@ -106,7 +106,7 @@ class MerchantWithdrawal extends Model
     public function getExpiredAtAttribute()
     {
         $min = app(\App\Settings\CurrencySetting::class)->getExpiredMinutes($this->attributes['currency']);
-        return $this->created_at->addMinutes($min);
+        return $this->created_at->addMinutes($min)->format('Y-m-d\TH:i:s.uP');
     }
 
     public function getSlipUrlAttribute()

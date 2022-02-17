@@ -29,14 +29,12 @@
             distance: 0,
             countdown: null,
             expiredTime: new Date("{{ $dateTime }}").getTime(),
-            now: new Date("{{ \Carbon\Carbon::now()->toDateTimeString() }}").getTime(),
             init() {
-                this.distance =  ((this.expiredTime - this.now) > 0)? this.expiredTime - this.now: 0;
+                this.distance =  ((this.expiredTime - Date.now()) > 0)? this.expiredTime - Date.now(): 0;
                 this.updateTimer();
                 this.countdown = setInterval(() => {
                     // Calculate time
-                    this.now = this.now + 1000;
-                    this.distance = this.expiredTime - this.now;
+                    this.distance = this.expiredTime - Date.now();
                     // Stop
                     if (this.distance < 0) {
                         clearInterval(this.countdown);
