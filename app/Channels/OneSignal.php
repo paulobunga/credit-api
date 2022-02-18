@@ -57,47 +57,55 @@ class OneSignal
      */
     public function send($notifiable, Notification $notification, array $meta = [])
     {
-        $client = $this->getOneSignalClient(
-            !empty($meta)
-                ? $meta["model"]
-                : $notifiable->getMorphClass()
-        );
-        if (!$client) {
+        $devices = $notifiable->devices()->get()->groupBy('platform');
+        if ($devices->isEmpty()) {
             return;
         }
 
-        if (!empty($meta)) {
+        $client = $this->getOneSignalClient($notifiable->getMorphClass());
+        if (!$client) {
+            return;
+        }
+        foreach ($devices as $platform => $dvs) {
             $response = $this->sendNotification(
                 $client,
                 $this->payload(
                     $notifiable,
                     $notification,
                     [
-                        'platform' => $meta["platform"],
-                        'tags' => $meta["targeting"]["tags"]
+                        "platform" => $platform,
+                        "include_player_ids" => $dvs->pluck('uuid')->toArray()
                     ]
                 )
             );
-        } else {
-            $devices = $notifiable->devices()->get()->groupBy('platform');
-            if ($devices->isEmpty()) {
-                return;
-            }
-
-            foreach ($devices as $platform => $dvs) {
-                $response = $this->sendNotification(
-                    $client,
-                    $this->payload(
-                        $notifiable,
-                        $notification,
-                        [
-                            "platform" => $platform,
-                            "include_player_ids" => $dvs->pluck('uuid')->toArray()
-                        ]
-                    )
-                );
-            }
         }
+        return $response;
+    }
+
+    /**
+     * Send Notification through OneSignal Braodcast based on tags.
+     *
+     * @param \Illuminate\Notifications\Notification $notification
+     * @param  array $meta
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \NotificationChannels\OneSignal\Exceptions\CouldNotSendNotification
+     */
+    public function broadcast(Notification $notification, $meta)
+    {
+        $client = $this->getOneSignalClient($meta["model"]);
+        if (!$client) {
+            return;
+        }
+
+        if (array_key_exists("model", $meta)) {
+            unset($meta["model"]);
+        }
+
+        $response = $this->sendNotification(
+            $client,
+            $this->payload(null, $notification, $meta)
+        );
 
         return $response;
     }
