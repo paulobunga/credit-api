@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Observers\MerchantCreditObserver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class MerchantCredit extends Model
 {
     use HasFactory;
+    use MerchantCreditObserver;
 
     public $timestamps = false;
 

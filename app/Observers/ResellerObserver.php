@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Models\Team;
+
 trait ResellerObserver
 {
     protected static function boot()
@@ -16,11 +18,20 @@ trait ResellerObserver
             ][strtoupper($query->currency)] ?? env('APP_TIMEZONE');
         });
 
-        // auto-add online record after creation
         static::created(function ($model) {
+            // auto-add online record after creation
             $model->online()->create([
                 'status' => 0
             ]);
+
+            // assign reseller to default team.
+            $teams = Team::where("currency", $model->currency)
+                        ->where("name", "Default")
+                        ->get();
+
+            foreach ($teams as $team) {
+                $model->assignTeams($team->id);
+            }
         });
     }
 }
