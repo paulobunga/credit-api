@@ -36,8 +36,11 @@
 
 # Class List
 
-|Currency | Class            |
-|:--------|------------------|
-|VND      | Default          |
-|INR      | Default          |
-|BDT      | Default          |
+**Please contact us for more information.**
+
+|Currency | PAYIN Class      | PAYOUT Class     |
+|:--------|------------------|------------------|
+|VND      | Default          | Default          |
+|INR      | Default          | Default          |
+|BDT      | Default          | Default          |
+

@@ -48,7 +48,8 @@ class PermissionList extends Command
             }
             $allow_permission = [
                 '.auth.',
-                '.notifications.'
+                '.notifications.',
+                'admin.activity_logs.type',
             ];
             if (preg_match('(' . implode('|', $allow_permission) . ')', $route)) {
                 continue;

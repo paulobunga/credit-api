@@ -16,8 +16,7 @@ abstract class Base extends BaseNotification
     public function via($notifiable)
     {
         return [
-            'database',
-            OneSignal::class
+            'database'
         ];
     }
 }

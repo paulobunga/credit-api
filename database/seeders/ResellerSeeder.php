@@ -62,7 +62,6 @@ class ResellerSeeder extends Seeder
                     'status' => Reseller::STATUS['ACTIVE'],
                     'password' => 'P@ssw0rd',
                 ]);
-                $this->assignTeam($agent);
             }
         }
         $setting = $c->currency['VND'];
@@ -101,7 +100,6 @@ class ResellerSeeder extends Seeder
             'downline_slot' => 0,
             'status' => true,
         ]);
-        $this->assignTeam($agent);
 
         // create reseller deposit
         foreach (Reseller::where('level', Reseller::LEVEL['AGENT'])->get() as $reseller) {
@@ -121,19 +119,6 @@ class ResellerSeeder extends Seeder
                 ]
             ]);
         }
-    }
-
-    protected function assignTeam(Reseller $agent)
-    {
-        $agent->assignTeams([
-            'name' => 'Default',
-            'type' => Team::TYPE['PAYIN'],
-            'currency' => $agent->currency,
-        ], [
-            'name' => 'Default',
-            'type' => Team::TYPE['PAYOUT'],
-            'currency' => $agent->currency,
-        ]);
     }
 
     protected function getName($currency, $level)

@@ -25,6 +25,7 @@ $api->group([
         $api->post('/auth/channel', ['as' => 'auth.channel', 'uses' => 'AuthController@channel']);
         $api->resource('notifications', 'NotificationController', ['only' => ['index', 'destroy']]);
         $api->post("/notifications/mark", ['uses' => "NotificationController@mark", 'as' => "notifications.mark"]);
+        $api->get('/activity_logs/type', ['uses' => "ActivityLogController@type", 'as' => "activity_logs.type"]);
 
         $api->group([
             'middleware' => [
