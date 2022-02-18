@@ -127,7 +127,7 @@ class WithdrawalController extends Controller
             ->where('merchant_id', $merchant->id)
             ->paginate($this->perPage);
 
-        return $this->response->withPaginator($m, new WithdrawalTransformer);
+        return $this->response->withPaginator($m, new WithdrawalTransformer());
     }
 
     /**
@@ -164,7 +164,7 @@ class WithdrawalController extends Controller
             'merchant_order_id' => $this->parameters('withdrawal')
         ])->firstOrFail();
 
-        return $this->response->item($m, new WithdrawalTransformer);
+        return $this->response->item($m, new WithdrawalTransformer());
     }
 
     /**
@@ -223,6 +223,8 @@ class WithdrawalController extends Controller
      * @bodyParam player_id string required Unique id of player. Example: 1
      * @bodyParam currency string required The currency of the withdrawal. Example: INR
      * @bodyParam channel string required Payment channel of the withdrawal. Example: UPI
+     * @bodyParam class string specific name of agent group. Defaults to 'Default'.
+     * refer to [class list](/#class-list). Example: Default
      * @bodyParam upi_id string required Payment channel required field, various with different channel,
      * please refer the table above. Example: test1234@upi
      * @bodyParam amount string required Amount of the withdrawal. Example: 500
@@ -325,6 +327,8 @@ class WithdrawalController extends Controller
                         ON md.reseller_bank_card_id = rbc.id
                         AND md.status IN (:md_status_0, :md_status_1) 
                         AND md.updated_at BETWEEN :md_start AND :md_end
+                    LEFT JOIN model_has_teams AS mht ON mht.model_id = r.id AND model_type = 'reseller'
+                    LEFT JOIN teams AS t ON mht.team_id = t.id
                 WHERE
                     r.currency = '{$request->currency}'
                     AND r.STATUS = :r_status
@@ -332,6 +336,8 @@ class WithdrawalController extends Controller
                     AND r.payout->>'$.min' <= {$request->amount}
                     AND r.payout->>'$.max' >= {$request->amount}
                     AND r.LEVEL = :r_level
+                    AND t.type = 'PAYOUT'
+                    AND t.name = '{$request->get('class', 'Default')}'
                 GROUP BY r.id
                 ),
                 reseller_daily AS (
