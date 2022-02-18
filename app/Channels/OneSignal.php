@@ -50,38 +50,73 @@ class OneSignal
      *
      * @param mixed $notifiable
      * @param \Illuminate\Notifications\Notification $notification
+     * @param array $meta
      *
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \NotificationChannels\OneSignal\Exceptions\CouldNotSendNotification
      */
-    public function send($notifiable, Notification $notification)
+    public function send($notifiable, Notification $notification, array $meta = [])
     {
-        $devices = $notifiable->devices()->get()->groupBy('platform');
-        if ($devices->isEmpty()) {
-            return;
-        }
-        $client = $this->getOneSignalClient($notifiable->getMorphClass());
+        $client = $this->getOneSignalClient(
+            !empty($meta)
+                ? $meta["model"]
+                : $notifiable->getMorphClass()
+        );
         if (!$client) {
             return;
         }
-        foreach ($devices as $platform => $dvs) {
-            $response = $client->sendNotificationCustom(
+
+        if (!empty($meta)) {
+            $response = $this->sendNotification(
+                $client,
                 $this->payload(
                     $notifiable,
                     $notification,
                     [
-                        'platform' => $platform,
-                        'include_player_ids' => $dvs->pluck('uuid')->toArray()
+                        'platform' => $meta["platform"],
+                        'tags' => $meta["targeting"]["tags"]
                     ]
                 )
             );
-
-            if ($response->getStatusCode() !== 200) {
-                Log::error($response->getBody());
-                throw CouldNotSendNotification::serviceRespondedWithAnError($response);
-            } else {
-                Log::info($response->getBody());
+        } else {
+            $devices = $notifiable->devices()->get()->groupBy('platform');
+            if ($devices->isEmpty()) {
+                return;
             }
+
+            foreach ($devices as $platform => $dvs) {
+                $response = $this->sendNotification(
+                    $client,
+                    $this->payload(
+                        $notifiable,
+                        $notification,
+                        [
+                            "platform" => $platform,
+                            "include_player_ids" => $dvs->pluck('uuid')->toArray()
+                        ]
+                    )
+                );
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Send Notification
+     *
+     * @param  \Berkayk\OneSignal\OneSignalClient $client
+     * @param  mixed $payload
+     * @return object
+     */
+    protected function sendNotification($client, $payload)
+    {
+        $response = $client->sendNotificationCustom($payload);
+        if ($response->getStatusCode() !== 200) {
+            Log::error($response->getBody());
+            throw CouldNotSendNotification::serviceRespondedWithAnError($response);
+        } else {
+            Log::info($response->getBody());
         }
 
         return $response;
