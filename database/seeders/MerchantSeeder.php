@@ -36,15 +36,6 @@ class MerchantSeeder extends Seeder
                 'credit' => 0,
                 'transaction_fee' => $setting['transaction_fee_percentage']
             ]);
-            $merchant->assignTeams([
-                'name' => 'Default',
-                'type' => Team::TYPE['PAYIN'],
-                'currency' => $currency,
-            ], [
-                'name' => 'Default',
-                'type' => Team::TYPE['PAYOUT'],
-                'currency' => $currency,
-            ]);
         }
     }
 }
