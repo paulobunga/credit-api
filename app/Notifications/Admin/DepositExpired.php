@@ -58,7 +58,7 @@ class DepositExpired extends Base
         return [
             'title' => 'Payin Order Expired',
             'body'  => $body,
-            'time'  => Carbon::now()->toDateTimeString()
+            'time'  => Carbon::now()->format('Y-m-d\TH:i:s.uP')
         ];
     }
 }

@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Notifications\Admin;
+namespace App\Notifications;
 
-use Carbon\Carbon;
-
-class PayInOutOff extends Base
+class DepositTransfer extends Base
 {
     /**
      * Get icon path
@@ -13,7 +11,7 @@ class PayInOutOff extends Base
      */
     protected function getIcon(): string
     {
-        return admin_url('/icons/favicon-32x32.png');
+        return reseller_url('/icons/favicon-32x32.png');
     }
 
     /**
@@ -23,7 +21,7 @@ class PayInOutOff extends Base
      */
     protected function getLink(): string
     {
-        return admin_url("/resellers?name={$this->model->name}&level={$this->model->level}");
+        return reseller_url('/deposits');
     }
     /**
      * Get data of message
@@ -34,9 +32,10 @@ class PayInOutOff extends Base
     protected function getData($notifiable)
     {
         return [
-            'title' => 'Agent offline',
-            'body' => "Automatically turn off payin and payout status of {$this->model->name}.",
-            'time' => Carbon::now()->format('Y-m-d\TH:i:s.uP')
+            'id' => $this->model->id,
+            'title' => 'Transfer payin order',
+            'body' => "Your payin order {$this->model->merchant_order_id} was transfered to another agent.",
+            'time' => $this->model->created_at->format('Y-m-d\TH:i:s.uP'),
         ];
     }
 }

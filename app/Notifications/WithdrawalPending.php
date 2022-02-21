@@ -35,7 +35,7 @@ class WithdrawalPending extends Base
             'id' => $this->model->id,
             'title' => 'New cash out order',
             'body' => "You got a new cash out order, {$this->model->merchant_order_id}.",
-            'time' => $this->model->created_at->toDateTimeString(),
+            'time' => $this->model->created_at->format('Y-m-d\TH:i:s.uP'),
         ];
     }
 }

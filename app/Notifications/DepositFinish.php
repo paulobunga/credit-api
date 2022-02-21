@@ -35,7 +35,7 @@ class DepositFinish extends Base
             'id' => $this->model->id,
             'title' => 'Payin finish',
             'body' => "Payin:{$this->model->merchant_order_id} is completed!",
-            'time' => $this->model->updated_at->toDateTimeString(),
+            'time' => $this->model->updated_at->format('Y-m-d\TH:i:s.uP'),
         ];
     }
 }
