@@ -26,7 +26,7 @@ class ReportDaily extends Command
      *
      * @var string
      */
-    protected $description = 'Gnerate daily report';
+    protected $description = 'Generate daily report';
 
     protected $type = Transaction::TYPE;
 

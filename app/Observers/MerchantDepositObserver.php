@@ -48,7 +48,7 @@ trait MerchantDepositObserver
                 MerchantDeposit::STATUS['MAKEUP'],
             ])
         ) {
-            if ($m->reseller->credit < $m->amount && $status == MerchantDeposit::STATUS['APPROVED']) {
+            if ($m->reseller->credits->credit < $m->amount && $status == MerchantDeposit::STATUS['APPROVED']) {
                 throw new \Exception('Amount exceed credit of agent', 405);
             }
             // merchant add credit and deduct transaction fee
@@ -86,11 +86,11 @@ trait MerchantDepositObserver
                     'user_type' => 'reseller',
                     'type' => Transaction::TYPE['SYSTEM_DEDUCT_CREDIT'],
                     'amount' => $m->amount,
-                    'before' => $m->reseller->credit,
-                    'after' => $m->reseller->credit - $m->amount,
+                    'before' => $m->reseller->credits->credit,
+                    'after' => $m->reseller->credits->credit - $m->amount,
                     'currency' => $m->currency,
                 ]);
-                $m->reseller->decrement(
+                $m->reseller->credits->decrement(
                     'credit',
                     $m->amount
                 );
@@ -98,16 +98,18 @@ trait MerchantDepositObserver
                 $rows = DB::select("
                 WITH agents AS (
                     SELECT
-                        id,
+                        r.id,
                         upline_id,
                         level,
                         name,
                         payin,
-                        coin 
+                        rc.coin 
                     FROM
-                        resellers 
+                        resellers AS r
+                    INNER JOIN
+                        reseller_credits AS rc ON r.id = rc.reseller_id
                     WHERE
-                        id = {$m->reseller->id} 
+                        r.id = {$m->reseller->id} 
                     UNION ALL
                     SELECT
                         r.id,
@@ -115,7 +117,7 @@ trait MerchantDepositObserver
                         level,
                         name,
                         payin,
-                        coin 
+                        rc.coin 
                     FROM
                     (
                         SELECT
@@ -130,7 +132,10 @@ trait MerchantDepositObserver
                         temp.uplines,
                         CAST( r.id AS json ),
                         '$' 
-                    ) 
+                    )
+                    INNER JOIN 
+                        reseller_credits AS rc 
+                        ON r.id = rc.reseller_id
                 )
                 SELECT
                     id AS user_id,
@@ -154,7 +159,7 @@ trait MerchantDepositObserver
                         'after' => $row->coin + $row->amount,
                         'currency' => $m->currency,
                     ]);
-                    DB::table('resellers')->where('id', $row->user_id)->increment('coin', $row->amount);
+                    DB::table('reseller_credits')->where('reseller_id', $row->user_id)->increment('coin', $row->amount);
                 }
             } catch (\Exception $e) {
                 DB::rollback();
@@ -174,6 +179,7 @@ trait MerchantDepositObserver
             case MerchantDeposit::STATUS['ENFORCED']:
                 $m->merchant->notify(new \App\Notifications\DepositFinish($m));
                 $m->callback_status = MerchantDeposit::CALLBACK_STATUS['PENDING'];
+                // push deposit information callback to callback url
                 // push deposit information callback to callback url
                 Queue::push((new \App\Jobs\GuzzleJob(
                     $m,

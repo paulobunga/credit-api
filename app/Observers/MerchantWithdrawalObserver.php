@@ -19,8 +19,10 @@ trait MerchantWithdrawalObserver
         static::creating(function ($m) {
             $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM merchant_withdrawals")[0]->ID ?? 0;
             $m->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(10);
-            if ($m->merchant->getWithdrawalCredit($m->currency) < ($m->amount +
-                $m->merchant->getPayOutFee($m->currency, $m->amount))) {
+            if (
+                $m->merchant->getWithdrawalCredit($m->currency) < ($m->amount +
+                $m->merchant->getPayOutFee($m->currency, $m->amount))
+            ) {
                 throw new \Exception("Amount exceed credit of merchant!", 405);
             }
         });
@@ -84,10 +86,12 @@ trait MerchantWithdrawalObserver
                 throw $e;
             }
             DB::commit();
-        } elseif (in_array($status, [
-            MerchantWithdrawal::STATUS['REJECTED'],
-            MerchantWithdrawal::STATUS['CANCELED'],
-        ])) {
+        } elseif (
+            in_array($status, [
+                MerchantWithdrawal::STATUS['REJECTED'],
+                MerchantWithdrawal::STATUS['CANCELED'],
+            ])
+        ) {
             if (
                 $status == MerchantWithdrawal::STATUS['REJECTED'] &&
                 $m->status != MerchantWithdrawal::STATUS['PENDING']
@@ -149,11 +153,11 @@ trait MerchantWithdrawalObserver
                     'user_type' => 'reseller',
                     'type' => Transaction::TYPE['SYSTEM_TOPUP_CREDIT'],
                     'amount' => $m->amount,
-                    'before' => $m->reseller->credit,
-                    'after' => $m->reseller->credit + $m->amount,
+                    'before' => $m->reseller->credits->credit,
+                    'after' => $m->reseller->credits->credit + $m->amount,
                     'currency' => $m->currency,
                 ]);
-                $m->reseller->increment(
+                $m->reseller->credits->increment(
                     'credit',
                     $m->amount
                 );
@@ -161,16 +165,18 @@ trait MerchantWithdrawalObserver
                 $rows = DB::select("
                 WITH agents AS (
                     SELECT
-                        id,
+                        r.id,
                         upline_id,
                         level,
                         name,
                         payout,
                         coin 
                     FROM
-                        resellers 
+                        resellers AS r
+                    INNER JOIN
+                        reseller_credits AS rc ON r.id = rc.reseller_id
                     WHERE
-                        id = {$m->reseller->id}
+                        r.id = {$m->reseller->id}
                     UNION ALL
                     SELECT
                         r.id,
@@ -178,7 +184,7 @@ trait MerchantWithdrawalObserver
                         r.level,
                         r.name,
                         r.payout,
-                        r.coin 
+                        rc.coin 
                     FROM
                     (
                         SELECT
@@ -193,7 +199,10 @@ trait MerchantWithdrawalObserver
                         temp.uplines,
                         CAST( r.id AS json ),
                         '$' 
-                    ) 
+                    )
+                    INNER JOIN
+                        reseller_credits AS rc
+                        ON r.id = rc.reseller_id
                 )
                 SELECT
                     id AS user_id,
@@ -217,7 +226,7 @@ trait MerchantWithdrawalObserver
                         'after' => $row->coin + $row->amount,
                         'currency' => $m->currency,
                     ]);
-                    DB::table('resellers')->where('id', $row->user_id)->increment('coin', $row->amount);
+                    DB::table('reseller_credits')->where('reseller_id', $row->user_id)->increment('coin', $row->amount);
                 }
             } catch (\Exception $e) {
                 DB::rollback();

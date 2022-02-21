@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Models\ResellerCredit;
 use App\Models\Team;
 
 trait ResellerObserver
@@ -19,12 +20,19 @@ trait ResellerObserver
         });
 
         static::created(function ($model) {
+            // auto add wallet for the model created.
+            ResellerCredit::create([
+                'reseller_id' => $model->id,
+                'credit' => 0,
+                'coin' => 0
+            ]);
+
             // auto-add online record after creation
             $model->online()->create([
                 'status' => 0
             ]);
 
-            // assign reseller to default team.
+            // auto assign reseller to default team.
             $teams = Team::where("currency", $model->currency)
                         ->where("name", "Default")
                         ->get();

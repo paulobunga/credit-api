@@ -93,6 +93,11 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
         return $this->hasMany(ResellerDeposit::class);
     }
 
+    public function credits()
+    {
+        return $this->hasOne(ResellerCredit::class);
+    }
+
     public function withdrawals()
     {
         return $this->hasMany(ResellerWithdrawal::class);
@@ -129,7 +134,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     public function getWithdrawalCreditAttribute()
     {
-        return $this->attributes['credit'] - $this->withdrawals()->where([
+        return $this->credits->attributes['credit'] - $this->withdrawals()->where([
             'type' => ResellerWithdrawal::TYPE['CREDIT'],
             'status' => ResellerWithdrawal::STATUS['PENDING']
         ])->sum('amount');
@@ -137,7 +142,7 @@ class Reseller extends Model implements AuthenticatableContract, AuthorizableCon
 
     public function getWithdrawalCoinAttribute()
     {
-        return $this->attributes['coin'] - $this->withdrawals()->where([
+        return $this->credits->attributes['coin'] - $this->withdrawals()->where([
             'type' => ResellerWithdrawal::TYPE['COIN'],
             'status' => ResellerWithdrawal::STATUS['PENDING']
         ])->sum('amount');

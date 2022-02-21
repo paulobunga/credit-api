@@ -22,8 +22,6 @@ class CreateTableResellers extends Migration
             $table->string('name')->unique()->index();
             $table->string('username')->unique()->index();
             $table->string('phone', 20);
-            $table->decimal('credit', 14, 4)->default(0);
-            $table->decimal('coin', 14, 4)->default(0);
             $table->string('currency', 6);
             $table->json('payin')->default(new Expression('(JSON_OBJECT())'));
             $table->json('payout')->default(new Expression('(JSON_OBJECT())'));
@@ -57,6 +55,14 @@ class CreateTableResellers extends Migration
             $table->timestamps();
         });
 
+        Schema::create('reseller_credits', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('reseller_id')->constrained();
+            $table->decimal('credit', 14, 4)->default(0);
+            $table->decimal('coin', 14, 4)->default(0);
+            $table->timestamps();
+        });
+
         Schema::create('reseller_withdrawals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reseller_id')->constrained();
@@ -71,6 +77,7 @@ class CreateTableResellers extends Migration
             $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
             $table->timestamps();
         });
+        
         Schema::create('reseller_sms', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('reseller_id');
@@ -101,6 +108,7 @@ class CreateTableResellers extends Migration
         Schema::dropIfExists('reseller_sms');
         Schema::dropIfExists('reseller_withdrawals');
         Schema::dropIfExists('reseller_deposits');
+        Schema::dropIfExists('reseller_credits');
         Schema::dropIfExists('reseller_bank_cards');
         Schema::dropIfExists('resellers');
     }

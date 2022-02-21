@@ -49,11 +49,11 @@ trait ResellerDepositObserver
                         'user_type' => 'reseller',
                         'type' => $m->transaction_type,
                         'amount' => $m->amount,
-                        'before' => $reseller->credit,
-                        'after' => $reseller->credit + $m->amount,
+                        'before' => $reseller->credits->credit,
+                        'after' => $reseller->credits->credit + $m->amount,
                         'currency' => $reseller->currency
                     ]);
-                    $reseller->increment('credit', $m->amount);
+                    $reseller->credits->increment('credit', $m->amount);
                 } catch (\Exception $e) {
                     Log::error($e->getMessage());
                     DB::rollback();
@@ -68,11 +68,11 @@ trait ResellerDepositObserver
                         'user_type' => 'reseller',
                         'type' => $m->transaction_type,
                         'amount' => $m->amount,
-                        'before' => $reseller->coin,
-                        'after' => $reseller->coin + $m->amount,
+                        'before' => $reseller->credits->coin,
+                        'after' => $reseller->credits->coin + $m->amount,
                         'currency' => $reseller->currency
                     ]);
-                    $reseller->increment('coin', $m->amount);
+                    $reseller->credits->increment('coin', $m->amount);
                 } catch (\Exception $e) {
                     Log::error($e->getMessage());
                     DB::rollback();
