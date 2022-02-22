@@ -16,6 +16,7 @@ use App\Models\Team;
 use App\Models\Merchant;
 use App\Models\Reseller;
 use App\Models\PaymentChannel;
+use App\Models\ResellerCredit;
 use App\Models\ResellerSms;
 use App\Models\ResellerDeposit;
 use App\Models\ResellerWithdrawal;
@@ -722,6 +723,41 @@ class ExecuteSql extends Command
                 $sms->payment_channel_id = $data['channel']->id;
             }
             $sms->save();
+        }
+    }
+
+    protected function createResellerCreditTable()
+    {
+        // Create Reseller Credit Table.
+        if (!Schema::hasTable('reseller_credits')) {
+            Schema::create('reseller_credits', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('reseller_id')
+                    ->constrained();
+                $table->decimal('credit', 14, 4)->default(0);
+                $table->decimal('coin', 14, 4)->default(0);
+                $table->timestamps();
+            });
+        }
+
+        // Migrate credits & coin from reseller table to reseller credit table.
+        foreach (Reseller::all() as $r) {
+            ResellerCredit::create([
+                'reseller_id' => $r->id,
+                'credit' => $r->credit,
+                'coin' => $r->coin
+            ]);
+        }
+
+        // Drop credits & coin column from reseller table.
+        if (
+            Schema::hasColumn('resellers', 'credit')
+            && Schema::hasColumn('resellers', 'coin')
+        ) {
+            Schema::table('resellers', function (Blueprint $table) {
+                $table->dropColumn(['credit']);
+                $table->dropColumn(['coin']);
+            });
         }
     }
 }

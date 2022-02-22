@@ -15,7 +15,7 @@ class BDT extends Base
                 r.id AS reseller_id,
                 rbc.id AS reseller_bank_card_id,
                 pc.NAME AS channel,
-                r.credit AS credit,
+                rc.credit AS credit,
                 r.currency AS currency,
                 COUNT(md.id) AS pending,
                 COALESCE(SUM(md.amount),0) AS pending_amount,
@@ -23,13 +23,14 @@ class BDT extends Base
             FROM
                 reseller_bank_cards AS rbc
                 LEFT JOIN resellers AS r ON rbc.reseller_id = r.id
+                LEFT JOIN reseller_credits AS rc ON r.id = rc.reseller_id
                 LEFT JOIN model_has_teams AS mht ON mht.model_id = r.id AND model_type = 'reseller'
                 LEFT JOIN teams AS t ON mht.team_id = t.id
                 LEFT JOIN payment_channels AS pc ON rbc.payment_channel_id = pc.id
                 LEFT JOIN merchant_deposits AS md ON md.reseller_bank_card_id = rbc.id AND md.status <= :md_status 
             WHERE
                 r.currency = '{$request->currency}'
-                AND r.credit >= {$request->amount}
+                AND rc.credit >= {$request->amount}
                 AND r.LEVEL = :r_level
                 AND r.STATUS = :r_status
                 AND r.payin->>'$.status' = :r_payin_status
@@ -40,7 +41,9 @@ class BDT extends Base
                 AND pc.currency = '{$request->currency}'
                 AND t.type = 'PAYIN'
                 AND t.name = '{$request->get('class', 'Default')}'
-                GROUP BY rbc.id
+            GROUP BY
+                rbc.id,
+                rc.id
             ),
             reseller_pending AS (
             SELECT

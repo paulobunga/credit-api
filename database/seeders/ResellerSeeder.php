@@ -41,7 +41,6 @@ class ResellerSeeder extends Seeder
                         array_merge($agent->uplines, [$agent->id]),
                     'level' =>  $level,
                     'currency' => $currency,
-                    'credit' => 0,
                     'payin' => [
                         'commission_percentage' => $c->getCommissionPercentage($currency, $level),
                         'pending_limit' => $rs->getDefaultPendingLimit($level),
@@ -79,8 +78,6 @@ class ResellerSeeder extends Seeder
             'password' => 'P@ssw0rd',
             'phone' => '+8865721455',
             'currency' => 'VND',
-            'credit' => 0,
-            'coin' => 0,
             'payin' => [
                 'commission_percentage' => $c->getCommissionPercentage('VND', Reseller::LEVEL['AGENT']),
                 'pending_limit' => $rs->default_pending_limit,

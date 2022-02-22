@@ -17,6 +17,7 @@ trait ResellerWithdrawalObserver
         static::creating(function ($m) {
             $last_insert_id = DB::select("SELECT MAX(id) AS ID FROM reseller_withdrawals")[0]->ID ?? 0;
             $m->order_id = Str::random(4) . ($last_insert_id + 1) . '@' . Str::random(20);
+            
             if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
                 if ($m->reseller->withdrawalCredit < $m->amount) {
                     throw new \Exception('Amount exceed coin of agent', 405);
@@ -52,7 +53,7 @@ trait ResellerWithdrawalObserver
         $reseller = $m->reseller;
         if ($status == ResellerWithdrawal::STATUS['APPROVED']) {
             if ($m->type == ResellerWithdrawal::TYPE['CREDIT']) {
-                if ($reseller->credit < $m->amount) {
+                if ($reseller->credits->credit < $m->amount) {
                     throw new \Exception('Amount exceed credit of agent', 405);
                 }
                 DB::beginTransaction();
@@ -62,11 +63,11 @@ trait ResellerWithdrawalObserver
                         'user_type' => 'reseller',
                         'type' => $m->transaction_type,
                         'amount' => $m->amount,
-                        'before' => $reseller->credit,
-                        'after' => $reseller->credit - $m->amount,
+                        'before' => $reseller->credits->credit,
+                        'after' => $reseller->credits->credit - $m->amount,
                         'currency' => $reseller->currency
                     ]);
-                    $reseller->decrement('credit', $m->amount);
+                    $reseller->credits->decrement('credit', $m->amount);
                 } catch (\Exception $e) {
                     Log::error($e->getMessage());
                     DB::rollback();
@@ -74,7 +75,7 @@ trait ResellerWithdrawalObserver
                 }
                 DB::commit();
             } elseif ($m->type == ResellerWithdrawal::TYPE['COIN']) {
-                if ($reseller->coin < $m->amount) {
+                if ($reseller->credits->coin < $m->amount) {
                     throw new \Exception('Amount exceed coin of agent', 405);
                 }
                 DB::beginTransaction();
@@ -84,11 +85,11 @@ trait ResellerWithdrawalObserver
                         'user_type' => 'reseller',
                         'type' => $m->transaction_type,
                         'amount' => $m->amount,
-                        'before' => $reseller->coin,
-                        'after' => $reseller->coin - $m->amount,
+                        'before' => $reseller->credits->coin,
+                        'after' => $reseller->credits->coin - $m->amount,
                         'currency' => $reseller->currency
                     ]);
-                    $reseller->decrement('coin', $m->amount);
+                    $reseller->credits->decrement('coin', $m->amount);
                 } catch (\Exception $e) {
                     Log::error($e->getMessage());
                     DB::rollback();
