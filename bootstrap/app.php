@@ -121,6 +121,7 @@ if (class_exists(\Knuckles\Scribe\ScribeServiceProvider::class)) {
     $app->register(\Knuckles\Scribe\ScribeServiceProvider::class);
     $app->configure('scribe');
 }
+$app->register(App\Services\MaintenanceMode\Providers\MaintenanceServiceProvider::class);
 $app->register(App\Providers\BroadcastServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\RouteServiceProvider::class);
