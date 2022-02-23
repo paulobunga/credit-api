@@ -40,18 +40,4 @@ class ReportController extends Controller
             \App\Transformers\Merchant\ReportTransformer::class
         );
     }
-
-    public function month(Request $request)
-    {
-        $reports = QueryBuilder::for(
-            \App\Models\ReportMonthlyMerchant::class::where('merchant_id', Auth::id())
-                ->limit(6)
-        )
-            ->allowedFilters([])
-            ->paginate($this->perPage);
-        return $this->response->withPaginator(
-            $reports,
-            \App\Transformers\Reseller\ReportMonthlyTransformer::class
-        );
-    }
 }
