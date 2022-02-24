@@ -55,6 +55,45 @@ class CheckOnline extends Command
                 $reseller_ids['offline'][] = $r->id;
             }
         }
+
+        $agents = Reseller::with('online')->where([
+            'level' => Reseller::LEVEL['AGENT'],
+        ])
+            ->where(function ($query) {
+                $query->where('payin->status', true)
+                    ->orWhere('payout->status', true);
+            })
+            ->whereIn('currency', ['BDT', 'INR'])
+            ->whereIn('id', $reseller_ids['offline'])
+            ->whereRelation('online', 'status', 1)
+            ->get();
+
+        foreach ($agents as $agent) {
+            $agent->payin->status = false;
+            $agent->payout->status = false;
+            $agent->save();
+            $notification = new PayInOutOff($agent);
+            broadcast(new \App\Events\AdminNotification($notification->toArray($agent), $notification));
+        }
+
+        $agents = Reseller::with('online')->where([
+            'level' => Reseller::LEVEL['AGENT'],
+        ])
+            ->where(function ($query) {
+                $query->where('payin->status', false)
+                    ->orWhere('payout->status', false);
+            })
+            ->whereIn('currency', ['BDT', 'INR'])
+            ->whereIn('id', $reseller_ids['online'])
+            ->whereRelation('online', 'status', 0)
+            ->get();
+
+        foreach ($agents as $agent) {
+            $agent->payin->status = true;
+            $agent->payout->status = true;
+            $agent->save();
+        }
+
         // massive update
         Online::where('user_type', 'reseller')
             ->whereIn('user_id', $reseller_ids['online'])
@@ -65,39 +104,5 @@ class CheckOnline extends Command
         Online::where('user_type', 'reseller')
             ->whereIn('user_id', $reseller_ids['offline'])
             ->update(['status' => 0]);
-
-        $agents = Reseller::where([
-            'level' => Reseller::LEVEL['AGENT'],
-        ])
-            ->where(function ($query) {
-                $query->where('payin->status', true)
-                    ->orWhere('payout->status', true);
-            })
-            ->whereIn('currency', ['BDT', 'INR'])
-            ->whereIn('id', $reseller_ids['offline'])->get();
-
-        foreach ($agents as $agent) {
-            $agent->payin->status = false;
-            $agent->payout->status = false;
-            $agent->save();
-            $notification = new PayInOutOff($agent);
-            broadcast(new \App\Events\AdminNotification($notification->toArray($agent), $notification));
-        }
-
-        $agents = Reseller::where([
-            'level' => Reseller::LEVEL['AGENT'],
-        ])
-            ->where(function ($query) {
-                $query->where('payin->status', false)
-                    ->orWhere('payout->status', false);
-            })
-            ->whereIn('currency', ['BDT', 'INR'])
-            ->whereIn('id', $reseller_ids['online'])->get();
-
-        foreach ($agents as $agent) {
-            $agent->payin->status = true;
-            $agent->payout->status = true;
-            $agent->save();
-        }
     }
 }
