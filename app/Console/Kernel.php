@@ -14,6 +14,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
+        \App\Services\MaintenanceMode\Console\Commands\DownCommand::class,
+        \App\Services\MaintenanceMode\Console\Commands\UpCommand::class,
         \App\Console\Commands\ReportDaily::class,
         \App\Console\Commands\PermissionList::class,
         \App\Console\Commands\CheckActivate::class,

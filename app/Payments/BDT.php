@@ -3,6 +3,9 @@
 namespace App\Payments;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Notifications\DepositTransfer;
+use App\Notifications\DepositPending;
 use App\Models\ResellerSms;
 use App\Models\MerchantDeposit;
 
@@ -70,39 +73,59 @@ class BDT extends Base
         $sms = ResellerSms::where(
             [
                 'payment_channel_id' => $channel->id,
-                'reseller_id' => $deposit->reseller->id,
+                // 'reseller_id' => $deposit->reseller->id,
                 'status' => ResellerSms::STATUS['PENDING'],
             ],
-        )->whereIn(
-            'address',
-            $channel->payin->sms_addresses
         )->where('created_at', '>=', Carbon::now()->subHours(24))
-        ->orderByDesc('id')->get();
+            ->where('payer', $deposit->extra['sender_mobile_number'])
+            ->where('amount', $deposit->amount)
+            ->orderByDesc('id')->get();
 
-        $count = 0;
-        $match = null;
-        $match_data = null;
-        foreach ($sms as $k => $s) {
-            $data = ResellerSms::parse($s->toArray(), [$channel]);
-            if (
-                $data['amount'] == $deposit->amount &&
-                $data['payer'] == $deposit->extra['sender_mobile_number']
-            ) {
-                $match = $sms[$k];
-                $match_data = $data;
-                ++$count;
-            }
+        $agent_sms = $sms->filter(fn ($sms) => $sms->reseller_id == $deposit->reseller->id);
+        if ($agent_sms->count() == 1) {
+            $sms = $agent_sms->first();
+        } elseif ($sms->count() == 1) {
+            $sms = $sms->first();
+        } else {
+            return;
         }
-        if ($count == 1) {
+
+        $hasNotification = false;
+        DB::beginTransaction();
+        if ($sms->reseller_id != $deposit->reseller->id) {
+            $hasNotification = true;
+            $transfer_from = $deposit->reseller;
+            $transfer_to = $sms->reseller;
+            $bankcard = $transfer_to->bankCards()->where([
+                'payment_channel_id' => $channel->id,
+                // 'attributes->wallet_number' => $sms->sim_num
+            ])->first();
+            if (!$bankcard) {
+                return;
+            }
             $deposit->update([
-                'status' => MerchantDeposit::STATUS['APPROVED'],
-                'extra' => ['reference_id' => $match_data['trx_id']]
+                'reseller_bank_card_id' => $bankcard->id
             ]);
-            $match->update([
+            $deposit->refresh();
+        }
+        try {
+            $sms->update([
                 'model_id' => $deposit->id,
                 'model_name' => 'merchant.deposit',
                 'status' => ResellerSms::STATUS['MATCH'],
             ]);
+            $deposit->update([
+                'status' => MerchantDeposit::STATUS['APPROVED'],
+                'extra' => ['reference_id' => $sms->trx_id]
+            ]);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+        if ($hasNotification) {
+            $transfer_from->notify(new \App\Notifications\DepositTransfer($deposit));
+            $transfer_to->notify(new \App\Notifications\DepositPending($deposit));
         }
     }
 }

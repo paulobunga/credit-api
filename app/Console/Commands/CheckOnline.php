@@ -83,5 +83,21 @@ class CheckOnline extends Command
             $notification = new PayInOutOff($agent);
             broadcast(new \App\Events\AdminNotification($notification->toArray($agent), $notification));
         }
+
+        $agents = Reseller::where([
+            'level' => Reseller::LEVEL['AGENT'],
+        ])
+            ->where(function ($query) {
+                $query->where('payin->status', false)
+                    ->orWhere('payout->status', false);
+            })
+            ->whereIn('currency', ['BDT', 'INR'])
+            ->whereIn('id', $reseller_ids['online'])->get();
+
+        foreach ($agents as $agent) {
+            $agent->payin->status = true;
+            $agent->payout->status = true;
+            $agent->save();
+        }
     }
 }

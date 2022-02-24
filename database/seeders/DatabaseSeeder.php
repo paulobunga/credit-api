@@ -22,7 +22,6 @@ class DatabaseSeeder extends Seeder
             ResellerBankCardSeeder::class,
             MerchantSeeder::class,
             MerchantDepositSeeder::class,
-            ReportSeeder::class,
         ]);
     }
 }

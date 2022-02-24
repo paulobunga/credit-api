@@ -33,9 +33,9 @@ class WithdrawalTransfer extends Base
     {
         return [
             'id' => $this->model->id,
-            'title' => 'Transfer cash out order',
-            'body' => "Your cash out order {$this->model->merchant_order_id} was transfered to another agent.",
-            'time' => $this->model->created_at->toDateTimeString(),
+            'title' => 'Transfer payout order',
+            'body' => "Your payout order {$this->model->merchant_order_id} was transfered to another agent.",
+            'time' => $this->model->created_at->format('Y-m-d\TH:i:s.uP')
         ];
     }
 }

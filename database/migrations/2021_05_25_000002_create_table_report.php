@@ -17,7 +17,7 @@ class CreateTableReport extends Migration
         Schema::create('report_daily_merchants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('merchant_id')
-                  ->constrained();
+                ->constrained();
             $table->datetime('start_at');
             $table->datetime('end_at');
             $table->unsignedInteger('turnover');
@@ -28,40 +28,16 @@ class CreateTableReport extends Migration
             $table->timestamp('created_at')->useCurrent();
         });
 
-        Schema::create('report_monthly_merchants', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('merchant_id')
-                  ->constrained();
-            $table->date('date');
-            $table->unsignedInteger('turnover');
-            $table->decimal('payin', 14, 4);
-            $table->decimal('payout', 14, 4);
-            $table->string('currency', 6);
-            $table->timestamp('created_at')->useCurrent();
-        });
-
         Schema::create('report_daily_resellers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reseller_id')
-                  ->constrained();
+                ->constrained();
             $table->datetime('start_at');
             $table->datetime('end_at');
             $table->unsignedInteger('turnover');
             $table->decimal('credit', 14, 4);
             $table->decimal('coin', 14, 4);
             $table->json('extra')->default(new Expression('(JSON_OBJECT())'));
-            $table->timestamp('created_at')->useCurrent();
-        });
-
-        Schema::create('report_monthly_resellers', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('reseller_id')
-                  ->constrained();
-            $table->date('date');
-            $table->unsignedInteger('turnover');
-            $table->decimal('payin', 14, 4);
-            $table->decimal('payout', 14, 4);
-            $table->decimal('coin', 14, 4);
             $table->timestamp('created_at')->useCurrent();
         });
     }
@@ -75,7 +51,5 @@ class CreateTableReport extends Migration
     {
         Schema::dropIfExists('report_daily_merchants');
         Schema::dropIfExists('report_daily_resellers');
-        Schema::dropIfExists('report_monthly_merchants');
-        Schema::dropIfExists('report_monthly_resellers');
     }
 }

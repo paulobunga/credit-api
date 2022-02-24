@@ -760,4 +760,10 @@ class ExecuteSql extends Command
             });
         }
     }
+
+    protected function dropMonthlyReportTable()
+    {
+        Schema::dropIfExists('report_monthly_merchants');
+        Schema::dropIfExists('report_monthly_resellers');
+    }
 }
