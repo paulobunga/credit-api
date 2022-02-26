@@ -337,7 +337,7 @@ class WithdrawalController extends Controller
                     AND r.payout->>'$.max' >= {$request->amount}
                     AND r.LEVEL = :r_level
                     AND t.type = 'PAYOUT'
-                    AND t.name = '{$request->get('class', 'Default')}'
+                    AND t.`name` = '{$request->get('class', 'Default')}'
                 GROUP BY r.id
                 ),
                 reseller_daily AS (
