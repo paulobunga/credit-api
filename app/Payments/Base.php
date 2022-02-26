@@ -42,7 +42,7 @@ abstract class Base
                 AND pc.payin->>'$.status' = :pc_status
                 AND pc.currency = '{$request->currency}'
                 AND t.type = 'PAYIN'
-                AND t.name = '{$request->get('class', 'Default')}'
+                AND t.`name` = '{$request->get('class', 'Default')}'
             GROUP BY
                 rbc.id,
                 rc.id
