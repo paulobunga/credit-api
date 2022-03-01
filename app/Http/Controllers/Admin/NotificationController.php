@@ -58,9 +58,9 @@ class NotificationController extends Controller
 
         $notifications = auth()->user()->notifications()->whereIn('id', $request->id);
         if ($request->mark_type == "read") {
-            $notifications->update(['read_at' => Carbon::now()]);
+            $notifications->get()->markAsRead();
         } else {
-            $notifications->update(['read_at' => null]);
+            $notifications->get()->markAsUnread();
         }
 
         return $this->paginate(
@@ -77,9 +77,10 @@ class NotificationController extends Controller
      */
     public function destroy(Request $request)
     {
-        $notification = auth()->user()->notifications()->where('id', $this->parameters('notification'))->first();
-        if ($notification->count() === 0) {
-            throw new \Exception("Notification not found!");
+        if ($request->has('ids')) {
+            $notification = auth()->user()->notifications()->whereIn('id', $request->ids);
+        } else {
+            $notification = auth()->user()->notifications()->findOrFail($this->parameters('notification'));
         }
         $notification->delete();
 
